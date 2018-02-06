@@ -78,7 +78,7 @@ namespace sp { namespace graphics { namespace ui {
 		renderer.DrawRect(m_HeadBounds);
 
 		vec2 offset = m_Vertical ? vec2(0, m_Bounds.size.y) : vec2(m_Bounds.size.x, 0);
-		renderer.DrawLine(m_Bounds.position - offset, m_Bounds.position + offset);
+		renderer.DrawLine((vec2) m_Bounds.position.Subtract(offset), (vec2) m_Bounds.position.Add(offset));
 	}
 
 	void Slider::SetValue(float value)

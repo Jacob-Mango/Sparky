@@ -7,13 +7,16 @@
 #include "sp/utils/Log.h"
 
 #include <GL/glew.h>
+#include <GL/wglew.h>
 
 namespace sp { namespace graphics { namespace API {
 
 	static HDC hDc;
 
-	GLContext::GLContext(WindowProperties, void* deviceContext)
+	GLContext::GLContext(WindowProperties* properties, void* deviceContext)
 	{
+		m_Properties = properties;
+
 		hDc = GetDC((HWND)deviceContext);
 		HGLRC hrc = wglCreateContext(hDc);
 		if (hrc)
@@ -35,10 +38,12 @@ namespace sp { namespace graphics { namespace API {
 			SP_FATAL("Could not initialize GLEW!");
 			SP_ASSERT(false);
 		}
+
 	}
 
 	void GLContext::Present()
 	{
+		wglSwapIntervalEXT(m_Properties->vsync);
 		SwapBuffers(hDc);
 	}
 

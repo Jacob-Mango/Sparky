@@ -170,14 +170,14 @@ namespace sp { namespace debug {
 	template<typename T>
 	struct ValueAction : public IAction
 	{
-		using Getter = std::function<T()>;
-		using Setter = std::function<void(T)>;
+		using Getter = std::function<const T&()>;
+		using Setter = std::function<void(const T&)>;
 	private:
 		Getter m_Getter;
 		Setter m_Setter;
-		T m_Min, m_Max;
+		const T& m_Min, m_Max;
 	public:
-		ValueAction(const String& name, const Getter& getter, const Setter& setter, T minValue, T maxValue)
+		ValueAction(const String& name, const Getter& getter, const Setter& setter, const T& minValue, const T& maxValue)
 			: m_Getter(getter), m_Setter(setter), m_Min(minValue), m_Max(maxValue) { this->name = name; }
 
 		void OnAction() override

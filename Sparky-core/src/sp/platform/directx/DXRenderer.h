@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sp/graphics/Renderer.h"
+#include "sp/graphics/API/Renderer.h"
 #include "DXContext.h"
 
 namespace sp { namespace graphics {

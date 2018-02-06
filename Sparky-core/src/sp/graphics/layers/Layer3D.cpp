@@ -1,11 +1,10 @@
 #include "sp/sp.h"
 #include "Layer3D.h"
 
-#include "../DeferredRenderer.h"
 
 namespace sp { namespace graphics {
 
-	Layer3D::Layer3D(Scene* scene, Renderer3D* renderer)
+	Layer3D::Layer3D(world::World* scene, Renderer3D* renderer)
 		: m_Scene(scene), m_Renderer(renderer)
 	{
 	}
@@ -18,10 +17,11 @@ namespace sp { namespace graphics {
 
 	void Layer3D::Init()
 	{
-		OnInit(*m_Renderer, *m_Scene);
+		OnInit(m_Renderer, m_Scene);
+		m_Renderer->Init();
 	}
 
-	void Layer3D::OnInit(Renderer3D& renderer, Scene& scene)
+	void Layer3D::OnInit(Renderer3D* renderer, world::World* scene)
 	{
 	}
 
@@ -33,6 +33,7 @@ namespace sp { namespace graphics {
 
 	void Layer3D::OnUpdateInternal(const Timestep& ts)
 	{
+		m_Scene->OnUpdate(ts);
 		OnUpdate(ts);
 	}
 
@@ -43,7 +44,7 @@ namespace sp { namespace graphics {
 
 	void Layer3D::OnRender(Renderer3D& renderer)
 	{
-		m_Scene->Render(renderer);
+		m_Scene->OnRender(renderer);
 		renderer.Present();
 	}
 

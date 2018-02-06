@@ -8,8 +8,7 @@
 #include "API/VertexBuffer.h"
 #include "API/IndexBuffer.h"
 #include "shaders/Shader.h"
-
-#include "../maths/maths.h"
+#include "sp/maths/maths.h"
 
 namespace sp { namespace graphics {
 

@@ -29,9 +29,20 @@ namespace sp { namespace graphics { namespace API {
 		m_Buffers.front()->Unbind();
 	}
 
-	void GLVertexArray::Draw(uint count) const
+	GLenum SPRenderTypeToGL(RenderType type)
 	{
-		GLCall(glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, NULL));
+		switch (type)
+		{
+		case TRIANGLES: return GL_TRIANGLES;
+		case POINTS: return GL_POINTS;
+		case LINES: return GL_LINES;
+		default: return GL_TRIANGLES;
+		}
+	}
+
+	void GLVertexArray::Draw(RenderType type, uint count) const
+	{
+		GLCall(glDrawElements(SPRenderTypeToGL(type), count, GL_UNSIGNED_INT, NULL));
 	}
 
 } } }

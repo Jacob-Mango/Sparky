@@ -3,8 +3,13 @@
 
 namespace sp { namespace entity { namespace component {
 
-	TransformComponent::TransformComponent(const maths::mat4& transform)
+	TransformComponent::TransformComponent(maths::mat4* transform)
 		: transform(transform)
+	{
+	}
+
+	TransformComponent::TransformComponent(maths::mat4& transform)
+		: transform(&transform)
 	{
 	}
 

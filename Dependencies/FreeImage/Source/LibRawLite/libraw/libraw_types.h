@@ -24,7 +24,9 @@ it under the terms of the one of three licenses as you choose:
 #define _LIBRAW_TYPES_H
 
 #include <sys/types.h>
-#ifndef WIN32
+#ifdef WIN64
+#elif WIN32
+#else
 #include <sys/time.h>
 #endif
 #include <stdio.h>

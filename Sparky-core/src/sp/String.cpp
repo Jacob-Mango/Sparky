@@ -134,4 +134,29 @@ namespace sp {
 		return -1;
 	}
 
+	bool StringEquals(const String& string1, const String& string2)
+	{
+		return strcmp(string1.c_str(), string2.c_str()) == 0;
+	}
+
+	String StringReplace(String str, char ch1, char ch2) {
+		for (int i = 0; i < str.length(); ++i) {
+			if (str[i] == ch1)
+				str[i] = ch2;
+		}
+
+		return str;
+	}
+
+	String StringReplace(String str, char ch) {
+		for (int i = 0; i < str.length(); ++i) {
+			if (str[i] == ch)
+			{
+				str = String(str).substr(0, i) + String(str).substr(i + 1, str.length());
+			}
+		}
+
+		return str;
+	}
+
 }

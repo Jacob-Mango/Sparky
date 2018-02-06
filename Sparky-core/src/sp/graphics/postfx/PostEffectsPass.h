@@ -2,7 +2,7 @@
 
 #include "sp/Common.h"
 #include "sp/graphics/API/Framebuffer.h"
-#include "../Material.h"
+#include "../material/Material.h"
 
 namespace sp { namespace graphics {
 
@@ -14,7 +14,7 @@ namespace sp { namespace graphics {
 		PostEffectsPass(API::Shader* shader);
 		~PostEffectsPass();
 
-		void RenderPass(Framebuffer* target);
+		void RenderPass(API::Framebuffer* target);
 	};
 
 } }

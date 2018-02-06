@@ -18,11 +18,13 @@ namespace sp {
 		internal::System::Init();
 		PlatformInit();
 
-		debug::DebugMenu::Init();
-		// debug::DebugRenderer::Init();
+		if (!IsServer()) {
+			debug::DebugMenu::Init();
+			debug::DebugRenderer::Init();
 
-		m_DebugLayer = spnew debug::DebugLayer();
-		m_DebugLayer->Init();
+			m_DebugLayer = spnew debug::DebugLayer();
+			m_DebugLayer->Init();
+		}
 	}
 
 	void Application::PushLayer(Layer* layer)
@@ -81,7 +83,7 @@ namespace sp {
 	void Application::OnEvent(events::Event& event)
 	{
 		m_DebugLayer->OnEvent(event);
-		if (event.IsHandled()) // TODO(Yan): Maybe this shouldn't happen
+		if (event.IsHandled())
 			return;
 
 		for (int32 i = m_OverlayStack.size() - 1; i >= 0; i--)
@@ -101,7 +103,7 @@ namespace sp {
 
 	void Application::OnTick()
 	{
-		m_DebugLayer->OnTick();
+		if (!IsServer()) m_DebugLayer->OnTick();
 
 		for (uint i = 0; i < m_OverlayStack.size(); i++)
 			m_OverlayStack[i]->OnTick();
@@ -112,7 +114,7 @@ namespace sp {
 
 	void Application::OnUpdate(const Timestep& ts)
 	{
-		m_DebugLayer->OnUpdate(ts);
+		if (!IsServer()) m_DebugLayer->OnUpdate(ts);
 
 		for (uint i = 0; i < m_OverlayStack.size(); i++)
 			m_OverlayStack[i]->OnUpdateInternal(ts);
@@ -139,9 +141,9 @@ namespace sp {
 		if (debugLayer->IsVisible())
 			debugLayer->OnRender();
 
-		// debug::DebugRenderer::Present();
+		debug::DebugRenderer::Present();
 	}
-	
+
 	String Application::GetBuildConfiguration()
 	{
 #if defined(SP_DEBUG)
@@ -151,6 +153,5 @@ namespace sp {
 #else
 		return "Unknown Build Configuration";
 #endif
-
 	}
 }

@@ -8,57 +8,87 @@
 
 #include "sp/system/Memory.h"
 
-namespace sp { namespace graphics { namespace API {
+namespace sp {
+	namespace graphics {
+		namespace API {
 
-	const Shader* Shader::s_CurrentlyBound = nullptr;
+			const Shader* Shader::s_CurrentlyBound = nullptr;
 
-	Shader* Shader::CreateFromFile(const String& name, const String& filepath, void* address)
-	{
-		String source = VFS::Get()->ReadTextFile(filepath);
-
-		// TODO: Fix dynamic shader reloading
-		switch (Context::GetRenderAPI())
-		{
-			case RenderAPI::OPENGL:
+			Shader* Shader::CreateFromFile(const String& name, const String& filepath, void* address)
 			{
-				GLShader* result = address ? new(address) GLShader(name, source) : spnew GLShader(name, source);
-				result->m_Path = filepath;
-				return result;
+				String source = VFS::Get()->ReadTextFile(filepath);
+
+				// TODO: Fix dynamic shader reloading
+				switch (Context::GetRenderAPI())
+				{
+				case RenderAPI::OPENGL:
+				{
+					GLShader* result = address ? new(address) GLShader(name, source) : spnew GLShader(name, source);
+					result->m_Path = filepath;
+					return result;
+				}
+				case RenderAPI::DIRECT3D:
+				{
+					D3DShader* result = address ? new(address) D3DShader(name, source) : spnew D3DShader(name, source);
+					result->m_FilePath = filepath;
+					return result;
+				}
+				}
+				return nullptr;
 			}
-			case RenderAPI::DIRECT3D:
+
+			Shader* Shader::CreateFromName(const String& name, void* address) {
+				String folder = String("/shaders/").append(name).append("/").append(name);
+				String type = (API::Context::GetRenderAPI() == RenderAPI::OPENGL ? ".shader" : ".hlsl");
+				String filepath = folder + type;
+
+				String source = VFS::Get()->ReadTextFile(filepath);
+
+				// TODO: Fix dynamic shader reloading
+				switch (Context::GetRenderAPI())
+				{
+				case RenderAPI::OPENGL:
+				{
+					GLShader* result = address ? new(address) GLShader(name, source) : spnew GLShader(name, source);
+					result->m_Path = filepath;
+					return result;
+				}
+				case RenderAPI::DIRECT3D:
+				{
+					D3DShader* result = address ? new(address) D3DShader(name, source) : spnew D3DShader(name, source);
+					result->m_FilePath = filepath;
+					return result;
+				}
+				}
+				return nullptr;
+			}
+
+			Shader* Shader::CreateFromSource(const String& name, const String& source)
 			{
-				D3DShader* result = address ? new(address) D3DShader(name, source) : spnew D3DShader(name, source);
-				result->m_FilePath = filepath;
-				return result;
+				switch (Context::GetRenderAPI())
+				{
+				case RenderAPI::OPENGL:		return spnew GLShader(name, source);
+				case RenderAPI::DIRECT3D:	return spnew D3DShader(name, source);
+				}
+				return nullptr;
 			}
+
+			bool Shader::TryCompile(const String& source, String& error)
+			{
+				switch (Context::GetRenderAPI())
+				{
+				case RenderAPI::OPENGL:		return GLShader::TryCompile(source, error);
+				case RenderAPI::DIRECT3D:	return D3DShader::TryCompile(source, error);
+				}
+				return nullptr;
+			}
+
+			bool Shader::TryCompileFromFile(const String& filepath, String& error)
+			{
+				String source = VFS::Get()->ReadTextFile(filepath);
+				return TryCompile(source, error);
+			}
+
 		}
-		return nullptr;
 	}
-
-	Shader* Shader::CreateFromSource(const String& name, const String& source)
-	{
-		switch (Context::GetRenderAPI())
-		{
-			case RenderAPI::OPENGL:		return spnew GLShader(name, source);
-			case RenderAPI::DIRECT3D:	return spnew D3DShader(name, source);
-		}
-		return nullptr;
-	}
-
-	bool Shader::TryCompile(const String& source, String& error)
-	{
-		switch (Context::GetRenderAPI())
-		{
-			case RenderAPI::OPENGL:		return GLShader::TryCompile(source, error);
-			case RenderAPI::DIRECT3D:	return D3DShader::TryCompile(source, error);
-		}
-		return nullptr;
-	}
-
-	bool Shader::TryCompileFromFile(const String& filepath, String& error)
-	{
-		String source = VFS::Get()->ReadTextFile(filepath);
-		return TryCompile(source, error);
-	}
-
-} } }
+}

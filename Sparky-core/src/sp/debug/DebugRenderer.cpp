@@ -14,6 +14,18 @@ namespace sp { namespace debug {
 	using namespace graphics;
 	using namespace maths;
 
+	enum VSSystemUniformIndices : int32
+	{
+		VSSystemUniformIndex_ProjectionMatrix = 0,
+		VSSystemUniformIndex_ViewMatrix = 1,
+		VSSystemUniformIndex_Size
+	};
+
+	static byte* m_VSSystemUniformBuffer;
+	static uint m_VSSystemUniformBufferSize;
+
+	static std::vector<uint> m_VSSystemUniformBufferOffsets;
+
 	struct LineVertex
 	{
 		vec3 position;
@@ -52,6 +64,15 @@ namespace sp { namespace debug {
 		buffer->Unbind();
 		s_VertexArray->Unbind();
 		s_IndexCount = 0;
+
+
+		m_VSSystemUniformBufferSize = sizeof(mat4) + sizeof(mat4);
+		m_VSSystemUniformBuffer = spnew byte[m_VSSystemUniformBufferSize];
+		memset(m_VSSystemUniformBuffer, 0, m_VSSystemUniformBufferSize);
+		m_VSSystemUniformBufferOffsets.resize(VSSystemUniformIndex_Size);
+
+		m_VSSystemUniformBufferOffsets[VSSystemUniformIndex_ProjectionMatrix] = 0;
+		m_VSSystemUniformBufferOffsets[VSSystemUniformIndex_ViewMatrix] = m_VSSystemUniformBufferOffsets[VSSystemUniformIndex_ProjectionMatrix] + sizeof(mat4);
 	}
 
 	void DebugRenderer::Shutdown()
@@ -61,13 +82,17 @@ namespace sp { namespace debug {
 		delete s_IndexBuffer;
 	}
 
-	static void Begin()
+	void DebugRenderer::Begin()
 	{
 		s_VertexArray->GetBuffer()->Bind();
 		s_LineVertexPointer = s_VertexArray->GetBuffer()->GetPointer<LineVertex>();
+
+		memcpy(m_VSSystemUniformBuffer + m_VSSystemUniformBufferOffsets[VSSystemUniformIndex_ProjectionMatrix], &s_Camera->GetProjectionMatrix(), sizeof(mat4));
+		memcpy(m_VSSystemUniformBuffer + m_VSSystemUniformBufferOffsets[VSSystemUniformIndex_ViewMatrix], &s_Camera->GetViewMatrix(), sizeof(mat4));
+
 	}
 
-	static void End()
+	void DebugRenderer::End()
 	{
 		s_VertexArray->GetBuffer()->ReleasePointer();
 		s_VertexArray->GetBuffer()->Unbind();
@@ -128,18 +153,14 @@ namespace sp { namespace debug {
 		if (!s_Camera)
 			return;
 
-		/*GLCall(glEnable(GL_DEPTH_TEST));
 		s_Shader->Bind();
-		// TODO: set this to use uniform declaration!
-		s_Shader->SetUniformMat4("pr_matrix", s_Camera->GetProjectionMatrix());
-		s_Shader->SetUniformMat4("vw_matrix", s_Camera->GetViewMatrix());
-
 		s_VertexArray->Bind();
 		s_IndexBuffer->Bind();
-		s_VertexArray->Draw(s_IndexCount, GL_LINES);
+		s_VertexArray->Draw(RenderType::LINES, s_IndexCount);
 		s_IndexBuffer->Unbind();
 		s_VertexArray->Unbind();
-		s_IndexCount = 0;*/
+		s_Shader->Unbind();
+		s_IndexCount = 0;
 	}
 
 } }

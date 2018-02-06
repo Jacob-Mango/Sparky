@@ -26,9 +26,9 @@ namespace sp { namespace graphics { namespace API {
 		ID3D11Debug* m_DebugLayer;
 
 		// Temp
-		WindowProperties m_Properties;
+		WindowProperties* m_Properties;
 	public:
-		D3DContext(WindowProperties properties, void* deviceContext);
+		D3DContext(WindowProperties* properties, void* deviceContext);
 
 		void Present();
 	private:

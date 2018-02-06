@@ -13,7 +13,7 @@ using namespace API;
 #define DEBUG_MENU(name, var, min, max) debug::DebugMenu::Add("Test3D/" ## name, var, min, max)
 
 Test3D::Test3D()
-	: Layer3D(spnew Scene())
+	: Layer3D(spnew graphics::Scene())
 {
 	m_MayaCamera = m_Scene->GetCamera();
 	m_FPSCamera = spnew FPSCamera(maths::mat4::Perspective(65.0f, 16.0f / 9.0f, 0.1f, 1000.0f));

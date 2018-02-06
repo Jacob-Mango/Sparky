@@ -6,6 +6,8 @@
 
 #include "LightSetup.h"
 
+#define NUMBONES 64
+
 namespace sp { namespace graphics {
 
 	typedef std::vector<RenderCommand> CommandQueue;
@@ -33,13 +35,16 @@ namespace sp { namespace graphics {
 		virtual void BeginScene(Camera* camera) = 0;
 		// TODO: Submit needs to be replaced by some sort of macro
 		virtual void Submit(const RenderCommand& command) = 0;
-		virtual void SubmitMesh(Mesh* mesh, const maths::mat4& transform) = 0;
+		virtual void SubmitMesh(Mesh* mesh, const maths::mat4& transform, maths::mat4 joints[NUMBONES], Bone* rootBone) = 0;
 		virtual void SubmitLightSetup(const LightSetup& lightSetup) = 0;
 		virtual void EndScene() = 0;
 		virtual void End() = 0;
 		virtual void Present() = 0;
 
 		virtual void SetScreenBufferSize(uint width, uint height) { m_ScreenBufferWidth = width; m_ScreenBufferHeight = height; }
+
+	protected:
+		virtual void PerformBoneTransforms(Bone* bone, maths::mat4 joints[NUMBONES], std::vector<maths::mat4> &matArray) = 0;
 	};
 
 } }

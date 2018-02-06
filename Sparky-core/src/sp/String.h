@@ -65,4 +65,8 @@ namespace sp {
 	bool StartsWith(const String& string, const String& start);
 	int32 NextInt(const String& string);
 
+	bool StringEquals(const String& string1, const String& string2);
+	String StringReplace(String str, char ch1, char ch2);
+	String StringReplace(String str, char ch);
+
 }

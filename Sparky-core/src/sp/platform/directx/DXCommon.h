@@ -1,12 +1,29 @@
 #pragma once
 
+#ifndef DX_COMMON_H
+#define DX_COMMON_H
+
 #include <d3d11.h>
 #include <d3dcompiler.h>
+
+#include "../../utils/Log.h"
+
+#include <comdef.h>
+
+#include <stdarg.h>
+#include <memory>
+
+
+std::string string_format(const std::string fmt_str, ...);
 
 static bool CheckD3DError(HRESULT result)
 {
 	if (result == S_OK)
 		return true;
+
+	_com_error error(result);
+	
+	SP_ERROR("Error ", result, ": ", error.ErrorMessage());
 
 	switch (result)
 	{
@@ -25,6 +42,7 @@ static bool CheckD3DError(HRESULT result)
 	case E_FAIL:
 		break;
 	case E_INVALIDARG:
+		// return true;
 		break;
 	case E_OUTOFMEMORY:
 		break;
@@ -44,4 +62,6 @@ static bool CheckD3DError(HRESULT result)
 		} while(false)
 #else
 	#define DXCall(x) x
+#endif
+
 #endif

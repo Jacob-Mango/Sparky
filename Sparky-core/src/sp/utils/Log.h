@@ -2,10 +2,10 @@
 
 #include "sp/Common.h"
 #include "sp/Types.h"
-
-#include "sp/maths/vec2.h"
-#include "sp/maths/Rectangle.h"
+#include "sp/maths/maths.h"
 #include "sp/events/Events.h"
+
+#include <sstream>
 
 #define SPARKY_LOG_LEVEL_FATAL 0
 #define SPARKY_LOG_LEVEL_ERROR 1

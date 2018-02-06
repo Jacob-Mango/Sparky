@@ -28,7 +28,7 @@ namespace sp { namespace graphics { namespace API {
 	{
 	}
 
-	void D3DVertexArray::Draw(uint count) const
+	void D3DVertexArray::Draw(RenderType type, uint count) const
 	{
 		// TODO: For now
 		for (uint i = 0; i < m_Buffers.size(); i++)

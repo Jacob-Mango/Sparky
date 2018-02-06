@@ -3,42 +3,64 @@
 #include "sp/sp.h"
 #include "sp/Common.h"
 
+#include "sp/utils/Timestep.h"
+
 #include "component/Components.h"
 
-namespace sp { namespace entity {
+namespace sp {
+	namespace entity {
 
-	class SP_API Entity
-	{
-	protected:
-		std::unordered_map<component::ComponentType*, component::Component*> m_Components;
-	public:
-		Entity();
-		Entity(graphics::Sprite* sprite, const maths::mat4& transform = maths::mat4::Identity());
-		Entity(graphics::Mesh* mesh, const maths::mat4& transform = maths::mat4::Identity());
-
-		void AddComponent(component::Component* component);
-
-		template <typename T>
-		const T* GetComponent() const
+		class SP_API Entity
 		{
-			return GetComponentInternal<T>();
-		}
+		protected:
+			std::vector<component::Component*> m_Components;
 
-		template <typename T>
-		T* GetComponent()
-		{
-			return (T*)GetComponentInternal<T>();
-		}
-	private:
-		template <typename T>
-		const T* GetComponentInternal() const
-		{
-			component::ComponentType* type = T::GetStaticType();
-			auto it = m_Components.find(type);
-			if (it == m_Components.end())
+			bool m_ShouldUpdate;
+		public:
+			Entity();
+			Entity(graphics::Sprite* sprite, maths::mat4* transform = &maths::mat4::Identity());
+			Entity(graphics::Mesh* mesh, maths::mat4* transform = &maths::mat4::Identity());
+
+			void AddComponent(component::Component* component);
+
+			template <typename T>
+			const T* GetComponent() const
+			{
+				return GetComponentInternal<T>();
+			}
+
+			std::vector<component::Component*> GetComponents()
+			{
+				return m_Components;
+			}
+
+			template <typename T>
+			T* GetComponent()
+			{
+				return (T*)GetComponentInternal<T>();
+			}
+
+			bool ShouldUpdate()
+			{
+				return m_ShouldUpdate;
+			}
+
+			virtual void OnInit() {}
+			virtual void OnUpdate(const sp::Timestep& ts) {}
+		private:
+			template <typename T>
+			const T* GetComponentInternal() const
+			{
+				component::ComponentType* type = T::GetStaticType();
+				if (m_Components.size() == 0) return nullptr;
+				for (auto x : m_Components)
+				{
+					if (x->GetType() == type)
+						return (const T*)x;
+				}
 				return nullptr;
-			return (T*)it->second; // TODO: ...
-		}
-	};
+			}
+		};
 
-} }
+	}
+}

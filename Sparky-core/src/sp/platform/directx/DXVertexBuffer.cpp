@@ -87,4 +87,3 @@ namespace sp { namespace graphics { namespace API {
 	}
 
 } } }
-

@@ -15,7 +15,7 @@ namespace sp { namespace maths {
 
 		vec4() = default;
 		vec4(float scalar);
-		vec4(float x, float y, float z, float w);
+		vec4(float x, float y, float z, float w = 0.0f);
 		vec4(const vec3& xyz, float w);
 
 		vec4& Add(const vec4& other);

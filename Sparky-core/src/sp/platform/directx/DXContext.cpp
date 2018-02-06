@@ -15,7 +15,7 @@ namespace sp { namespace graphics { namespace API {
 		x = nullptr;		\
 	}
 
-	D3DContext::D3DContext(WindowProperties properties, void* deviceContext)
+	D3DContext::D3DContext(WindowProperties* properties, void* deviceContext)
 		: m_DebugLayerEnabled(true)
 	{
 		m_RenderTargetView = nullptr;
@@ -37,8 +37,8 @@ namespace sp { namespace graphics { namespace API {
 		DXGI_SWAP_CHAIN_DESC scd;
 		ZeroMemory(&scd, sizeof(DXGI_SWAP_CHAIN_DESC));
 
-		scd.BufferDesc.Width = m_Properties.width;
-		scd.BufferDesc.Height = m_Properties.height;
+		scd.BufferDesc.Width = m_Properties->width;
+		scd.BufferDesc.Height = m_Properties->height;
 		scd.BufferDesc.RefreshRate.Numerator = 60;
 		scd.BufferDesc.RefreshRate.Denominator = 1;
 		scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -49,7 +49,7 @@ namespace sp { namespace graphics { namespace API {
 		scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		scd.BufferCount = 3;
 		scd.OutputWindow = hWnd;
-		scd.Windowed = !m_Properties.fullscreen;
+		scd.Windowed = !m_Properties->fullscreen;
 		scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 		scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
@@ -86,8 +86,8 @@ namespace sp { namespace graphics { namespace API {
 
 	void D3DContext::Resize()
 	{
-		uint width = m_Properties.width;
-		uint height = m_Properties.height;
+		uint width = m_Properties->width;
+		uint height = m_Properties->height;
 
 		ReleaseCOM(m_RenderTargetView);
 		ReleaseCOM(m_DepthStencilView);
@@ -151,7 +151,7 @@ namespace sp { namespace graphics { namespace API {
 
 	void D3DContext::Present()
 	{
-		swapchain->Present(m_Properties.vsync, 0);
+		swapchain->Present(m_Properties->vsync, 0);
 	}
 
 	String D3DContext::GetD3DVersionStringInternal() const

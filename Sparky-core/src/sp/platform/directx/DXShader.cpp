@@ -379,6 +379,19 @@ namespace sp { namespace graphics { namespace API {
 		D3DContext::GetDeviceContext()->Unmap(cbuffer, NULL);
 	}
 
+	void D3DShader::SetGSSystemUniformBuffer(byte* data, uint size, uint slot)
+	{
+		SP_ASSERT(!m_GSUserUniformBuffer || slot != m_GSUserUniformBuffer->GetRegister());
+		ID3D11Buffer* cbuffer = m_GSConstantBuffers[slot];
+
+		D3D11_MAPPED_SUBRESOURCE msr;
+		memset(&msr, 0, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+		D3DContext::GetDeviceContext()->Map(cbuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &msr);
+		memcpy(msr.pData, data, size);
+		D3DContext::GetDeviceContext()->Unmap(cbuffer, NULL);
+	}
+
 	void D3DShader::SetPSSystemUniformBuffer(byte* data, uint size, uint slot)
 	{
 		SP_ASSERT(!m_PSUserUniformBuffer || slot != m_PSUserUniformBuffer->GetRegister());
@@ -395,6 +408,18 @@ namespace sp { namespace graphics { namespace API {
 	void D3DShader::SetVSUserUniformBuffer(byte* data, uint size)
 	{
 		ID3D11Buffer* cbuffer = m_VSConstantBuffers[m_VSUserUniformBuffer->GetRegister()];
+
+		D3D11_MAPPED_SUBRESOURCE msr;
+		memset(&msr, 0, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+		D3DContext::GetDeviceContext()->Map(cbuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &msr);
+		memcpy(msr.pData, data, size);
+		D3DContext::GetDeviceContext()->Unmap(cbuffer, NULL);
+	}
+
+	void D3DShader::SetGSUserUniformBuffer(byte* data, uint size)
+	{
+		ID3D11Buffer* cbuffer = m_GSConstantBuffers[m_GSUserUniformBuffer->GetRegister()];
 
 		D3D11_MAPPED_SUBRESOURCE msr;
 		memset(&msr, 0, sizeof(D3D11_MAPPED_SUBRESOURCE));

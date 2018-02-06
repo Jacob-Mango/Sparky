@@ -5,6 +5,8 @@
 
 namespace sp { namespace graphics {
 
+	class Renderer2D;
+
 	class SP_API Group : public Renderable2D
 	{
 	private:

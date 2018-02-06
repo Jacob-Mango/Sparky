@@ -7,6 +7,8 @@
 #include "sp/graphics/shaders/ShaderManager.h"
 #include "sp/system/VFS.h"
 
+#include "Renderer3D.h"
+
 namespace sp { namespace graphics {
 
 	using namespace maths;
@@ -18,6 +20,8 @@ namespace sp { namespace graphics {
 		UV = BIT(2),
 		BINORMAL = BIT(3),
 		TANGENT = BIT(4),
+		JOINTWEIGHT = BIT(5),
+		JOINTINDEX = BIT(6),
 	};
 
 	struct SPMFormat
@@ -30,6 +34,8 @@ namespace sp { namespace graphics {
 		byte* vertexData;
 		uint indexBufferSize;
 		byte* indexData;
+		uint boneInfoBufferSize;
+		byte* boneInfoData;
 		char* footer = "1234";
 	};
 
@@ -105,6 +111,17 @@ namespace sp { namespace graphics {
 		}
 
 		{
+			byte buffer[4];
+			ReadBytes(f, buffer, 4);
+			format.boneInfoBufferSize = *(uint*)buffer;
+		}
+
+		{
+			format.boneInfoData = spnew byte[format.boneInfoBufferSize];
+			ReadBytes(f, format.boneInfoData, format.boneInfoBufferSize);
+		}
+
+		{
 			byte footer[4];
 			ReadBytes(f, footer, 4);
 			SP_ASSERT(memcmp(footer, format.footer, 4) == 0);
@@ -112,7 +129,7 @@ namespace sp { namespace graphics {
 
 		fclose(f);
 
-		ShaderManager::Get("AdvancedLighting")->Bind();
+		ShaderManager::Get("DefaultShader")->Bind();
 
 		API::VertexBuffer* buffer = API::VertexBuffer::Create(API::BufferUsage::STATIC);
 		buffer->SetData(format.vertexBufferSize, format.vertexData);
@@ -123,13 +140,70 @@ namespace sp { namespace graphics {
 		layout.Push<vec2>("TEXCOORD");
 		layout.Push<vec3>("BINORMAL");
 		layout.Push<vec3>("TANGENT");
+		layout.Push<vec4>("JOINTWEIGHTS");
+		layout.Push<vec4>("JOINTINDICES");
 		buffer->SetLayout(layout);
 
 		API::VertexArray* va = API::VertexArray::Create();
 		va->PushBuffer(buffer);
 
 		API::IndexBuffer* ib = API::IndexBuffer::Create((uint*)format.indexData, format.indexBufferSize / sizeof(uint));
-		m_Mesh = spnew Mesh(va, ib, nullptr);
+
+		Vertices* vertices = spnew Vertices{ (graphics::Vertex*)format.vertexData, format.vertexBufferSize / sizeof(Vertex) };
+
+		std::vector<Bone*> bones;
+		bones.reserve(NUMBONES);
+
+		for (int i = 0; i < format.boneInfoBufferSize; i)
+		{
+			Bone* bone = spnew Bone();
+
+
+			uint index = toInt(format.boneInfoData, i);
+			i += 4;
+			bone->Index = index;
+
+			uint parentIndex = toInt(format.boneInfoData, i);
+			i += 4;
+			bone->ParentIndex = parentIndex;
+
+			uint nameSize = toInt(format.boneInfoData, i);
+			i += 4;
+			bone->Name = toData<String>(format.boneInfoData, i, i + nameSize);
+			i += nameSize;
+
+			uint boneOffsetSize = toInt(format.boneInfoData, i);
+			i += 4;
+
+			
+
+			float* elements = toData<float*>(format.boneInfoData, i, i + boneOffsetSize);
+			
+			bone->BoneOffset = mat4(elements);
+
+			i += boneOffsetSize;
+
+			bones.push_back(bone);
+		}
+
+		for (int i = 0; i < bones.size(); i++) {
+			Bone* currentBone = bones[i];
+			if (currentBone->ParentIndex < 0 || currentBone->ParentIndex >= NUMBONES) continue;
+			if (currentBone->Parent != nullptr) continue;
+			Bone* parent = bones[currentBone->ParentIndex];
+			currentBone->Parent = parent;
+			currentBone->Parent->Children.push_back(currentBone);
+		}
+
+		Bone* parent = nullptr;
+		for (int i = 0; i < bones.size(); i++) {
+			if (bones[i]->Parent == nullptr) {
+				parent = bones[i];
+				break;
+			}
+		}
+
+		m_Mesh = spnew Mesh(va, ib, nullptr, vertices, (uint*)format.indexData, format.indexBufferSize / sizeof(uint*), parent);
 
 #ifdef SP_DEBUG
 		m_Mesh->SetDebugData((Vertex*)format.vertexData, format.vertexBufferSize / sizeof(Vertex));

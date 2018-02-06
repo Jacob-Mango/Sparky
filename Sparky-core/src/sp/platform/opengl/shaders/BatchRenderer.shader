@@ -10,12 +10,8 @@ layout (location = 4) in float mid;
 layout (location = 5) in vec4 color;
 
 uniform mat4 sys_ProjectionMatrix;
-uniform mat4 sys_ViewMatrix;
-uniform mat4 sys_ModelMatrix;
 
-uniform mat4 sys_MaskMatrix;
-
-out DATA
+out GSDATA
 {
 	vec4 position;
 	vec2 uv;
@@ -35,6 +31,48 @@ void main()
 	vs_out.color = color;
 	vs_out.mask_uv = mask_uv;
 };
+
+#shader geometry
+#version 330 core
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+in GSDATA
+{
+	vec4 position;
+	vec2 uv;
+	vec2 mask_uv;
+	float tid;
+	float mid;
+	vec4 color;
+} gs_in[];
+
+out DATA
+{
+	vec4 position;
+	vec2 uv;
+	vec2 mask_uv;
+	float tid;
+	float mid;
+	vec4 color;
+} gs_out;
+
+void main()
+{
+	int i;
+	for (i = 0; i < 3; i++) {
+		gl_Position = gl_in[i].gl_Position;
+		gs_out.position = gs_in[i].position;
+		gs_out.uv = gs_in[i].uv;
+		gs_out.mask_uv = gs_in[i].mask_uv;
+		gs_out.tid = gs_in[i].tid;
+		gs_out.mid = gs_in[i].mid;
+		gs_out.color = gs_in[i].color;
+		EmitVertex();
+	}
+	EndPrimitive();
+}
 
 #shader fragment
 #version 330 core

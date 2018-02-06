@@ -9,14 +9,6 @@ namespace sp { namespace graphics { namespace API {
 	class D3DTexture2D : public Texture2D
 	{
 	private:
-		String m_Name;
-		String m_FileName;
-		uint m_Handle;
-		uint m_Width, m_Height;
-		uint m_BitsPerPixel;
-		TextureParameters m_Parameters;
-		TextureLoadOptions m_LoadOptions;
-
 		D3D11_TEXTURE2D_DESC m_Desc;
 		ID3D11Texture2D* m_Texture;
 		ID3D11ShaderResourceView* m_ResourceView;
@@ -24,6 +16,7 @@ namespace sp { namespace graphics { namespace API {
 		D3D11_SAMPLER_DESC m_SamplerDesc;
 	public:
 		D3DTexture2D(uint width, uint height, TextureParameters parameters = TextureParameters(), TextureLoadOptions loadOptions = TextureLoadOptions());
+		D3DTexture2D(uint width, uint height, byte* pixels, TextureParameters parameters = TextureParameters(), TextureLoadOptions loadOptions = TextureLoadOptions());
 		D3DTexture2D(uint width, uint height, uint color, TextureParameters parameters = TextureParameters(), TextureLoadOptions loadOptions = TextureLoadOptions());
 		D3DTexture2D(const String& name, const String& filename, TextureParameters parameters = TextureParameters(), TextureLoadOptions loadOptions = TextureLoadOptions());
 

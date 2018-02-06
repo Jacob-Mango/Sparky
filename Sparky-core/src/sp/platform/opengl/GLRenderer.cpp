@@ -26,7 +26,8 @@ namespace sp { namespace graphics {
 		SP_WARN("----------------------------------");
 
 		// Move to API independent layer
-		GLCall(glEnable(GL_CULL_FACE));
+
+		//GLCall(glEnable(GL_CULL_FACE));
 		GLCall(glFrontFace(GL_CCW));
 		GLCall(glCullFace(GL_BACK));
 

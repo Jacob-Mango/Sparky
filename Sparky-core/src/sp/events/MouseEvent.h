@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Event.h"
-#include "../maths/vec2.h"
+
+#include "../maths/maths.h"
 
 namespace sp { namespace events {
 

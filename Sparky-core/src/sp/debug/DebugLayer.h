@@ -1,8 +1,9 @@
 #pragma once
 
 #include "sp/graphics/Renderer2D.h"
-#include "sp/graphics/Label.h"
 #include "sp/graphics/Sprite.h"
+
+#include "sp/graphics/ui/Label.h"
 
 #include "sp/graphics/layers/Layer2D.h"
 #include "sp/graphics/shaders/Shader.h"
@@ -24,6 +25,7 @@ namespace sp { namespace debug {
 	private:
 		Application& m_Application;
 		graphics::Label* m_FPSLabel;
+		graphics::Label* m_UPSLabel;
 		graphics::Label* m_MemoryUsageLabel;
 		graphics::Label* m_FrametimeLabel;
 		std::vector<graphics::Sprite*> m_TempSprites;

@@ -1,7 +1,8 @@
 #include "sp/sp.h"
 #include "Window.h"
 
-#include "sp/graphics/Renderer.h"
+#include "sp/graphics/API/Context.h"
+#include "sp/graphics/API/Renderer.h"
 
 #include "sp/utils/Log.h"
 
@@ -14,7 +15,7 @@ namespace sp {
 
 	std::map<void*, Window*> Window::s_Handles;
 
-	Window::Window(const String& title, const WindowProperties& properties)
+	Window::Window(const String& title, WindowProperties* properties)
 		: m_Title(title), m_Properties(properties), m_Handle(nullptr), m_Closed(false), m_EventCallback(nullptr)
 	{
 		if (!Init())
@@ -26,7 +27,7 @@ namespace sp {
 #ifdef SPARKY_PLATFORM_WEB
 		FontManager::Add(new Font("SourceSansPro", "res/SourceSansPro-Light.ttf", 32));
 #else
-		FontManager::SetScale(maths::vec2(m_Properties.width / 32.0f, m_Properties.height / 18.0f)); // TODO: Seriously
+		FontManager::SetScale(maths::vec2(m_Properties->width / 32.0f, m_Properties->height / 18.0f)); // TODO: Seriously
 		FontManager::Add(new Font("SourceSansPro", internal::DEFAULT_FONT, internal::DEFAULT_FONT_SIZE, 32));
 #endif
 
@@ -57,11 +58,9 @@ namespace sp {
 		return true;
 	}
 	
-	void Window::SetVsync(bool enabled)
+	void Window::SetVsync(uint syncInterval)
 	{
-		// TODO: Not implemented
-		m_Vsync = enabled;
-		
+		m_Properties->vsync = syncInterval;
 	}
 
 	void Window::Clear() const

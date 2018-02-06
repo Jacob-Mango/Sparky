@@ -9,13 +9,12 @@ namespace sp { namespace graphics {
 	private:
 		float m_MouseSensitivity;
 		float m_Speed, m_SprintSpeed;
-		float m_Pitch, m_Yaw;
 		bool m_MouseWasGrabbed;
 	public:
 		FPSCamera(const maths::mat4& projectionMatrix);
 		~FPSCamera();
-		void Focus() override;
-		void Update() override;
+		void OnFocus() override;
+		void OnUpdate(const Timestep& ts) override;
 	private:
 		maths::Quaternion GetOrientation() const;
 		maths::vec3 GetForwardDirection(const maths::Quaternion& orientation) const;

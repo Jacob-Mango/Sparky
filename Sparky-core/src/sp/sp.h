@@ -2,6 +2,8 @@
 
 // Sparky PCH header
 
+#define _NO_NUMERIC_LIMITS
+
 #include <algorithm>
 #include <functional>
 #include <iostream>

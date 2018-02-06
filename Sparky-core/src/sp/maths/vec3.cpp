@@ -273,6 +273,11 @@ namespace sp { namespace maths {
 		return vec3(-vector.x, -vector.y, -vector.z);
 	}
 
+	vec3 operator+(const vec3& vector)
+	{
+		return vec3(+vector.x, +vector.y, +vector.z);
+	}
+
 	vec3 vec3::Cross(const vec3& other) const
 	{
 		return vec3(y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x);

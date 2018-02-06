@@ -1,6 +1,7 @@
 #pragma once
 
-#include "sp/graphics/Renderer.h"
+#include "sp/graphics/API/Renderer.h"
+
 #include "GLContext.h"
 #include "GLCommon.h"
 

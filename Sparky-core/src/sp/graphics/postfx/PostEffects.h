@@ -21,7 +21,7 @@ namespace sp { namespace graphics {
 		void Push(PostEffectsPass* pass);
 		void Pop();
 
-		void RenderPostEffects(Framebuffer* source, Framebuffer* target, API::VertexArray* quad, API::IndexBuffer* indices);
+		void RenderPostEffects(API::Framebuffer* source, API::Framebuffer* target, API::VertexArray* quad, API::IndexBuffer* indices);
 	};
 
 } }

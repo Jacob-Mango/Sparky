@@ -2,6 +2,8 @@
 
 // From dxgiformat.h
 
+#include <dxgiformat.h>
+
 typedef enum DXTYPES
 {
 	DX_TYPE_UNKNOWN = 0,

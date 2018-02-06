@@ -23,7 +23,7 @@ namespace sp { namespace graphics {
 		m_Passes.pop_back();
 	}
 
-	void PostEffects::RenderPostEffects(Framebuffer* source, Framebuffer* target, API::VertexArray* quad, API::IndexBuffer* indices)
+	void PostEffects::RenderPostEffects(API::Framebuffer* source, API::Framebuffer* target, API::VertexArray* quad, API::IndexBuffer* indices)
 	{
 		target->Bind();
 		// API::SetActiveTexture(GL_TEXTURE0);

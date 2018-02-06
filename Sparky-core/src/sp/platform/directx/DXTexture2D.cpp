@@ -15,8 +15,19 @@
 namespace sp { namespace graphics { namespace API {
 
 	D3DTexture2D::D3DTexture2D(uint width, uint height, TextureParameters parameters, TextureLoadOptions loadOptions)
-		: m_FileName("NULL")
 	{
+		m_FileName = "NULL";
+		m_Width = width;
+		m_Height = height;
+		m_Parameters = parameters;
+		m_LoadOptions = loadOptions;
+		Load();
+	}
+
+	D3DTexture2D::D3DTexture2D(uint width, uint height, byte* pixels, TextureParameters parameters, TextureLoadOptions loadOptions)
+	{
+		m_FileName = "NULL";
+		memcpy(&m_Pixels, &pixels, sizeof(pixels));
 		m_Width = width;
 		m_Height = height;
 		m_Parameters = parameters;
@@ -25,8 +36,8 @@ namespace sp { namespace graphics { namespace API {
 	}
 
 	D3DTexture2D::D3DTexture2D(uint width, uint height, uint color, TextureParameters parameters, TextureLoadOptions loadOptions)
-		: m_FileName("NULL")
 	{
+		m_FileName = "NULL";
 		m_Width = width;
 		m_Height = height;
 		m_Parameters = parameters;
@@ -37,8 +48,9 @@ namespace sp { namespace graphics { namespace API {
 	}
 
 	D3DTexture2D::D3DTexture2D(const String& name, const String& filename, TextureParameters parameters, TextureLoadOptions loadOptions)
-		: m_Name(name), m_FileName(filename)
 	{
+		m_FileName = filename;
+		m_Name = name;
 		m_Parameters = parameters;
 		m_LoadOptions = loadOptions;
 		Load();
@@ -57,19 +69,18 @@ namespace sp { namespace graphics { namespace API {
 
 	void D3DTexture2D::Load()
 	{
-		byte* data = nullptr;
 		if (m_FileName != "NULL")
 		{
-			data = LoadImage(m_FileName, &m_Width, &m_Height, &m_BitsPerPixel, !m_LoadOptions.flipY); // FreeImage loads bottom->top
+			m_Pixels = LoadImage(m_FileName, &m_Width, &m_Height, &m_BitsPerPixel, !m_LoadOptions.flipY); // FreeImage loads bottom->top
 			m_Parameters.format = m_BitsPerPixel == 24 ? TextureFormat::RGB : TextureFormat::RGBA;
 		}
 
-		bool generateMips = data != nullptr;
+		bool generateMips = m_Pixels != nullptr;
 
 		uint stride = 4;// GetStrideFromFormat(m_Parameters.format);
 
 		D3D11_SUBRESOURCE_DATA initData;
-		initData.pSysMem = data;
+		initData.pSysMem = m_Pixels;
 		initData.SysMemPitch = stride * m_Width;
 		initData.SysMemSlicePitch = m_Width * m_Height * stride;
 
@@ -90,7 +101,7 @@ namespace sp { namespace graphics { namespace API {
 		}
 		else
 		{
-			if (data) initDataPtr = &initData;
+			if (m_Pixels) initDataPtr = &initData;
 		}
 
 		DXGI_FORMAT format = SPTextureFormatToD3D(m_Parameters.format);
@@ -148,8 +159,8 @@ namespace sp { namespace graphics { namespace API {
 
 		DXCall(D3DContext::GetDevice()->CreateSamplerState(&m_SamplerDesc, &m_SamplerState));
 		
-		if (data != nullptr)
-			spdel[] data;
+		if (m_Pixels != nullptr)
+			spdel[] m_Pixels;
 	}
 
 	void D3DTexture2D::Bind(uint slot) const

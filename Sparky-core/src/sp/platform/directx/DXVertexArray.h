@@ -19,7 +19,7 @@ namespace sp { namespace graphics { namespace API {
 		void Bind() const override;
 		void Unbind() const override;
 
-		void Draw(uint count) const override;
+		void Draw(RenderType type, uint count) const override;
 	};
 
 } } }

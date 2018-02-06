@@ -73,6 +73,7 @@ namespace sp { namespace maths {
 		bool operator>=(const vec3& other) const;
 
 		friend vec3 operator-(const vec3& vector);
+		friend vec3 operator+(const vec3& vector);
 
 		vec3 Cross(const vec3& other) const;
 		float Dot(const vec3& other) const;

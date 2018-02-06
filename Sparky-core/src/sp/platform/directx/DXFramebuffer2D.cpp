@@ -4,11 +4,11 @@
 #include "sp/system/Memory.h"
 #include "sp/utils/Log.h"
 
-namespace sp { namespace graphics {
+namespace sp { namespace graphics { namespace API {
 
 	using namespace API;
 
-	D3DFramebuffer2D::D3DFramebuffer2D(uint width, uint height)
+	D3DFramebuffer2D::D3DFramebuffer2D(uint width, uint height, uint textures)
 		: m_Width(width), m_Height(height)
 	{
 		Init();
@@ -39,4 +39,7 @@ namespace sp { namespace graphics {
 
 	}
 
-} }
+	void D3DFramebuffer2D::Render(API::Shader* shader)
+	{
+	}
+} } }

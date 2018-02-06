@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\Survival.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\RenderLayer.cpp" />
+    <ClCompile Include="src\GameObjects\Player.cpp" />
+    <ClCompile Include="src\GameObjects\Plane.cpp" />
+    <ClCompile Include="src\GameObjects\Ball.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Survival.h" />
+    <ClInclude Include="src\RenderLayer.h" />
+    <ClInclude Include="src\GameObjects\Player.h" />
+    <ClInclude Include="src\GameObjects\Plane.h" />
+    <ClInclude Include="src\GameObjects\Ball.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shaders\AdvancedLighting.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\Skybox.hlsl" />
+    <None Include="data\Shaders\GBuffer\GBuffer.frag" />
+    <None Include="data\Shaders\GBuffer\GBuffer.vert" />
+    <None Include="data\Shaders\GBuffer\GBuffer.shader" />
+    <None Include="data\Shaders\Water\Water.shader" />
+    <None Include="data\Shaders\Water\Water.vert" />
+    <None Include="data\Shaders\PBR\PBR.frag" />
+    <None Include="data\Shaders\PBR\PBR.vert" />
+    <None Include="data\Shaders\PBR\PBR.shader" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="data\Shaders\PreintegratedFG.bmp" />
+    <Image Include="engine\PreintegratedFG.bmp" />
+  </ItemGroup>
+</Project>

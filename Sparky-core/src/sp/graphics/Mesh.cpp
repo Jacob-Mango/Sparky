@@ -7,11 +7,26 @@
 
 #include "sp/debug/DebugRenderer.h"
 
+#include <iterator>
+#include <algorithm>
+
 namespace sp { namespace graphics {
 
-	Mesh::Mesh(API::VertexArray* vertexArray, API::IndexBuffer* indexBuffer, MaterialInstance* materialInstance)
-		: m_VertexArray(vertexArray), m_IndexBuffer(indexBuffer), m_MaterialInstance(materialInstance)
+	Mesh::Mesh(API::VertexArray* vertexArray, API::IndexBuffer* indexBuffer, MaterialInstance* materialInstance, Vertices* verts, uint* indices, uint indexLength, Bone* rootBone)
+		: m_VertexArray(vertexArray), m_IndexBuffer(indexBuffer), m_MaterialInstance(materialInstance), m_Verts(verts), m_Indices(indices), m_IndexLength(indexLength), m_RootBone(rootBone)
 	{
+		m_RenderType = RenderType::TRIANGLES;
+#ifdef SP_DEBUG
+		m_DebugVertexData = nullptr;
+		m_DebugVertexDataCount = 0;
+		m_DebugDraw = false;
+#endif
+	}
+
+	Mesh::Mesh(API::VertexArray* vertexArray, API::IndexBuffer* indexBuffer, MaterialInstance* materialInstance)
+		: m_VertexArray(vertexArray), m_IndexBuffer(indexBuffer), m_MaterialInstance(materialInstance), m_RootBone(spnew Bone())
+	{
+		m_RenderType = RenderType::TRIANGLES;
 #ifdef SP_DEBUG
 		m_DebugVertexData = nullptr;
 		m_DebugVertexDataCount = 0;
@@ -22,6 +37,7 @@ namespace sp { namespace graphics {
 	Mesh::Mesh(const Mesh* mesh)
 		: m_VertexArray(mesh->m_VertexArray), m_IndexBuffer(mesh->m_IndexBuffer), m_MaterialInstance(mesh->m_MaterialInstance)
 	{
+		m_RenderType = RenderType::TRIANGLES;
 #ifdef SP_DEBUG
 		m_DebugVertexData = mesh->m_DebugVertexData;
 		m_DebugVertexDataCount = mesh->m_DebugVertexDataCount;
@@ -46,7 +62,7 @@ namespace sp { namespace graphics {
 
 		m_VertexArray->Bind();
 		m_IndexBuffer->Bind();
-		m_VertexArray->Draw(m_IndexBuffer->GetCount());
+		m_VertexArray->Draw(m_RenderType, m_IndexBuffer->GetCount());
 		m_IndexBuffer->Unbind();
 		m_VertexArray->Unbind();
 

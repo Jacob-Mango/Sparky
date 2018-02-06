@@ -72,17 +72,17 @@ namespace sp { namespace debug {
 
 	void DebugMenu::Add(const String& path, vec2* value, float minimum, float maximum)
 	{
-		Add(path, spnew Vec2Action(path, [value]() { return *value; }, [value](vec2 v) { *value = v; }, vec2(minimum), vec2(maximum)));
+		Add(path, spnew Vec2Action(path, [value]() { return *value; }, [value](const vec2& v) { *value = v; }, vec2(minimum), vec2(maximum)));
 	}
 
 	void DebugMenu::Add(const String& path, vec3* value, float minimum, float maximum)
 	{
-		Add(path, spnew Vec3Action(path, [value]() { return *value; }, [value](vec3 v) { *value = v; }, vec3(minimum), vec3(maximum)));
+		Add(path, spnew Vec3Action(path, [value]() { return *value; }, [value](const vec3& v) { *value = v; }, vec3(minimum), vec3(maximum)));
 	}
 
 	void DebugMenu::Add(const String& path, vec4* value, float minimum, float maximum)
 	{
-		Add(path, spnew Vec4Action(path, [value]() { return *value; }, [value](vec4 v) { *value = v; }, vec4(minimum), vec4(maximum)));
+		Add(path, spnew Vec4Action(path, [value]() { return *value; }, [value](const vec4& v) { *value = v; }, vec4(minimum), vec4(maximum)));
 	}
 
 	void DebugMenu::Add(const String& path, IAction* action)

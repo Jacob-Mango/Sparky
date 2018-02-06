@@ -5,8 +5,8 @@ R"(
 layout (location = 0) in vec4 position;
 layout (location = 1) in vec4 color;
 
-uniform mat4 pr_matrix;
-uniform mat4 vw_matrix;
+uniform mat4 sys_Projectionmatrix;
+uniform mat4 sys_ViewMatrix;
 
 out DATA
 {
@@ -15,7 +15,7 @@ out DATA
 
 void main()
 {
-	gl_Position = pr_matrix * vw_matrix * position;
+	gl_Position = sys_Projectionmatrix * sys_ViewMatrix * position;
 	vs_out.color = color;
 };
 

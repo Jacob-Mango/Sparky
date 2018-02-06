@@ -188,10 +188,12 @@ class DllDef LibRaw_bigfile_datastream : public LibRaw_abstract_datastream
     virtual void        subfile_close();
     virtual int         get_char()
     { 
-#ifndef WIN32
-        return substream?substream->get_char():getc_unlocked(f);
+#ifdef WIN32
+		return substream ? substream->get_char() : fgetc(f);
+#elif WIN64
+		return substream ? substream->get_char() : fgetc(f);
 #else
-        return substream?substream->get_char():fgetc(f);
+        return substream?substream->get_char():getc_unlocked(f);
 #endif
     }
 

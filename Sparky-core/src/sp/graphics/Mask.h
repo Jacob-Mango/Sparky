@@ -1,7 +1,7 @@
 #pragma once
 
 #include "sp/Common.h"
-#include "../maths/maths.h"
+#include "sp/maths/maths.h"
 #include "API/Texture2D.h"
 
 namespace sp { namespace graphics {

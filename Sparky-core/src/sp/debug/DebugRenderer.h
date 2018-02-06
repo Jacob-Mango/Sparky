@@ -31,6 +31,9 @@ namespace sp { namespace debug {
 
 		SP_DEBUG_METHOD_V(static void Present())
 	private:
+		SP_DEBUG_METHOD_V(static void Begin())
+		SP_DEBUG_METHOD_V(static void End())
+
 		SP_DEBUG_METHOD_V(static void DrawLineInternal(const maths::vec3& start, const maths::vec3& end, uint color))
 	};
 

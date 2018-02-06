@@ -11,8 +11,8 @@ namespace sp { namespace graphics {
 	public:
 		OrthographicCamera(const maths::mat4& projectionMatrix);
 		~OrthographicCamera();
-		void Focus() override;
-		void Update() override;
+		void OnFocus() override;
+		void OnUpdate(const Timestep& ts) override;
 
 	};
 

@@ -22,3 +22,11 @@ namespace sp { namespace maths {
 	typedef tvec2<uint> uvec2;
 
 } }
+
+#ifdef DOUBLE_PRECISION
+typedef double decimal;
+#else
+typedef float decimal;
+#endif 
+
+#define M_PI 3.14159265359

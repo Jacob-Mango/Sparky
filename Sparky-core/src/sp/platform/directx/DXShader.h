@@ -36,14 +36,19 @@ namespace sp { namespace graphics { namespace API {
 		mutable Data m_Data;
 
 		ShaderUniformBufferList m_VSUniformBuffers;
+		ShaderUniformBufferList m_GSUniformBuffers;
 		ShaderUniformBufferList m_PSUniformBuffers;
 		D3DShaderUniformBufferDeclaration* m_VSUserUniformBuffer;
+		D3DShaderUniformBufferDeclaration* m_GSUserUniformBuffer;
 		D3DShaderUniformBufferDeclaration* m_PSUserUniformBuffer;
 		ShaderResourceList m_Resources;
 		ShaderStructList m_Structs;
 
 		ID3D11Buffer** m_VSConstantBuffers;
 		uint m_VSConstantBuffersCount;
+
+		ID3D11Buffer** m_GSConstantBuffers;
+		uint m_GSConstantBuffersCount;
 
 		ID3D11Buffer** m_PSConstantBuffers;
 		uint m_PSConstantBuffersCount;
@@ -56,18 +61,22 @@ namespace sp { namespace graphics { namespace API {
 		void Bind() const override;
 		void Unbind() const override;
 
-		void SetVSSystemUniformBuffer(byte* data, uint size, uint slot = 0) override;
-		void SetPSSystemUniformBuffer(byte* data, uint size, uint slot = 0) override;
+		void SetVSSystemUniformBuffer(byte* data, uint size, uint slot) override;
+		void SetGSSystemUniformBuffer(byte* data, uint size, uint slot) override;
+		void SetPSSystemUniformBuffer(byte* data, uint size, uint slot) override;
 
 		void SetVSUserUniformBuffer(byte* data, uint size) override;
+		void SetGSUserUniformBuffer(byte* data, uint size) override;
 		void SetPSUserUniformBuffer(byte* data, uint size) override;
 
 		inline const String& GetName() const override { return m_Name; }
 		inline const String& GetFilePath() const override { return m_FilePath; }
 
 		inline const ShaderUniformBufferList& GetVSSystemUniforms() const override { return m_VSUniformBuffers; }
+		inline const ShaderUniformBufferList& GetGSSystemUniforms() const override { return m_GSUniformBuffers; }
 		inline const ShaderUniformBufferList& GetPSSystemUniforms() const override { return m_PSUniformBuffers; }
 		inline const ShaderUniformBufferDeclaration* GetVSUserUniformBuffer() const override { return m_VSUserUniformBuffer; }
+		inline const ShaderUniformBufferDeclaration* GetGSUserUniformBuffer() const override { return m_GSUserUniformBuffer; }
 		inline const ShaderUniformBufferDeclaration* GetPSUserUniformBuffer() const override { return m_PSUserUniformBuffer; }
 		inline const ShaderResourceList& GetResources() const override { return m_Resources; }
 	private:

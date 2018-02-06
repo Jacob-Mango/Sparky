@@ -8,17 +8,17 @@
 
 #include "sp/system/Memory.h"
 
-namespace sp { namespace graphics {
+namespace sp { namespace graphics { namespace API {
 
-	FramebufferDepth* FramebufferDepth::Create(uint width, uint height)
+	FramebufferDepth* FramebufferDepth::Create(uint width, uint height, uint numberTextures)
 	{
 		switch (API::Context::GetRenderAPI())
 		{
-			case API::RenderAPI::OPENGL:	return spnew GLFramebufferDepth(width, height);
-			case API::RenderAPI::DIRECT3D:	return spnew D3DFramebufferDepth(width, height);
+			case API::RenderAPI::OPENGL:	return spnew GLFramebufferDepth(width, height, numberTextures);
+			case API::RenderAPI::DIRECT3D:	return spnew D3DFramebufferDepth(width, height, numberTextures);
 		}
 		return nullptr;
 	}
 
 	
-} }
+} } }

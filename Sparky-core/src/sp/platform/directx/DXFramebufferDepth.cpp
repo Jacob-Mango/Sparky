@@ -1,9 +1,9 @@
 #include "sp/sp.h"
 #include "DXFramebufferDepth.h"
 
-namespace sp { namespace graphics {
+namespace sp { namespace graphics { namespace API {
 
-	D3DFramebufferDepth::D3DFramebufferDepth(uint width, uint height)
+	D3DFramebufferDepth::D3DFramebufferDepth(uint width, uint height, uint textures)
 		: m_Width(width), m_Height(height)
 	{
 		Init();
@@ -30,4 +30,7 @@ namespace sp { namespace graphics {
 	{
 	}
 
-} }
+	void D3DFramebufferDepth::Render(API::Shader* shader)
+	{
+	}
+} } }

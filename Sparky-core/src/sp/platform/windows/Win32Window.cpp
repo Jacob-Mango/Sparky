@@ -10,7 +10,7 @@
 #include "sp/app/Application.h"
 #include "sp/app/Window.h"
 #include "sp/graphics/API/Context.h"
-#include "sp/graphics/Renderer.h"
+#include "sp/graphics/API/Renderer.h"
 
 #include <GL/glew.h>
 
@@ -63,14 +63,14 @@ namespace sp {
 			return false;
 		}
 
-		RECT size = { 0, 0, (LONG)m_Properties.width, (LONG)m_Properties.height };
+		RECT size = { 0, 0, (LONG)m_Properties->width, (LONG)m_Properties->height };
 		AdjustWindowRectEx(&size, WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, false, WS_EX_APPWINDOW | WS_EX_WINDOWEDGE);
 
 		hWnd = CreateWindowExA(WS_EX_APPWINDOW | WS_EX_WINDOWEDGE,
 			winClass.lpszClassName, m_Title.c_str(),
 			WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-			GetSystemMetrics(SM_CXSCREEN) / 2 - m_Properties.width / 2,
-			GetSystemMetrics(SM_CYSCREEN) / 2 - m_Properties.height / 2,
+			GetSystemMetrics(SM_CXSCREEN) / 2 - m_Properties->width / 2,
+			GetSystemMetrics(SM_CYSCREEN) / 2 - m_Properties->height / 2,
 			// TODO: This requires some... attention
 			size.right + (-size.left), size.bottom + (-size.top), NULL, NULL, hInstance, NULL);
 			
@@ -134,9 +134,9 @@ namespace sp {
 
 	void ResizeCallback(Window* window, int32 width, int32 height)
 	{
-		window->m_Properties.width = width;
-		window->m_Properties.height = height;
-		FontManager::SetScale(maths::vec2(window->m_Properties.width / 32.0f, window->m_Properties.height / 18.0f));
+		window->m_Properties->width =  width;
+		window->m_Properties->height = height;
+		FontManager::SetScale(maths::vec2(window->m_Properties->width / 32.0f, window->m_Properties->height / 18.0f));
 
 		if (window->m_EventCallback)
 			window->m_EventCallback(ResizeWindowEvent((uint)width, (uint)height));

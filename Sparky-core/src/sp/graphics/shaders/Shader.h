@@ -5,6 +5,7 @@
 #include "sp/Types.h"
 
 #include "sp/maths/maths.h"
+
 #include "sp/system/VFS.h"
 
 #include "ShaderUniform.h"
@@ -32,14 +33,18 @@ namespace sp { namespace graphics { namespace API {
 		virtual void Unbind() const = 0;
 
 		virtual void SetVSSystemUniformBuffer(byte* data, uint size, uint slot = 0) = 0;
+		virtual void SetGSSystemUniformBuffer(byte* data, uint size, uint slot = 0) = 0;
 		virtual void SetPSSystemUniformBuffer(byte* data, uint size, uint slot = 0) = 0;
 
 		virtual void SetVSUserUniformBuffer(byte* data, uint size) = 0;
+		virtual void SetGSUserUniformBuffer(byte* data, uint size) = 0;
 		virtual void SetPSUserUniformBuffer(byte* data, uint size) = 0;
 
 		virtual const ShaderUniformBufferList& GetVSSystemUniforms() const = 0;
+		virtual const ShaderUniformBufferList& GetGSSystemUniforms() const = 0;
 		virtual const ShaderUniformBufferList& GetPSSystemUniforms() const = 0;
 		virtual const ShaderUniformBufferDeclaration* GetVSUserUniformBuffer() const = 0;
+		virtual const ShaderUniformBufferDeclaration* GetGSUserUniformBuffer() const = 0;
 		virtual const ShaderUniformBufferDeclaration* GetPSUserUniformBuffer() const = 0;
 
 		virtual const ShaderResourceList& GetResources() const = 0;
@@ -52,6 +57,7 @@ namespace sp { namespace graphics { namespace API {
 		// bool HasUniform(const String& name) const = 0;
 	public:
 		static Shader* CreateFromFile(const String& name, const String& filepath, void* address = nullptr); // TODO: Temp, implement properly
+		static Shader* CreateFromName(const String& name, void* address = nullptr);
 		static Shader* CreateFromSource(const String& name, const String& source);
 		
 		static bool TryCompile(const String& source, String& error);

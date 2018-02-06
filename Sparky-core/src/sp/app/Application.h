@@ -30,18 +30,24 @@ namespace sp {
 		bool m_Running, m_Suspended;
 		Timer* m_Timer;
 		uint m_UpdatesPerSecond, m_FramesPerSecond;
-		float m_Frametime;
+		double m_MaxUpdatesPerSecond = 60.0, m_MaxFramesPerSecond = 300.0;
+		float m_Frametime, m_UpdateTime;
 
 		String m_Name;
-		WindowProperties m_Properties;
+		WindowProperties* m_Properties;
 
 		std::vector<graphics::Layer*> m_LayerStack;
 		std::vector<graphics::Layer*> m_OverlayStack;
 	public:
-		Application(const String& name, const WindowProperties& properties, graphics::API::RenderAPI api = graphics::API::RenderAPI::OPENGL);
+		/// SERVER
+		Application(const String& name);
+
+		/// CLIENT
+		Application(const String& name, WindowProperties* properties, graphics::API::RenderAPI api = graphics::API::RenderAPI::OPENGL);
 		virtual ~Application();
 
 		virtual void Init();
+		virtual void OnUpdate(const Timestep& ts);
 
 		void PushLayer(graphics::Layer* layer);
 		graphics::Layer* PopLayer();
@@ -58,6 +64,8 @@ namespace sp {
 
 		inline uint GetFPS() const { return m_FramesPerSecond; }
 		inline uint GetUPS() const { return m_UpdatesPerSecond; }
+		inline double GetMaxFPS() const { return m_MaxFramesPerSecond; }
+		inline double GetMaxUPS() const { return m_MaxUpdatesPerSecond; }
 		inline float GetFrametime() const { return m_Frametime; }
 
 		inline uint GetWindowWidth() const { return window->GetWidth(); }
@@ -66,12 +74,12 @@ namespace sp {
 
 		String GetBuildConfiguration();
 		String GetPlatform(); // TODO: Return "Platform" object rather than String
+		inline bool IsServer() { return m_Properties == nullptr; }
 	private:
 		void PlatformInit();
 		void Run();
 
 		void OnTick();
-		void OnUpdate(const Timestep& ts);
 		void OnRender();
 	private:
 		void OnEvent(events::Event& event);

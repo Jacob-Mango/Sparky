@@ -16,7 +16,7 @@ namespace sp { namespace graphics { namespace API {
 		static Context* s_Context;
 		static RenderAPI s_RenderAPI;
 	public:
-		static void Create(WindowProperties properties, void* deviceContext);
+		static void Create(WindowProperties* properties, void* deviceContext);
 
 		static RenderAPI GetRenderAPI() { return s_RenderAPI; }
 		static void SetRenderAPI(RenderAPI api) { s_RenderAPI = api; }

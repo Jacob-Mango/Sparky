@@ -2,8 +2,6 @@
 
 #include "sp/sp.h"
 
-#include "sp/maths/vec2.h"
-
 #include "sp/audio/SoundManager.h"
 #include "sp/events/Events.h"
 
@@ -11,6 +9,9 @@
 #include "sp/graphics/TextureManager.h"
 
 #include "sp/app/Input.h"
+
+#define VSYNC_DISABLED 0
+#define VSYNC_ENABLED 1
 
 namespace sp {
 
@@ -20,7 +21,7 @@ namespace sp {
 	{
 		uint width, height;
 		bool fullscreen;
-		bool vsync;
+		uint vsync;
 	};
 
 	class SP_API Window
@@ -29,15 +30,14 @@ namespace sp {
 		static std::map<void*, Window*> s_Handles;
 	private:
 		String m_Title;
-		WindowProperties m_Properties;
+		WindowProperties* m_Properties;
 		bool m_Closed;
 		void* m_Handle;
 
-		bool m_Vsync;
 		WindowEventCallback m_EventCallback;
 		InputManager* m_InputManager;
 	public:
-		Window(const String& name, const WindowProperties& properties);
+		Window(const String& name, WindowProperties* properties);
 		~Window();
 		void Clear() const;
 		void Update();
@@ -45,11 +45,11 @@ namespace sp {
 
 		void SetTitle(const String& title);
 
-		inline uint GetWidth() const { return m_Properties.width; }
-		inline uint GetHeight() const { return m_Properties.height; }
+		inline uint GetWidth() const { return m_Properties->width; }
+		inline uint GetHeight() const { return m_Properties->height; }
 
-		void SetVsync(bool enabled);
-		inline bool IsVsync() const { return m_Vsync; }
+		void SetVsync(uint syncInterval);
+		inline bool IsVsync() const { return m_Properties->vsync != 0; }
 
 		inline InputManager* GetInputManager() const { return m_InputManager; }
 		 

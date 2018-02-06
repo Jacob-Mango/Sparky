@@ -33,7 +33,7 @@ namespace sp { namespace graphics { namespace API {
 		template<typename T>
 		void Push(const String& name, uint count = 1, bool normalized = false)
 		{
-			SP_ASSERT(false, "Unkown type!");
+			SP_ASSERT(false, "Unknown type!");
 		}
 
 		template<>
@@ -87,7 +87,7 @@ namespace sp { namespace graphics { namespace API {
 					Push(name, GL_FLOAT, sizeof(float), 2, normalized);
 					break;
 				case RenderAPI::DIRECT3D:
-					Push(name, DX_TYPE_R32G32_FLOAT, sizeof(maths::vec2), count, normalized);
+					Push(name, DX_TYPE_R32G32_FLOAT, sizeof(maths::vec2), 2, normalized);
 					break;
 			}
 		}
@@ -101,7 +101,7 @@ namespace sp { namespace graphics { namespace API {
 					Push(name, GL_FLOAT, sizeof(float), 3, normalized);
 					break;
 				case RenderAPI::DIRECT3D:
-					Push(name, DX_TYPE_R32G32B32_FLOAT, sizeof(maths::vec3), count, normalized);
+					Push(name, DX_TYPE_R32G32B32_FLOAT, sizeof(maths::vec3), 3, normalized);
 					break;
 			}
 		}
@@ -115,8 +115,22 @@ namespace sp { namespace graphics { namespace API {
 					Push(name, GL_FLOAT, sizeof(float), 4, normalized);
 					break;
 				case RenderAPI::DIRECT3D:
-					Push(name, DX_TYPE_R32G32B32A32_FLOAT, sizeof(maths::vec4), count, normalized);
+					Push(name, DX_TYPE_R32G32B32A32_FLOAT, sizeof(maths::vec4), 4, normalized);
 					break;
+			}
+		}
+
+		template<>
+		void Push<maths::mat4>(const String& name, uint count, bool normalized)
+		{
+			switch (Context::GetRenderAPI())
+			{
+			case RenderAPI::OPENGL:
+				Push(name, GL_FLOAT, sizeof(float), 16, normalized);
+				break;
+			case RenderAPI::DIRECT3D:
+				//Push(name, DX_TYPE_R32G32B32A32_FLOAT, sizeof(maths::vec4), 4, normalized);
+				break;
 			}
 		}
 

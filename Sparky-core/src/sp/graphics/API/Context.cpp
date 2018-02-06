@@ -11,7 +11,7 @@ namespace sp { namespace graphics { namespace API {
 	Context* Context::s_Context = nullptr;
 	RenderAPI Context::s_RenderAPI = RenderAPI::NONE;
 
-	void Context::Create(WindowProperties properties, void* deviceContext)
+	void Context::Create(WindowProperties* properties, void* deviceContext)
 	{
 		switch (GetRenderAPI())
 		{

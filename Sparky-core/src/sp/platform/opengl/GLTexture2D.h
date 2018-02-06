@@ -7,17 +7,13 @@ namespace sp { namespace graphics { namespace API {
 
 	class GLTexture2D : public Texture2D
 	{
-	private:
-		String m_Name;
-		String m_FileName;
-		uint m_Handle;
-		uint m_Width, m_Height;
-		TextureParameters m_Parameters;
-		TextureLoadOptions m_LoadOptions;
 	public:
-		GLTexture2D(uint width, uint height, TextureParameters parameters = TextureParameters(), TextureLoadOptions loadOptions = TextureLoadOptions());
-		GLTexture2D(uint width, uint height, uint color, TextureParameters parameters = TextureParameters(), TextureLoadOptions loadOptions = TextureLoadOptions());
-		GLTexture2D(const String& name, const String& filename, TextureParameters parameters = TextureParameters(), TextureLoadOptions loadOptions = TextureLoadOptions());
+		GLTexture2D(uint width, uint height, TextureParameters parameters = TextureParameters(), TextureLoadOptions loadOptions = TextureLoadOptions(), TextureType type = TextureType());
+		GLTexture2D(uint width, uint height, byte* pixels, TextureParameters parameters = TextureParameters(), TextureLoadOptions loadOptions = TextureLoadOptions(), TextureType type = TextureType());
+		GLTexture2D(uint width, uint height, uint color, TextureParameters parameters = TextureParameters(), TextureLoadOptions loadOptions = TextureLoadOptions(), TextureType type = TextureType());
+		GLTexture2D(const String& name, const String& filename, TextureParameters parameters = TextureParameters(), TextureLoadOptions loadOptions = TextureLoadOptions(), TextureType type = TextureType());
+
+		GLTexture2D() {}
 
 		~GLTexture2D();
 
@@ -38,7 +34,11 @@ namespace sp { namespace graphics { namespace API {
 		uint Load();
 	public:
 		static uint SPTextureFormatToGL(TextureFormat format);
+		static uint SPTextureInternalFormatToGL(TextureFormat format);
 		static uint SPTextureWrapToGL(TextureWrap wrap);
+		static uint SPTextureTypeToGL(TextureType type);
+
+		static GLTexture2D* FromHandle(GLuint handle);
 	};
 
 

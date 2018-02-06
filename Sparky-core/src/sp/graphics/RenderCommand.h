@@ -16,6 +16,7 @@ namespace sp { namespace graphics {
 		Mesh* mesh;
 		maths::mat4 transform;
 		API::Shader* shader;
+		maths::mat4 bones[64];
 		std::vector<RendererUniform> uniforms;
 	};
 

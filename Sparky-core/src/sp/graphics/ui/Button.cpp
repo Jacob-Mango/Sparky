@@ -54,7 +54,7 @@ namespace sp { namespace graphics { namespace ui {
 
 		renderer.DrawRect(m_Bounds);
 		renderer.FillRect(m_Bounds, m_State == ButtonState::PRESSED ? 0xcfbbbbbb : 0xcf5f5f5f);
-		renderer.DrawString(m_Label, m_Bounds.position - vec2(m_Bounds.width - horizontalPadding, m_Font->GetHeight(m_Label) * 0.5f), *m_Font); // TODO: Actually use a Label
+		renderer.DrawString(m_Label, (vec2) m_Bounds.position.Subtract(vec2(m_Bounds.width - horizontalPadding, m_Font->GetHeight(m_Label) * 0.5f)), *m_Font); // TODO: Actually use a Label
 	}
 
 } } }

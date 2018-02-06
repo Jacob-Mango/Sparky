@@ -13,7 +13,7 @@ namespace sp { namespace graphics {
 
 	PostEffectsPass::PostEffectsPass(API::Shader* shader)
 	{
-		m_Material = spnew Material(shader);
+		m_Material = spnew Material("pe", shader);
 		// m_Material->SetTexture("tex", 0);
 	}
 
@@ -22,7 +22,7 @@ namespace sp { namespace graphics {
 
 	}
 
-	void PostEffectsPass::RenderPass(Framebuffer* target)
+	void PostEffectsPass::RenderPass(API::Framebuffer* target)
 	{
 		m_Material->SetUniform("pr_matrix", maths::mat4::Orthographic(0.0f, (float)target->GetWidth(), (float)target->GetHeight(), 0.0f, -1.0f, 1.0f));
 		m_Material->Bind();

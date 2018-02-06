@@ -27,8 +27,19 @@ namespace sp { namespace graphics { namespace API {
 		NONE = 0,
 		RGB,
 		RGBA,
+		RGB16F,
 		LUMINANCE,
 		LUMINANCE_ALPHA
+	};
+
+	enum class SP_API TextureType
+	{
+		NONE = 0,
+		FLOAT,
+		UNSIGNED_BYTE,
+		BYTE,
+		INT,
+		DOUBLE
 	};
 
 	struct SP_API TextureParameters
@@ -36,16 +47,23 @@ namespace sp { namespace graphics { namespace API {
 		TextureFormat format;
 		TextureFilter filter;
 		TextureWrap wrap;
+		TextureType type;
 
 		TextureParameters()
 		{
 			format = TextureFormat::RGBA;
 			filter = TextureFilter::LINEAR;
 			wrap = TextureWrap::CLAMP;
+			type = TextureType::UNSIGNED_BYTE;
+		}
+
+		TextureParameters(TextureFormat format, TextureFilter filter, TextureWrap wrap, TextureType type)
+			: format(format), filter(filter), wrap(wrap), type(type)
+		{
 		}
 
 		TextureParameters(TextureFormat format, TextureFilter filter, TextureWrap wrap)
-			: format(format), filter(filter), wrap(wrap)
+			: format(format), filter(filter), wrap(wrap), type(TextureType::UNSIGNED_BYTE)
 		{
 		}
 

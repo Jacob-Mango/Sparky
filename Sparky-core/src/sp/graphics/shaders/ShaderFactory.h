@@ -12,5 +12,6 @@ namespace sp { namespace graphics { namespace ShaderFactory {
 	SP_API API::Shader* GeometryPassShader();
 
 	SP_API API::Shader* DebugShader();
+	SP_API API::Shader* PhysicsShader();
 
 } } }
