@@ -12,12 +12,12 @@
 
 namespace sp { namespace graphics { namespace API {
 
-	Framebuffer2D* Framebuffer2D::Create(uint width, uint height, uint numberTextures)
+	FrameBuffer2D* FrameBuffer2D::Create(uint width, uint height, std::vector<TextureParameters> parameters)
 	{
 		switch (API::Context::GetRenderAPI())
 		{
-			case API::RenderAPI::OPENGL:	return spnew GLFramebuffer2D(width, height, numberTextures);
-			case API::RenderAPI::DIRECT3D:	return spnew D3DFramebuffer2D(width, height, numberTextures);
+			case API::RenderAPI::OPENGL:	return spnew GLFramebuffer2D(width, height, parameters);
+			case API::RenderAPI::DIRECT3D:	return spnew D3DFramebuffer2D(width, height, parameters);
 		}
 		return nullptr;
 	}

@@ -7,27 +7,23 @@
 
 namespace sp { namespace graphics { namespace API {
 
-	class GLFramebuffer2D : public Framebuffer2D
+	class GLFramebuffer2D : public FrameBuffer2D
 	{
 	private:
 		uint m_FramebufferHandle;
 		uint m_DepthbufferHandle;
 
-		uint m_NumberTextures;
-
-		GLuint* m_TextureHandles;
+		std::vector<TextureParameters> m_Parameters;
 
 		uint m_Width, m_Height;
 		maths::vec4 m_ClearColor;
 	public:
-		GLFramebuffer2D(uint width, uint height, uint numberTextures);
+		GLFramebuffer2D(uint width, uint height, std::vector<TextureParameters> parameters);
 		~GLFramebuffer2D();
 
 		void Bind() const override;
 		void Unbind() const override;
 		void Clear() override;
-
-		void Render(API::Shader* shader) override;
 
 		inline uint GetWidth() const override { return m_Width; }
 		inline uint GetHeight() const override { return m_Height; }

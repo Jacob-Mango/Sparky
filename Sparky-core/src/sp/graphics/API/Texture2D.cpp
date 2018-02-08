@@ -10,21 +10,21 @@
 
 namespace sp { namespace graphics { namespace API {
 
-	Texture2D* Texture2D::Create(uint width, uint height, TextureParameters parameters, TextureLoadOptions loadOptions, TextureType type)
+	Texture2D* Texture2D::Create(uint width, uint height, TextureParameters parameters, TextureLoadOptions loadOptions)
 	{
 		switch (Context::GetRenderAPI())
 		{
-			case RenderAPI::OPENGL:		return spnew GLTexture2D(width, height, parameters, loadOptions, type);
+			case RenderAPI::OPENGL:		return spnew GLTexture2D(width, height, parameters, loadOptions);
 			case RenderAPI::DIRECT3D:	return spnew D3DTexture2D(width, height, parameters, loadOptions);
 		}
 		return nullptr;
 	}
 
-	Texture2D* Texture2D::CreateFromFile(const String& filepath, TextureParameters parameters, TextureLoadOptions loadOptions, TextureType type)
+	Texture2D* Texture2D::CreateFromFile(const String& filepath, TextureParameters parameters, TextureLoadOptions loadOptions)
 	{
 		switch (Context::GetRenderAPI())
 		{
-			case RenderAPI::OPENGL:		return spnew GLTexture2D(filepath, filepath, parameters, loadOptions, type);
+			case RenderAPI::OPENGL:		return spnew GLTexture2D(filepath, filepath, parameters, loadOptions);
 			case RenderAPI::DIRECT3D:	return spnew D3DTexture2D(filepath, filepath, parameters, loadOptions);
 		}
 		return nullptr;
@@ -40,11 +40,11 @@ namespace sp { namespace graphics { namespace API {
 		return nullptr;
 	}
 
-	Texture2D* Texture2D::CreateFromFile(const String& name, const String& filepath, TextureParameters parameters, TextureLoadOptions loadOptions, TextureType type)
+	Texture2D* Texture2D::CreateFromFile(const String& name, const String& filepath, TextureParameters parameters, TextureLoadOptions loadOptions)
 	{
 		switch (Context::GetRenderAPI())
 		{
-			case RenderAPI::OPENGL:		return spnew GLTexture2D(name, filepath, parameters, loadOptions, type);
+			case RenderAPI::OPENGL:		return spnew GLTexture2D(name, filepath, parameters, loadOptions);
 			case RenderAPI::DIRECT3D:	return spnew D3DTexture2D(name, filepath, parameters, loadOptions);
 		}
 		return nullptr;

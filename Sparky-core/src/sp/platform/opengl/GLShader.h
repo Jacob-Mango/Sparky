@@ -71,7 +71,7 @@ namespace sp { namespace graphics { namespace API {
 	private:
 		static uint Compile(String** shaders, GLShaderErrorInfo& info = GLShaderErrorInfo());
 		static void PreProcess(const String& source, String** shaders);
-		static void ReadShaderFile(String line, ShaderType type, String** shaders);
+		static void ReadShaderFile(std::vector<String> lines, String** shaders);
 
 		void Parse(const String& vertexSource, const String& geometrySource, const String& fragmentSource);
 		void ParseUniform(const String& statement, uint shaderType);

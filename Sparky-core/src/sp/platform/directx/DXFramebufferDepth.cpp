@@ -3,7 +3,7 @@
 
 namespace sp { namespace graphics { namespace API {
 
-	D3DFramebufferDepth::D3DFramebufferDepth(uint width, uint height, uint textures)
+	D3DFramebufferDepth::D3DFramebufferDepth(uint width, uint height, std::vector<TextureParameters> parameters)
 		: m_Width(width), m_Height(height)
 	{
 		Init();
@@ -27,10 +27,6 @@ namespace sp { namespace graphics { namespace API {
 	}
 
 	void D3DFramebufferDepth::Clear()
-	{
-	}
-
-	void D3DFramebufferDepth::Render(API::Shader* shader)
 	{
 	}
 } } }

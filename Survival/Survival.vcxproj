@@ -196,9 +196,6 @@
     <ClInclude Include="src\GameObjects\Plane.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dependencies\Bullet\Bullet.vcxproj">
-      <Project>{446b083a-45c3-4252-a6fd-91b0383867d5}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\Sparky-core\Sparky-core.vcxproj">
       <Project>{c737c239-3a40-4388-9c61-6cf779025785}</Project>
     </ProjectReference>

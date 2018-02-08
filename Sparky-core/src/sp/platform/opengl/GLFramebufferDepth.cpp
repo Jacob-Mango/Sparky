@@ -13,8 +13,8 @@ namespace sp { namespace graphics { namespace API {
 
 	using namespace API;
 
-	GLFramebufferDepth::GLFramebufferDepth(uint width, uint height, uint numberTextures)
-		: m_Width(width), m_Height(height), m_NumberTextures(numberTextures)
+	GLFramebufferDepth::GLFramebufferDepth(uint width, uint height, std::vector<TextureParameters> parameters)
+		: m_Width(width), m_Height(height), m_Parameters(parameters)
 	{
 		Init();
 	}
@@ -71,11 +71,6 @@ namespace sp { namespace graphics { namespace API {
 	{
 		GLCall(glClearColor(m_ClearColor.x, m_ClearColor.y, m_ClearColor.z, m_ClearColor.w));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-	}
-
-	void GLFramebufferDepth::Render(API::Shader* shader)
-	{
-
 	}
 
 } } }

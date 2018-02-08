@@ -13,7 +13,6 @@ namespace sp { namespace graphics {
 	class SP_API DeferredRenderer : public Renderer3D
 	{
 	private:
-		API::Framebuffer2D* m_FrameBuffer;
 		API::Shader* m_Shader;
 		API::VertexArray* m_VertexArray;
 		API::IndexBuffer* m_IndexBuffer;

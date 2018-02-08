@@ -4,6 +4,7 @@
 #include "sp/Types.h"
 #include "sp/maths/maths.h"
 #include "Texture.h"
+#include "Texture2D.h"
 
 namespace sp { namespace graphics { namespace API {
 
@@ -28,6 +29,8 @@ namespace sp { namespace graphics { namespace API {
 
 	class SP_API Framebuffer
 	{
+	protected:
+		std::vector<API::Texture2D*> m_Textures;
 	public:
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
@@ -36,7 +39,7 @@ namespace sp { namespace graphics { namespace API {
 		virtual uint GetWidth() const = 0;
 		virtual uint GetHeight() const = 0;
 
-		virtual void Render(API::Shader* shader) = 0;
+		std::vector<API::Texture2D*> GetTextures() { return m_Textures; };
 	protected:
 		virtual void Init() {};
 	};

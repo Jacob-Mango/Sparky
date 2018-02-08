@@ -37,7 +37,7 @@ vec3 g_SphereSpecularColor(1.0f, 1.0f, 0.6f);
 float g_DaggerGloss = 0.5f;
 
 Shader* shadowPassShader;
-FramebufferDepth* g_DepthBuffer;
+FrameBufferDepth* g_DepthBuffer;
 TextureDepth* g_ShadowMap;
 
 String materialInputs[5] =

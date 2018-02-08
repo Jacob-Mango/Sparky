@@ -8,7 +8,7 @@ namespace sp { namespace graphics { namespace API {
 
 	using namespace API;
 
-	D3DFramebuffer2D::D3DFramebuffer2D(uint width, uint height, uint textures)
+	D3DFramebuffer2D::D3DFramebuffer2D(uint width, uint height, std::vector<TextureParameters> parameters)
 		: m_Width(width), m_Height(height)
 	{
 		Init();
@@ -37,9 +37,5 @@ namespace sp { namespace graphics { namespace API {
 	void D3DFramebuffer2D::Clear()
 	{
 
-	}
-
-	void D3DFramebuffer2D::Render(API::Shader* shader)
-	{
 	}
 } } }

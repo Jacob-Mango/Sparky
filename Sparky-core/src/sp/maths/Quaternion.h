@@ -67,6 +67,7 @@ namespace sp { namespace maths {
 		const Quaternion operator-() const;
 		bool operator==(const Quaternion& quaternion) const;
 		bool operator!=(const Quaternion& quaternion) const;
+
 		static Quaternion Identity();
 		static Quaternion FromEulerAngles(const vec3& angles);
 

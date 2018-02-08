@@ -24,14 +24,14 @@ namespace sp {
 			VSSystemUniformIndex_Size
 		};
 
-		enum PSSystemUniformIndices : int32
-		{
-			PSSystemUniformIndex_Size
-		};
-
 		enum GSSystemUniformIndices : int32
 		{
 			GSSystemUniformIndex_Size
+		};
+
+		enum PSSystemUniformIndices : int32
+		{
+			PSSystemUniformIndex_Size
 		};
 
 		DeferredRenderer::DeferredRenderer()
@@ -46,9 +46,16 @@ namespace sp {
 
 		void DeferredRenderer::Init()
 		{
-			m_FrameBuffer = API::Framebuffer2D::Create(m_ScreenBufferWidth, m_ScreenBufferHeight, 6);
+			m_FrameBuffer = API::FrameBuffer2D::Create(m_ScreenBufferWidth, m_ScreenBufferHeight, {
+					API::TextureParameters(API::TextureFormat::RGBA, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
+					API::TextureParameters(API::TextureFormat::RGBA, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
+					API::TextureParameters(API::TextureFormat::RGBA, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
+					API::TextureParameters(API::TextureFormat::RGBA, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
+					API::TextureParameters(API::TextureFormat::RGBA, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
+					API::TextureParameters(API::TextureFormat::RGBA, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
+				});
 
-			m_Shader = ShaderManager::Get("PBRDeferred");
+			m_Shader = API::Shader::CreateFromFile("Deferred", String("/shaders/PBR_D/PBR_D.shader"));
 			m_Material = spnew Material("DeferredRendering", m_Shader);
 
 			m_CommandQueue.reserve(1000);
@@ -68,10 +75,11 @@ namespace sp {
 			memset(m_GSSystemUniformBuffer, 0, m_GSSystemUniformBufferSize);
 			m_GSSystemUniformBufferOffsets.resize(GSSystemUniformIndex_Size);
 
-			m_PSSystemUniformBufferSize = NUMLIGHTS * sizeof(Light);
+			m_PSSystemUniformBufferSize = 0;
 			m_PSSystemUniformBuffer = spnew byte[m_PSSystemUniformBufferSize];
 			memset(m_PSSystemUniformBuffer, 0, m_PSSystemUniformBufferSize);
 			m_PSSystemUniformBufferOffsets.resize(PSSystemUniformIndex_Size);
+
 
 			m_Mesh = MeshFactory::CreateQuad(vec2(-1, -1), vec2(2, 2), nullptr);
 			m_IndexBuffer = m_Mesh->m_IndexBuffer;
@@ -197,13 +205,13 @@ namespace sp {
 		{
 			shader->SetVSSystemUniformBuffer(m_VSSystemUniformBuffer, m_VSSystemUniformBufferSize, 0);
 			//shader->SetGSSystemUniformBuffer(m_GSSystemUniformBuffer, m_GSSystemUniformBufferSize, 0);
-			//shader->SetPSSystemUniformBuffer(m_PSSystemUniformBuffer, m_PSSystemUniformBufferSize, 0);
+			shader->SetPSSystemUniformBuffer(m_PSSystemUniformBuffer, m_PSSystemUniformBufferSize, 0);
 		}
 
 		void DeferredRenderer::Present()
 		{
 			m_FrameBuffer->Bind();
-			Renderer::SetViewport(0, 0, m_ScreenBufferWidth, m_ScreenBufferHeight);
+			m_FrameBuffer->SetClearColor(maths::vec4(1, 0, 1, 1));
 			m_FrameBuffer->Clear();
 			for (uint i = 0; i < m_CommandQueue.size(); i++)
 			{
@@ -218,9 +226,7 @@ namespace sp {
 				SetSystemUniforms(command.shader);
 				command.mesh->Render(*this);
 			}
-
 			m_FrameBuffer->Unbind();
-
 
 			float aspectX = (float)m_ScreenBufferWidth / (float)m_ScreenBufferHeight;
 			float aspectY = (float)m_ScreenBufferHeight / (float)m_ScreenBufferWidth;
@@ -237,7 +243,13 @@ namespace sp {
 			m_Shader->Bind();
 			m_Material->Bind();
 
-			m_FrameBuffer->Render(m_Shader);
+			std::vector<API::Texture2D*> textures = m_FrameBuffer->GetTextures();
+			m_Material->SetTexture("u_Position", textures[0]);
+			m_Material->SetTexture("u_Albedo", textures[1]);
+			m_Material->SetTexture("u_SpecularRoughness", textures[2]);
+			m_Material->SetTexture("u_Normal", textures[3]);
+			//m_Material->SetTexture("u_Tangent", textures[4]);
+			//m_Material->SetTexture("u_Binormal", textures[5]);
 
 			m_VertexArray->Bind();
 			m_IndexBuffer->Bind();

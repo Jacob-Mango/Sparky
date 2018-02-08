@@ -18,14 +18,14 @@ __declspec(align(16)) class btVector3;
 class Player : public sp::entity::Entity
 {
 private:
-	sp::world::World* m_World;
+	sp::graphics::Scene* m_Scene;
 
 	float m_MouseSensitivity;
 	bool m_MouseWasGrabbed;
 
 	float m_Speed, m_SprintSpeed;
 public:
-	Player(sp::world::World* scene, sp::graphics::API::Shader* shader);
+	Player(sp::graphics::Scene* scene, sp::graphics::API::Shader* shader);
 	~Player();
 
 	void OnInit() override;

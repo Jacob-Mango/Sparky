@@ -10,18 +10,17 @@
 
 namespace sp { namespace graphics { namespace API {
 
-	GLTexture2D::GLTexture2D(uint width, uint height, TextureParameters parameters, TextureLoadOptions loadOptions, TextureType type)
+	GLTexture2D::GLTexture2D(uint width, uint height, TextureParameters parameters, TextureLoadOptions loadOptions)
 	{
 		m_FileName = "NULL";
 		m_Width = width;
 		m_Height = height;
 		m_Parameters = parameters;
 		m_LoadOptions = loadOptions;
-		m_Type = type;
 		m_Handle = Load();
 	}
 
-	GLTexture2D::GLTexture2D(uint width, uint height, byte* pixels, TextureParameters parameters, TextureLoadOptions loadOptions, TextureType type)
+	GLTexture2D::GLTexture2D(uint width, uint height, byte* pixels, TextureParameters parameters, TextureLoadOptions loadOptions)
 	{
 		m_FileName = "NULL";
 		memcpy(&m_Pixels, &pixels, sizeof(pixels));
@@ -29,30 +28,27 @@ namespace sp { namespace graphics { namespace API {
 		m_Height = height;
 		m_Parameters = parameters;
 		m_LoadOptions = loadOptions;
-		m_Type = type;
 		Load();
 	}
 
-	GLTexture2D::GLTexture2D(uint width, uint height, uint color, TextureParameters parameters, TextureLoadOptions loadOptions, TextureType type)
+	GLTexture2D::GLTexture2D(uint width, uint height, uint color, TextureParameters parameters, TextureLoadOptions loadOptions)
 	{
 		m_FileName = "NULL";
 		m_Width = width;
 		m_Height = height;
 		m_Parameters = parameters;
 		m_LoadOptions = loadOptions;
-		m_Type = type;
 		m_Handle = Load();
 
 		SetData(color);
 	}
 
-	GLTexture2D::GLTexture2D(const String& name, const String& filename, TextureParameters parameters, TextureLoadOptions loadOptions, TextureType type)
+	GLTexture2D::GLTexture2D(const String& name, const String& filename, TextureParameters parameters, TextureLoadOptions loadOptions)
 	{
 		m_FileName = filename;
 		m_Name = name;
 		m_Parameters = parameters;
 		m_LoadOptions = loadOptions;
-		m_Type = type;
 		m_Handle = Load();
 	}
 
@@ -75,13 +71,16 @@ namespace sp { namespace graphics { namespace API {
 		uint handle;
 		GLCall(glGenTextures(1, &handle));
 		GLCall(glBindTexture(GL_TEXTURE_2D, handle));
-		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_Parameters.filter == TextureFilter::LINEAR ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST));
-		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_Parameters.filter == TextureFilter::LINEAR ? GL_LINEAR : GL_NEAREST));
+		GLCall(glTexImage2D(GL_TEXTURE_2D, 0, SPTextureInternalFormatToGL(m_Parameters.format), m_Width, m_Height, 0, SPTextureFormatToGL(m_Parameters.format), SPTextureTypeToGL(m_Parameters.type), m_Pixels ? m_Pixels : NULL));
+		
+		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, SPMinTextureFilterToGL(m_Parameters.filter)));
+		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, SPMagTextureFilterToGL(m_Parameters.filter)));
 		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, SPTextureWrapToGL(m_Parameters.wrap)));
 		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, SPTextureWrapToGL(m_Parameters.wrap)));
 
-		GLCall(glTexImage2D(GL_TEXTURE_2D, 0, SPTextureInternalFormatToGL(m_Parameters.format), m_Width, m_Height, 0, SPTextureFormatToGL(m_Parameters.format), SPTextureTypeToGL(m_Type), m_Pixels ? m_Pixels : NULL));
-		GLCall(glGenerateMipmap(GL_TEXTURE_2D));
+		if (m_Parameters.mipmap)
+			GLCall(glGenerateMipmap(GL_TEXTURE_2D));
+		
 		GLCall(glBindTexture(GL_TEXTURE_2D, 0));
 
 		if (m_Pixels != nullptr)
@@ -127,6 +126,28 @@ namespace sp { namespace graphics { namespace API {
 		GLCall(glBindTexture(GL_TEXTURE_2D, 0));
 	}
 
+	uint GLTexture2D::SPMinTextureFilterToGL(TextureFilter filter)
+	{
+		switch (filter)
+		{
+		case TextureFilter::LINEAR_MIPMAP:		return GL_LINEAR;
+		case TextureFilter::LINEAR:				return GL_LINEAR;
+		case TextureFilter::NEAREST:			return GL_NEAREST;
+		}
+		return 0;
+	}
+
+	uint GLTexture2D::SPMagTextureFilterToGL(TextureFilter filter)
+	{
+		switch (filter)
+		{
+		case TextureFilter::LINEAR_MIPMAP:		return GL_LINEAR_MIPMAP_LINEAR;
+		case TextureFilter::LINEAR:				return GL_LINEAR;
+		case TextureFilter::NEAREST:			return GL_NEAREST;
+		}
+		return 0;
+	}
+
 	uint GLTexture2D::SPTextureFormatToGL(TextureFormat format)
 	{
 		switch (format)
@@ -134,6 +155,7 @@ namespace sp { namespace graphics { namespace API {
 		case TextureFormat::RGBA:				return GL_RGBA;
 		case TextureFormat::RGB:				return GL_RGB;
 		case TextureFormat::RGB16F:				return GL_RGB;
+		case TextureFormat::RGBA32F:			return GL_RGBA;
 		case TextureFormat::LUMINANCE:			return GL_LUMINANCE;
 		case TextureFormat::LUMINANCE_ALPHA:	return GL_LUMINANCE_ALPHA;
 		}
@@ -147,6 +169,7 @@ namespace sp { namespace graphics { namespace API {
 			case TextureFormat::RGBA:				return GL_RGBA;
 			case TextureFormat::RGB:				return GL_RGB;
 			case TextureFormat::RGB16F:				return GL_RGB32F;
+			case TextureFormat::RGBA32F:			return GL_RGBA32F;
 			case TextureFormat::LUMINANCE:			return GL_LUMINANCE;
 			case TextureFormat::LUMINANCE_ALPHA:	return GL_LUMINANCE_ALPHA;
 		}

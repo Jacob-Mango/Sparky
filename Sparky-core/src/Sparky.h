@@ -65,6 +65,9 @@
 #include <sp/graphics/shaders/ShaderManager.h>
 #include <sp/graphics/shaders/ShaderUniform.h>
 
+#include <sp/graphics/scene/Scene.h>
+#include <sp/graphics/scene/Scene2D.h>
+
 #include <sp/graphics/API/Renderer.h>
 #include <sp/graphics/API/Texture.h>
 #include <sp/graphics/API/Texture2D.h>
@@ -92,8 +95,3 @@
 
 #include <sp/String.h>
 #include <sp/Types.h>
-
-#include <sp/world/World.h>
-#include <sp/world/World2D.h>
-
-#include <sp/world/terrain/HeightMap.h>

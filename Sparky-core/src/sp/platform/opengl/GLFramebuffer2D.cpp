@@ -10,8 +10,8 @@ namespace sp { namespace graphics {
 
 	using namespace API;
 
-	GLFramebuffer2D::GLFramebuffer2D(uint width, uint height, uint numberTextures)
-		: m_Width(width), m_Height(height), m_NumberTextures(numberTextures)
+	GLFramebuffer2D::GLFramebuffer2D(uint width, uint height, std::vector<TextureParameters> parameters)
+		: m_Width(width), m_Height(height), m_Parameters(parameters)
 	{
 		Init();
 	}
@@ -25,27 +25,22 @@ namespace sp { namespace graphics {
 	{
 		GLCall(glGenFramebuffers(1, &m_FramebufferHandle));
 		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, m_FramebufferHandle));
-		
-		GLuint* attachments = new GLuint[m_NumberTextures];
-		m_TextureHandles = new GLuint[m_NumberTextures];
 
-		for (unsigned int i = 0; i < m_NumberTextures; i++) {
-			glGenTextures(1, &m_TextureHandles[i]);
-			glBindTexture(GL_TEXTURE_2D, m_TextureHandles[i]);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_Width, m_Height, 0, GL_RGBA, GL_FLOAT, NULL);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		GLuint* attachments = spnew GLuint[m_Parameters.size()];
+		
+		for (unsigned int i = 0; i < m_Parameters.size(); i++) {
+			GLTexture2D* texture = spnew GLTexture2D(m_Width, m_Height, m_Parameters[i], TextureLoadOptions());
 			attachments[i] = GL_COLOR_ATTACHMENT0 + i;
-			glFramebufferTexture2D(GL_FRAMEBUFFER, attachments[i], GL_TEXTURE_2D, m_TextureHandles[i], 0);
+			GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, attachments[i], GL_TEXTURE_2D, texture->GetHandle(), 0));
+			m_Textures.push_back((Texture2D*)texture);
 		}
 
-		GLCall(glDrawBuffers(m_NumberTextures, attachments));
+		GLCall(glDrawBuffers(m_Parameters.size(), attachments));
 
 		GLCall(glGenRenderbuffers(1, &m_DepthbufferHandle));
 		GLCall(glBindRenderbuffer(GL_RENDERBUFFER, m_DepthbufferHandle));
-		GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32F, m_Width, m_Height));
+		GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Width, m_Height));
+		// GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32F, m_Width, m_Height));
 		GLCall(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_DepthbufferHandle));
 		
 		GLenum status = (GLenum)glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
@@ -53,28 +48,28 @@ namespace sp { namespace graphics {
 		switch (status)
 		{
 		case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
-			SP_ERROR("OpenGL framebuffer format not supported. ");
+			SP_ERROR("OpenGL: Framebuffers are not supported/enabled on your system.");
 			break;
 		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
-			SP_ERROR("OpenGL framebuffer missing attachment.");
+			SP_ERROR("OpenGL: Missing a framebuffer attachment.");
 			break;
 		case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-			SP_ERROR("OpenGL framebuffer attached images must have same dimensions.");
+			SP_ERROR("OpenGL: All framebuffer attached textures must have the same dimensions.");
 			break;
 		case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-			SP_ERROR("OpenGL framebuffer attached images must have same format.");
+			SP_ERROR("OpenGL: All framebuffer attached textures must have same the format.");
 			break;
 		case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
-			SP_ERROR("OpenGL framebuffer missing draw buffer.");
+			SP_ERROR("OpenGL: The framebuffer is missing a draw buffer.");
 			break;
 		case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
-			SP_ERROR("OpenGL framebuffer missing read buffer.");
+			SP_ERROR("OpenGL: The framebuffer is missing a read buffer.");
 			break;
 		case GL_FRAMEBUFFER_COMPLETE_EXT:
-			SP_INFO("OpenGL framebuffer was created successfully.");
+			SP_INFO("OpenGL: The framebuffer was created successfully.");
 			break;
 		default:
-			SP_ERROR("OpenGL framebuffer had an unknown error.");
+			SP_ERROR("OpenGL: An unknown error occurred when creating the framebuffer object.");
 			break;
 		}
 
@@ -97,14 +92,6 @@ namespace sp { namespace graphics {
 	{
 		GLCall(glClearColor(m_ClearColor.x, m_ClearColor.y, m_ClearColor.z, m_ClearColor.w));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-	}
-
-	void GLFramebuffer2D::Render(API::Shader* shader)
-	{
-		for (unsigned int i = 0; i < m_NumberTextures; i++) {
-			GLCall(glActiveTexture(GL_TEXTURE0 + i));
-			GLCall(glBindTexture(GL_TEXTURE_2D, m_TextureHandles[i]));
-		}
 	}
 
 } }

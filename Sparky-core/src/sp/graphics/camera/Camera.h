@@ -14,6 +14,8 @@ namespace sp { namespace graphics {
 		maths::vec3 m_FocalPoint;
 		maths::Quaternion m_Rotation;
 	public:
+		float Pitch, Yaw, Roll;
+	public:
 		Camera(const maths::mat4& projectionMatrix);
 
 		virtual void OnFocus() { }
@@ -23,7 +25,7 @@ namespace sp { namespace graphics {
 		inline void SetPosition(const maths::vec3& position) { m_Position = position; }
 
 		inline const maths::vec3& GetRotation() const { return m_Rotation.ToEulerAngles(); }
-		inline void SetRotation(const maths::vec3& rotation) { m_Rotation.FromEulerAngles(rotation); }
+		inline void SetRotation(const maths::vec3& rotation) { m_Rotation = maths::Quaternion::FromEulerAngles(rotation); }
 		void SetRotation(maths::Quaternion& rotation);
 
 		inline const maths::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }

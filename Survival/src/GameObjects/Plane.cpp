@@ -11,7 +11,7 @@ using namespace component;
 
 using namespace API;
 
-using namespace world;
+using namespace graphics;
 
 Plane::Plane(const sp::maths::vec3& position, sp::graphics::MaterialInstance* mat)
 {

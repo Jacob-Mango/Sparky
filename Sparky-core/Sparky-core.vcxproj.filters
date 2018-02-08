@@ -96,8 +96,6 @@
     <ClCompile Include="src\sp\graphics\Mesh.cpp" />
     <ClCompile Include="src\sp\graphics\MeshFactory.cpp" />
     <ClCompile Include="src\sp\graphics\OBJModel.cpp" />
-    <ClCompile Include="src\sp\world\terrain\HeightMap.cpp" />
-    <ClCompile Include="src\sp\world\World.cpp" />
     <ClCompile Include="src\sp\graphics\shaders\Shader.cpp" />
     <ClCompile Include="src\sp\graphics\shaders\ShaderFactory.cpp" />
     <ClCompile Include="src\sp\graphics\shaders\ShaderUniform.cpp" />
@@ -108,7 +106,6 @@
     <ClCompile Include="src\sp\platform\windows\Win32Application.cpp" />
     <ClCompile Include="src\sp\platform\windows\Win32Log.cpp" />
     <ClCompile Include="src\sp\platform\windows\Win32Window.cpp" />
-    <ClCompile Include="src\sp\world\World2D.cpp" />
     <ClCompile Include="src\sp\sp.cpp" />
     <ClCompile Include="src\sp\String.cpp" />
     <ClCompile Include="src\sp\system\Allocator.cpp" />
@@ -120,9 +117,7 @@
     <ClCompile Include="src\sp\utils\FileUtils.cpp" />
     <ClCompile Include="src\sp\utils\ImageLoad.cpp" />
     <ClCompile Include="src\sp\platform\windows\Win32MemoryManager.cpp" />
-    <ClCompile Include="src\sp\graphics\Scene.cpp" />
     <ClCompile Include="src\sp\graphics\GBuffer.cpp" />
-    <ClCompile Include="src\sp\graphics\Label.cpp" />
     <ClCompile Include="src\sp\maths\AABB.cpp" />
     <ClCompile Include="src\sp\maths\mat4.cpp" />
     <ClCompile Include="src\sp\maths\Quaternion.cpp" />
@@ -130,6 +125,8 @@
     <ClCompile Include="src\sp\maths\vec2.cpp" />
     <ClCompile Include="src\sp\maths\vec3.cpp" />
     <ClCompile Include="src\sp\maths\vec4.cpp" />
+    <ClCompile Include="src\sp\graphics\scene\Scene2D.cpp" />
+    <ClCompile Include="src\sp\graphics\scene\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\sp\entity\component\CameraComponent.h" />
@@ -239,8 +236,6 @@
     <ClInclude Include="src\sp\graphics\Renderable2D.h" />
     <ClInclude Include="src\sp\graphics\RenderCommand.h" />
     <ClInclude Include="src\sp\graphics\Renderer3D.h" />
-    <ClInclude Include="src\sp\world\terrain\HeightMap.h" />
-    <ClInclude Include="src\sp\world\World.h" />
     <ClInclude Include="src\sp\graphics\shaders\Shader.h" />
     <ClInclude Include="src\sp\graphics\shaders\ShaderFactory.h" />
     <ClInclude Include="src\sp\graphics\shaders\ShaderUniform.h" />
@@ -248,7 +243,6 @@
     <ClInclude Include="src\sp\graphics\API\Texture.h" />
     <ClInclude Include="src\sp\graphics\TextureManager.h" />
     <ClInclude Include="src\sp\app\Window.h" />
-    <ClInclude Include="src\sp\world\World2D.h" />
     <ClInclude Include="src\sp\sp.h" />
     <ClInclude Include="src\sp\String.h" />
     <ClInclude Include="src\sp\system\Allocator.h" />
@@ -263,9 +257,7 @@
     <ClInclude Include="src\sp\utils\Log.h" />
     <ClInclude Include="src\sp\utils\Timer.h" />
     <ClInclude Include="src\sp\utils\Timestep.h" />
-    <ClInclude Include="src\sp\graphics\Scene.h" />
     <ClInclude Include="src\sp\graphics\GBuffer.h" />
-    <ClInclude Include="src\sp\graphics\Label.h" />
     <ClInclude Include="src\sp\maths\AABB.h" />
     <ClInclude Include="src\sp\maths\mat4.h" />
     <ClInclude Include="src\sp\maths\maths.h" />
@@ -276,6 +268,8 @@
     <ClInclude Include="src\sp\maths\vec2.h" />
     <ClInclude Include="src\sp\maths\vec3.h" />
     <ClInclude Include="src\sp\maths\vec4.h" />
+    <ClInclude Include="src\sp\graphics\scene\Scene2D.h" />
+    <ClInclude Include="src\sp\graphics\scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\sp\embedded\files\SourceSansPro-Light.embed" />

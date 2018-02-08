@@ -6,6 +6,8 @@
 
 #include "LightSetup.h"
 
+#include "API\Framebuffer2D.h"
+
 #define NUMBONES 64
 
 namespace sp { namespace graphics {
@@ -27,6 +29,8 @@ namespace sp { namespace graphics {
 
 		CommandQueue m_CommandQueue;
 		SystemUniformList m_SystemUniforms;
+
+		API::FrameBuffer2D* m_FrameBuffer;
 	public:
 		virtual ~Renderer3D() {}
 
@@ -43,6 +47,7 @@ namespace sp { namespace graphics {
 
 		virtual void SetScreenBufferSize(uint width, uint height) { m_ScreenBufferWidth = width; m_ScreenBufferHeight = height; }
 
+		virtual API::FrameBuffer2D* GetFrameBuffer() { return m_FrameBuffer;  }
 	protected:
 		virtual void PerformBoneTransforms(Bone* bone, maths::mat4 joints[NUMBONES], std::vector<maths::mat4> &matArray) = 0;
 	};

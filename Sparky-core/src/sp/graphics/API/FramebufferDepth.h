@@ -4,10 +4,10 @@
 
 namespace sp { namespace graphics { namespace API {
 
-	class SP_API FramebufferDepth : public Framebuffer
+	class SP_API FrameBufferDepth : public Framebuffer
 	{
 	public:
-		static FramebufferDepth* Create(uint width, uint height, uint numberTextures = 0);
+		static FrameBufferDepth* Create(uint width, uint height, std::vector<TextureParameters> parameters);
 	};
 
 } } }

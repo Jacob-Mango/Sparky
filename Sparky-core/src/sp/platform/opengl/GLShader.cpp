@@ -11,23 +11,14 @@ namespace sp {
 		namespace API {
 
 			bool* types = spnew bool[3];
+			bool IGNORE_LINES = false;
+			ShaderType type = ShaderType::UNKNOWN;
 
 			bool GLShader::TryCompile(const String& source, String& error)
 			{
 				String vert, geo, frag;
 				String* shaders[3] = { &vert, &geo, &frag };
 				GLShader::PreProcess(source, shaders);
-
-				SP_INFO("TryCompile Called!");
-
-				SP_INFO(shaders[0]);
-				SP_INFO(shaders[2]);
-				if (VFS::Get()->WriteTextFile(source + ".compiled.vert", *(shaders[0]))) {
-					SP_ERROR("Couldn't create file! Vert");
-				}
-				if (VFS::Get()->WriteTextFile(source + ".compiled.frag", *(shaders[2]))) {
-					SP_ERROR("Couldn't create file! Frag");
-				}
 
 				GLShaderErrorInfo info;
 				if (!GLShader::Compile(shaders, info))
@@ -66,6 +57,9 @@ namespace sp {
 				PreProcess(m_Source, shaders);
 				Parse(m_VertexSource, m_GeometrySource, m_FragmentSource);
 
+				SP_INFO("Vertex: \n", m_VertexSource);
+				SP_INFO("Fragment: \n", m_FragmentSource);
+
 				GLShaderErrorInfo error;
 				m_Handle = Compile(shaders, error);
 				if (!m_Handle)
@@ -83,17 +77,29 @@ namespace sp {
 
 			void GLShader::PreProcess(const String& source, String** shaders)
 			{
-				ShaderType type = ShaderType::UNKNOWN;
+				type = ShaderType::UNKNOWN;
 
 				types[0] = false;
 				types[1] = false;
 				types[2] = false;
 
 				std::vector<String> lines = GetLines(source);
+				ReadShaderFile(lines, shaders);
+			}
+
+			void GLShader::ReadShaderFile(std::vector<String> lines, String** shaders) {
+				String renderType = "FORWARD";
+
 				for (uint i = 0; i < lines.size(); i++)
 				{
 					const char* str = lines[i].c_str();
-					if (StartsWith(str, "#shader"))
+
+					if (IGNORE_LINES) {
+						if (StartsWith(str, "#end")) {
+							IGNORE_LINES = false;
+						}
+					}
+					else if (StartsWith(str, "#shader"))
 					{
 						if (StringContains(str, "vertex")) {
 							type = ShaderType::VERTEX;
@@ -107,8 +113,12 @@ namespace sp {
 							type = ShaderType::FRAGMENT;
 							types[2] = true;
 						}
+						else if (StringContains(str, "end")) {
+							type = ShaderType::UNKNOWN;
+						}
 					}
-					else if (StartsWith(str, "#include")) {
+					else if (StartsWith(str, "#include"))
+					{
 						String rem = "#include ";
 						String file = String(str);
 						if (strstr(file.c_str(), rem.c_str())) {
@@ -117,16 +127,23 @@ namespace sp {
 								file.erase(j, rem.length());
 							file = StringReplace(file, '\"');
 							SP_WARN("Including file \'", file, "\' into shader.");
-							String source2 = VFS::Get()->ReadTextFile(file);
 
-							std::vector<String> lines2 = GetLines(source2);
-
-							for (uint k = 0; k < lines2.size(); k++) {
-								ReadShaderFile(lines2[k], type, shaders);
-							}
+							ReadShaderFile(GetLines(VFS::Get()->ReadTextFile(file)), shaders);
 						}
-						else {
-							SP_WARN("Unknown include file: ", str);
+					}
+					else if (StartsWith(str, "#if"))
+					{
+						String rem = "#if ";
+						String def = String(str);
+						if (strstr(def.c_str(), rem.c_str())) {
+							std::string::size_type j = def.find(rem);
+							if (j != std::string::npos)
+								def.erase(j, rem.length());
+							def = StringReplace(def, '\"');
+
+							if (def != renderType) {
+								IGNORE_LINES = true;
+							}
 						}
 					}
 					else if (type != ShaderType::UNKNOWN)
@@ -134,34 +151,6 @@ namespace sp {
 						shaders[(int32)type - 1]->append(str);
 						shaders[(int32)type - 1]->append("\n");
 					}
-				}
-			}
-
-			void GLShader::ReadShaderFile(String line, ShaderType type, String** shaders) {
-				if (StartsWith(line, "#include")) {
-					String rem = "#include ";
-					String file = String(line);
-					if (strstr(file.c_str(), rem.c_str())) {
-						std::string::size_type j = file.find(rem);
-						if (j != std::string::npos)
-							file.erase(j, rem.length());
-						file = StringReplace(file, '\"');
-						SP_WARN("Including file \'", file, "\' into shader.");
-						String source2 = VFS::Get()->ReadTextFile(file);
-
-						std::vector<String> lines2 = GetLines(source2);
-
-						for (uint k = 0; k < lines2.size(); k++) {
-							ReadShaderFile(lines2[k], type, shaders);
-						}
-					}
-					else {
-						SP_WARN("Unknown include file: ", line);
-					}
-				}
-				else {
-					shaders[(int32)type - 1]->append(line.c_str());
-					shaders[(int32)type - 1]->append("\n");
 				}
 			}
 

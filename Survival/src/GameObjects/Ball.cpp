@@ -9,7 +9,7 @@ using namespace component;
 
 using namespace API;
 
-using namespace world;
+using namespace graphics;
 
 Ball::Ball(const sp::maths::vec3& position, sp::graphics::MaterialInstance* mat)
 {

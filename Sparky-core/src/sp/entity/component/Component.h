@@ -10,8 +10,8 @@ namespace sp { namespace entity {
 	class Entity;
 } }
 
-namespace sp { namespace world {
-	class World;
+namespace sp { namespace graphics {
+	class Scene;
 } }
 
 namespace sp { namespace entity { namespace component {
@@ -25,13 +25,13 @@ namespace sp { namespace entity { namespace component {
 	{
 	protected:
 		Entity* m_Entity;
-		world::World* m_World;
+		graphics::Scene* m_Scene;
 	public:
 		void SetEntity(Entity* entity) { m_Entity = entity; }
-		void SetWorld(world::World* world) { m_World = world; }
+		void SetScene(graphics::Scene* scene) { m_Scene = scene; }
 
 		virtual Entity* GetEntity() { return m_Entity; }
-		virtual world::World* GetWorld() { return m_World; }
+		virtual graphics::Scene* GetWorld() { return m_Scene; }
 		virtual ComponentType* GetType() const { return nullptr; }
 
 		virtual void OnInit() {}

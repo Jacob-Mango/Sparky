@@ -19,6 +19,7 @@ namespace sp { namespace graphics { namespace API {
 	{
 		NONE = 0,
 		LINEAR,
+		LINEAR_MIPMAP,
 		NEAREST
 	};
 
@@ -28,6 +29,7 @@ namespace sp { namespace graphics { namespace API {
 		RGB,
 		RGBA,
 		RGB16F,
+		RGBA32F,
 		LUMINANCE,
 		LUMINANCE_ALPHA
 	};
@@ -48,6 +50,7 @@ namespace sp { namespace graphics { namespace API {
 		TextureFilter filter;
 		TextureWrap wrap;
 		TextureType type;
+		bool mipmap;
 
 		TextureParameters()
 		{
@@ -57,8 +60,8 @@ namespace sp { namespace graphics { namespace API {
 			type = TextureType::UNSIGNED_BYTE;
 		}
 
-		TextureParameters(TextureFormat format, TextureFilter filter, TextureWrap wrap, TextureType type)
-			: format(format), filter(filter), wrap(wrap), type(type)
+		TextureParameters(TextureFormat format, TextureFilter filter, TextureWrap wrap, TextureType type, bool mipmap = true)
+			: format(format), filter(filter), wrap(wrap), type(type), mipmap(mipmap)
 		{
 		}
 

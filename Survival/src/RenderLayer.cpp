@@ -4,8 +4,6 @@
 #include "GameObjects\Plane.h"
 #include "GameObjects\Ball.h"
 
-#include <sp/world/terrain/HeightMap.h>
-
 using namespace sp;
 using namespace graphics;
 using namespace maths;
@@ -16,9 +14,9 @@ using namespace component;
 
 using namespace API;
 
-using namespace world;
+using namespace graphics;
 
-RenderLayer::RenderLayer() : Layer3D(spnew World(), spnew DeferredRenderer())
+RenderLayer::RenderLayer() : Layer3D(spnew Scene(), spnew ForwardRenderer())
 {
 	m_Window->SetVsync(VSYNC_DISABLED);
 }
@@ -32,50 +30,44 @@ MaterialInstance* bricks;
 MaterialInstance* water;
 Light* light;
 
-void RenderLayer::OnInit(Renderer3D* renderer, World* world)
+void RenderLayer::OnInit(Renderer3D* renderer, Scene* scene)
 {
-	Shader* pbrShader = Shader::CreateFromFile("PBRDeferred", String("/shaders/PBR/PBR.shader"));
-	Shader* mainShader = Shader::CreateFromFile("DefaultShader", String("/shaders/GBuffer/GBuffer.shader"));
-	Shader* waterShader = Shader::CreateFromFile("WaterShader", String("/shaders/Water/Water.shader"));
-	Shader* testShader = Shader::CreateFromName("Test");
+	Shader* defaultShader = Shader::CreateFromFile("Default", String("/shaders/Default/Default.shader"));
+	Shader* waterShader = Shader::CreateFromFile("Water", String("/shaders/Water/Water.shader"));
 
-	ShaderManager::Add(pbrShader);
-	ShaderManager::Add(mainShader);
+	ShaderManager::Add(defaultShader);
 	ShaderManager::Add(waterShader);
-	ShaderManager::Add(testShader);
 
 	LightSetup* lights = spnew LightSetup();
 
 	light = spnew Light(vec3(0.0f, 5.0f, 0.0f), 1.0f);
 	lights->Add(light);
 
-	world->PushLightSetup(lights);
+	scene->PushLightSetup(lights);
 
-	//Player* player = spnew Player(world, defaultShader);
-	//world->Add(player);
+	// Player* player = spnew Player(scene, mainShader);
+	// scene->Add(player);
 
-	world->SetCamera(spnew FPSCamera(mat4::Perspective(90.0f, 16.0f / 9.0f, 0.1f, 1000.0f)));
+	scene->SetCamera(spnew FPSCamera(mat4::Perspective(90.0f, 16.0f / 9.0f, 0.1f, 1000.0f)));
 
-	MaterialManager::Add(spnew Material("test", testShader));
-	MaterialManager::Add(spnew PBRMaterial("Bricks_V2", mainShader));
+	MaterialManager::Add(spnew PBRMaterial("Bricks_V2", defaultShader));
 	MaterialManager::Add(spnew PBRMaterial("Water", waterShader));
 
-	test = spnew MaterialInstance("test");
-	bricks = spnew PBRMaterialInstance("test");
+	test = spnew MaterialInstance("Bricks_V2");
+	bricks = spnew PBRMaterialInstance("Bricks_V2");
 	water = spnew PBRMaterialInstance("Water");
 
-	//world->Add(spnew Plane(vec3(0, -1, 0), water));
+	scene->Add(spnew Plane(vec3(0, -1, 0), water));
 
-	for (int i = 0; i < 100; i++) {
+	scene->Add(spnew Ball(vec3(0, 0, -10), bricks));
+
+	for (int i = 0; i < 1; i++) {
 		int max = 25;
 		decimal x = (rand() % (max * 2)) - (max);
 		decimal z = (rand() % (max * 2)) - (max);
 
-		world->Add(spnew Ball(vec3(x, 0, z), test));
-		world->Add(spnew Ball(vec3(x + 1, 0, z), bricks));
+		scene->Add(spnew Ball(vec3(x, 0, z), bricks));
 	}
-
-	// world->CreateHeightMap();
 
 }
 

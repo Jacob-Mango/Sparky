@@ -71,8 +71,8 @@ namespace sp {
 			uint m_IndexCount, m_LineIndexCount;
 			VertexData* m_Buffer;
 			std::vector<API::Texture*> m_Textures;
-			API::Framebuffer2D* m_Framebuffer;
-			API::Framebuffer2D* m_PostEffectsBuffer;
+			API::FrameBuffer2D* m_Framebuffer;
+			API::FrameBuffer2D* m_PostEffectsBuffer;
 			maths::tvec2<uint> m_ViewportSize, m_ScreenSize;
 			Material* m_FramebufferMaterial;
 			API::VertexArray* m_ScreenQuad;

@@ -122,7 +122,7 @@ namespace sp {
 			m_VertexArray->Unbind();
 
 #if 0
-			m_Framebuffer = Framebuffer2D::Create(m_ViewportSize.x, m_ViewportSize.y);
+			m_Framebuffer = FrameBuffer2D::Create(m_ViewportSize.x, m_ViewportSize.y);
 			// Setup Framebuffer
 			m_FramebufferMaterial = sonew Material(ShaderFactory::SimpleShader());
 			m_FramebufferMaterial->SetUniform("pr_matrix", maths::mat4::Orthographic(0, (float)m_ScreenSize.x, (float)m_ScreenSize.y, 0, -1.0f, 1.0f));
@@ -130,7 +130,7 @@ namespace sp {
 			m_ScreenQuad = MeshFactory::CreateQuad(0, 0, (float)m_ScreenSize.x, (float)m_ScreenSize.y);
 
 			m_PostEffects = spnew PostEffects();
-			m_PostEffectsBuffer = Framebuffer2D::Create(m_ViewportSize.x, m_ViewportSize.y);
+			m_PostEffectsBuffer = FrameBuffer2D::Create(m_ViewportSize.x, m_ViewportSize.y);
 #endif
 
 			debug::DebugMenu::Add(String("Renderer2D/Post Effects"), &s_PostEffectsEnabled);
@@ -205,12 +205,12 @@ namespace sp {
 				if (m_ViewportSize != m_Framebuffer->GetSize())
 				{
 					delete m_Framebuffer;
-					m_Framebuffer = spnew API::Framebuffer2D(m_ViewportSize);
+					m_Framebuffer = spnew API::FrameBuffer2D(m_ViewportSize);
 
 					if (m_PostEffectsEnabled)
 					{
 						delete m_PostEffectsBuffer;
-						m_PostEffectsBuffer = spnew API::Framebuffer2D(m_ViewportSize);
+						m_PostEffectsBuffer = spnew API::FrameBuffer2D(m_ViewportSize);
 					}
 				}
 

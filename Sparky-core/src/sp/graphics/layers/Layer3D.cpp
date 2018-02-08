@@ -4,7 +4,7 @@
 
 namespace sp { namespace graphics {
 
-	Layer3D::Layer3D(world::World* scene, Renderer3D* renderer)
+	Layer3D::Layer3D(graphics::Scene* scene, Renderer3D* renderer)
 		: m_Scene(scene), m_Renderer(renderer)
 	{
 	}
@@ -21,7 +21,7 @@ namespace sp { namespace graphics {
 		m_Renderer->Init();
 	}
 
-	void Layer3D::OnInit(Renderer3D* renderer, world::World* scene)
+	void Layer3D::OnInit(Renderer3D* renderer, graphics::Scene* scene)
 	{
 	}
 

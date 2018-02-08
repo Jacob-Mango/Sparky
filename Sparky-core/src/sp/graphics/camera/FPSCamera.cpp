@@ -16,7 +16,7 @@ namespace sp {
 		float Pitch;
 
 		FPSCamera::FPSCamera(const maths::mat4& projectionMatrix)
-			: Camera(projectionMatrix), m_MouseSensitivity(0.0005f), m_Speed(0.4f), m_SprintSpeed(m_Speed * 4.0f), m_MouseWasGrabbed(false)
+			: Camera(projectionMatrix), m_MouseSensitivity(5.0f), m_Speed(50.0f), m_SprintSpeed(m_Speed * 4.0f), m_MouseWasGrabbed(false)
 		{
 			debug::DebugMenu::Add("Camera/FPS Camera Speed", &m_Speed);
 			debug::DebugMenu::Add("Camera/FPS Camera Sprint Speed", &m_SprintSpeed);
@@ -49,45 +49,41 @@ namespace sp {
 
 			if (Input::GetInputManager()->IsMouseGrabbed())
 			{
+				m_MouseWasGrabbed = true;
 				vec2 mouse = Input::GetInputManager()->GetMousePosition();
 				mouse.x -= windowCenter.x;
 				mouse.y -= windowCenter.y;
 
-				Quaternion orientation = GetOrientation();
-				if (m_MouseWasGrabbed)
-				{
-					Yaw += mouse.x * m_MouseSensitivity * ts.GetMillis();
-					Pitch += mouse.y * m_MouseSensitivity * ts.GetMillis();
+				Yaw += mouse.x * m_MouseSensitivity * ts.GetSeconds();
+				Pitch += mouse.y * m_MouseSensitivity * ts.GetSeconds();
 
-					orientation = Quaternion::RotationY(-Yaw) * Quaternion::RotationX(-Pitch);
-				}
-
-				m_MouseWasGrabbed = true;
 				Input::GetInputManager()->SetMousePosition(windowCenter);
+
+				Quaternion orientation = GetOrientation();
 
 				vec3 forward = GetForwardDirection(orientation);
 				vec3 right = GetRightDirection(orientation);
 				vec3 up = vec3::YAxis();
-				float speed = Input::IsKeyPressed(SP_KEY_SHIFT) ? m_SprintSpeed : m_Speed;
+				float speed = (Input::IsKeyPressed(SP_KEY_SHIFT) ? m_SprintSpeed : m_Speed) * ts.GetSeconds();
 
 				if (Input::IsKeyPressed(SP_KEY_CONTROL))
 					speed /= 10.0f;
 
 				if (Input::IsKeyPressed(SP_KEY_W))
-					m_Position.Add(+forward.Multiply(speed));
+					m_Position += forward.Multiply(speed);
 				else if (Input::IsKeyPressed(SP_KEY_S))
-					m_Position.Add(-forward.Multiply(speed));
+					m_Position -= forward.Multiply(speed);
 
 				if (Input::IsKeyPressed(SP_KEY_A))
-					m_Position.Add(-right.Multiply(speed));
+					m_Position -= right.Multiply(speed);
 				else if (Input::IsKeyPressed(SP_KEY_D))
-					m_Position.Add(+right.Multiply(speed));
+					m_Position += right.Multiply(speed);
 
 
 				if (Input::IsKeyPressed(SP_KEY_SPACE))
-					m_Position.Add(+up.Multiply(speed));
+					m_Position += up.Multiply(speed);
 				else if (Input::IsKeyPressed(SP_KEY_Z))
-					m_Position.Add(-up.Multiply(speed));
+					m_Position -= up.Multiply(speed);
 
 				m_Rotation = orientation;
 				SetViewMatrix();

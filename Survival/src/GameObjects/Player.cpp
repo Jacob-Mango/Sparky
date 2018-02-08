@@ -14,12 +14,12 @@ using namespace component;
 
 using namespace API;
 
-using namespace world;
+using namespace graphics;
 
 #define TORADS (PI / 180.0f)
 
-Player::Player(World* world, Shader* shader)
-	: m_World(world), m_MouseSensitivity(2.0f), m_MouseWasGrabbed(false)
+Player::Player(Scene* scene, Shader* shader)
+	: m_Scene(scene), m_MouseSensitivity(2.0f), m_MouseWasGrabbed(false)
 {
 	String name = "Player";
 
@@ -31,7 +31,7 @@ Player::Player(World* world, Shader* shader)
 	AddComponent(spnew MeshComponent(playerModel->GetMesh()));
 	AddComponent(spnew AnimationComponent());
 	Camera* camera = spnew Camera(mat4::Identity());
-	world->SetCamera(camera);
+	scene->SetCamera(camera);
 
 	maths::mat4 pos = maths::mat4::Identity();
 	pos.SetPosition(maths::vec3(0, 0, 0));

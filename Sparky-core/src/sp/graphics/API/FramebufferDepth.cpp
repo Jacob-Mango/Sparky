@@ -10,12 +10,12 @@
 
 namespace sp { namespace graphics { namespace API {
 
-	FramebufferDepth* FramebufferDepth::Create(uint width, uint height, uint numberTextures)
+	FrameBufferDepth* FrameBufferDepth::Create(uint width, uint height, std::vector<TextureParameters> parameters)
 	{
 		switch (API::Context::GetRenderAPI())
 		{
-			case API::RenderAPI::OPENGL:	return spnew GLFramebufferDepth(width, height, numberTextures);
-			case API::RenderAPI::DIRECT3D:	return spnew D3DFramebufferDepth(width, height, numberTextures);
+			case API::RenderAPI::OPENGL:	return spnew GLFramebufferDepth(width, height, parameters);
+			case API::RenderAPI::DIRECT3D:	return spnew D3DFramebufferDepth(width, height, parameters);
 		}
 		return nullptr;
 	}
