@@ -7,7 +7,7 @@ layout(location = 3) out vec4 gNormal;
 layout(location = 4) out vec4 gTangent;
 layout(location = 5) out vec4 gBinormal;
 
-in DATA
+in FSDATA
 {
 	vec4 position;
 	vec3 normal;

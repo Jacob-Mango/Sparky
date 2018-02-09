@@ -55,8 +55,12 @@ namespace sp {
 					API::TextureParameters(API::TextureFormat::RGBA, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
 				});
 
+			m_MaxLights = 64;
+
 			m_Shader = API::Shader::CreateFromFile("Deferred", String("/shaders/PBR_D/PBR_D.shader"));
-			m_Material = spnew Material("DeferredRendering", m_Shader);
+			m_Material = spnew Material("Deferred", m_Shader);
+
+			ShaderManager::Add(m_Shader);
 
 			m_CommandQueue.reserve(1000);
 
@@ -109,88 +113,61 @@ namespace sp {
 			m_CommandQueue.push_back(command);
 		}
 
-		void DeferredRenderer::PerformBoneTransforms(Bone* bone, mat4 joints[NUMBONES], std::vector<mat4> &matArray) {
+		void DeferredRenderer::PerformBoneTransforms(Bone* bone, mat4 boneTransforms[NUMBONES], std::vector<mat4> &matArray) {
 			mat4 concatenated_transforms = mat4::Identity();
 			if (bone && bone->Parent) {
 				graphics::Bone* b = bone->Parent;
 				std::vector<mat4> mats;
 				while (b != nullptr)
 				{
-					mats.push_back(joints[b->Index]);
+					mats.push_back(boneTransforms[b->ID]);
 					b = b->Parent;
 				}
-
 				for (int i = mats.size() - 1; i >= 0; i--)
 					concatenated_transforms *= mats.at(i);
 			}
 
-			matArray[bone->Index] = concatenated_transforms.Multiply(joints[bone->Index]);
+			matArray[bone->ID] = concatenated_transforms.Multiply(boneTransforms[bone->ID]);
 			for (int i = 0; i < bone->Children.size(); i++) {
-				PerformBoneTransforms(bone->Children[i], joints, matArray);
+				PerformBoneTransforms(bone->Children[i], boneTransforms, matArray);
 			}
 		}
 
-		void DeferredRenderer::SubmitMesh(Mesh* mesh, const maths::mat4& transform, mat4 joints[NUMBONES], Bone* rootBone)
+		void DeferredRenderer::SubmitMesh(Mesh* mesh, const maths::mat4& transform, mat4 boneTransforms[NUMBONES], Bone* rootBone)
 		{
 			RenderCommand command;
 			command.mesh = mesh;
 			command.transform = transform;
 
-			bool noRootBone = false;
-
-			if (rootBone != nullptr)
-			{
-				if (StringEquals(rootBone->Name, "defaultBone")) {
-					noRootBone = true;
-				}
-				else {
-					std::vector<mat4> boneTransformArray;
-					boneTransformArray.reserve(NUMBONES);
-
-					for (int i = 0; i < NUMBONES; i++)
-						boneTransformArray.push_back(mat4::Identity());
-
-					PerformBoneTransforms(rootBone, joints, boneTransformArray);
-
-					memcpy(command.bones, boneTransformArray.data(), sizeof(maths::mat4) * NUMBONES);
-				}
-			}
-			else {
-				noRootBone = true;
-			}
-			if (noRootBone) {
+			if (mesh->HasRoot() && boneTransforms != nullptr) {
 				std::vector<mat4> boneTransformArray;
 				boneTransformArray.reserve(NUMBONES);
 
 				for (int i = 0; i < NUMBONES; i++)
 					boneTransformArray.push_back(mat4::Identity());
 
+				PerformBoneTransforms(rootBone, boneTransforms, boneTransformArray);
+
 				memcpy(command.bones, boneTransformArray.data(), sizeof(maths::mat4) * NUMBONES);
 			}
+			else {
+				mat4* temp = new mat4[NUMBONES];
+				for (int i = 0; i < NUMBONES; i++)
+					temp[i] = mat4::Identity();
+				memcpy(command.bones, temp, sizeof(maths::mat4) * NUMBONES);
+
+				delete temp;
+			}
+
 			command.shader = mesh->GetMaterialInstance()->GetMaterial()->GetShader();
 
 			Submit(command);
 		}
 
-		void DeferredRenderer::SubmitLightSetup(const LightSetup& lightSetup)
+		void DeferredRenderer::SubmitLightSetup(LightSetup& lightSetup)
 		{
-			union LightToByte {
-				Light lights[NUMLIGHTS];
-				byte data[NUMLIGHTS * sizeof(Light)];
-
-				LightToByte() {}
-			} ltb;
-
-			for (int i = 0; i < NUMLIGHTS; i++) {
-				if (lightSetup.GetLights().size() <= i) {
-					ltb.lights[i] = Light();
-				}
-				else {
-					ltb.lights[i] = *lightSetup.GetLights()[i];
-				}
-			}
-			m_Material->SetUniformData("u_LightSetup", ltb.data, NUMLIGHTS * sizeof(Light));
-
+			byte* data = lightSetup.GetLightData(0, m_MaxLights);
+			m_Material->SetUniformData("u_LightSetup", data, m_MaxLights * sizeof(Light));
 		}
 
 		void DeferredRenderer::EndScene()
@@ -204,7 +181,7 @@ namespace sp {
 		void DeferredRenderer::SetSystemUniforms(API::Shader* shader)
 		{
 			shader->SetVSSystemUniformBuffer(m_VSSystemUniformBuffer, m_VSSystemUniformBufferSize, 0);
-			//shader->SetGSSystemUniformBuffer(m_GSSystemUniformBuffer, m_GSSystemUniformBufferSize, 0);
+			// shader->SetGSSystemUniformBuffer(m_GSSystemUniformBuffer, m_GSSystemUniformBufferSize, 0);
 			shader->SetPSSystemUniformBuffer(m_PSSystemUniformBuffer, m_PSSystemUniformBufferSize, 0);
 		}
 
@@ -248,8 +225,8 @@ namespace sp {
 			m_Material->SetTexture("u_Albedo", textures[1]);
 			m_Material->SetTexture("u_SpecularRoughness", textures[2]);
 			m_Material->SetTexture("u_Normal", textures[3]);
-			//m_Material->SetTexture("u_Tangent", textures[4]);
-			//m_Material->SetTexture("u_Binormal", textures[5]);
+			m_Material->SetTexture("u_Tangent", textures[4]);
+			m_Material->SetTexture("u_Binormal", textures[5]);
 
 			m_VertexArray->Bind();
 			m_IndexBuffer->Bind();

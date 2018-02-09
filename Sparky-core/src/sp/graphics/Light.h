@@ -3,23 +3,26 @@
 #include "sp/Types.h"
 #include "sp/maths/maths.h"
 
-#define NUMLIGHTS 64
+namespace sp {
+	namespace graphics {
+		union SP_API Light
+		{
+			unsigned char bytes[sizeof(float) * 8];
+			struct
+			{
+				maths::vec4 color;
+				maths::vec3 position;
+				float intensity;
+			};
+			
+			Light() {
+				color = maths::vec4();
+				position = maths::vec3(0);
+				intensity = 0;
+			}
 
-namespace sp { namespace graphics {
+			Light(const maths::vec3& position, float intensity = 1.0f, const maths::vec4& color = maths::vec4(1.0f));
+		};
 
-	struct SP_API Light
-	{
-		maths::vec4 color;
-		maths::vec3 position;
-		float p0;
-		maths::vec3 direction;
-		float p1;
-		maths::vec3 lightVector;
-		float intensity;
-
-		Light() {}
-
-		Light(const maths::vec3& direction, float intensity = 1.0f, const maths::vec4& color = maths::vec4(1.0f));
-	};
-
-} }
+	}
+}

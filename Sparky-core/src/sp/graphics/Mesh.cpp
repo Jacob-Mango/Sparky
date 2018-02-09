@@ -12,19 +12,8 @@
 
 namespace sp { namespace graphics {
 
-	Mesh::Mesh(API::VertexArray* vertexArray, API::IndexBuffer* indexBuffer, MaterialInstance* materialInstance, Vertices* verts, uint* indices, uint indexLength, Bone* rootBone)
-		: m_VertexArray(vertexArray), m_IndexBuffer(indexBuffer), m_MaterialInstance(materialInstance), m_Verts(verts), m_Indices(indices), m_IndexLength(indexLength), m_RootBone(rootBone)
-	{
-		m_RenderType = RenderType::TRIANGLES;
-#ifdef SP_DEBUG
-		m_DebugVertexData = nullptr;
-		m_DebugVertexDataCount = 0;
-		m_DebugDraw = false;
-#endif
-	}
-
-	Mesh::Mesh(API::VertexArray* vertexArray, API::IndexBuffer* indexBuffer, MaterialInstance* materialInstance)
-		: m_VertexArray(vertexArray), m_IndexBuffer(indexBuffer), m_MaterialInstance(materialInstance), m_RootBone(spnew Bone())
+	Mesh::Mesh(API::VertexArray* vertexArray, API::IndexBuffer* indexBuffer, MaterialInstance* materialInstance, Bone* rootBone)
+		: m_VertexArray(vertexArray), m_IndexBuffer(indexBuffer), m_MaterialInstance(materialInstance), m_RootBone(rootBone)
 	{
 		m_RenderType = RenderType::TRIANGLES;
 #ifdef SP_DEBUG

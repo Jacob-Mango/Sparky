@@ -4,7 +4,7 @@
 #include <sp\debug\DebugLayer.h>
 
 Survival::Survival()
-	: Application("Survival", spnew WindowProperties { 1280, 720, false, false }, sp::graphics::API::RenderAPI::OPENGL)
+	: Application("Survival", spnew WindowProperties { 1280, 720, false, false }, sp::graphics::API::RenderAPI::OPENGL, sp::graphics::API::RendererType::DEFERRED)
 {
 	
 }

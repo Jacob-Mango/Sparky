@@ -11,7 +11,9 @@
 #include "ShaderUniform.h"
 #include "ShaderResource.h"
 
-namespace sp { namespace graphics { namespace API {
+namespace sp { namespace graphics { 
+	
+	namespace API {
 
 #define SHADER_VERTEX_INDEX		0
 #define SHADER_UV_INDEX			1
@@ -31,6 +33,7 @@ namespace sp { namespace graphics { namespace API {
 	public:
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
+		virtual bool Reload() = 0;
 
 		virtual void SetVSSystemUniformBuffer(byte* data, uint size, uint slot = 0) = 0;
 		virtual void SetGSSystemUniformBuffer(byte* data, uint size, uint slot = 0) = 0;

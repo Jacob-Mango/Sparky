@@ -15,13 +15,11 @@ using namespace graphics;
 
 Plane::Plane(const sp::maths::vec3& position, sp::graphics::MaterialInstance* mat)
 {
-	AddComponent(spnew MeshComponent(MeshFactory::CreatePlane(128, vec3(0, 1, 0), mat)));
+	AddComponent(spnew MeshComponent(MeshFactory::CreatePlane2(128, 8, mat)));
 
-	maths::mat4 pos = maths::mat4::Identity();
-	pos.SetPosition(position);
-	TransformComponent* pc = spnew TransformComponent(pos);
-	AddComponent(pc);
-
+	maths::mat4* transform = spnew maths::mat4(1.0f);
+	transform->SetPosition(position);
+	AddComponent(spnew TransformComponent(transform));
 	AddComponent(spnew AnimationComponent());
 
 	m_ShouldUpdate = true;

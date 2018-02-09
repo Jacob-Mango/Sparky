@@ -46,9 +46,9 @@ namespace sp {
 			{
 			}
 
-			void GLShader::Init()
+			bool GLShader::Init()
 			{
-				SP_INFO("Compiling shader: ", m_Name);
+				SP_WARN("Compiling shader: ", m_Name);
 				m_VSUserUniformBuffer = nullptr;
 				m_GSUserUniformBuffer = nullptr;
 				m_PSUserUniformBuffer = nullptr;
@@ -57,17 +57,29 @@ namespace sp {
 				PreProcess(m_Source, shaders);
 				Parse(m_VertexSource, m_GeometrySource, m_FragmentSource);
 
-				SP_INFO("Vertex: \n", m_VertexSource);
-				SP_INFO("Fragment: \n", m_FragmentSource);
+				_SP_WARN("Vertex:\n");
+				_SP_INFO(m_VertexSource);
+				_SP_WARN("Geometry:\n");
+				_SP_INFO(m_GeometrySource);
+				_SP_WARN("Fragment:\n");
+				_SP_INFO(m_FragmentSource);
 
 				GLShaderErrorInfo error;
 				m_Handle = Compile(shaders, error);
-				if (!m_Handle)
+				if (!m_Handle) {
 					SP_ERROR(error.message[error.shader]);
+					return false;
+				}
 				SP_ASSERT(m_Handle);
 				ResolveUniforms();
 				ValidateUniforms();
-				SP_INFO("Successfully compiled shader: ", m_Name);
+				SP_WARN("Successfully compiled shader: ", m_Name);
+				return true;
+			}
+
+			bool GLShader::Reload()
+			{
+				return Init();
 			}
 
 			void GLShader::Shutdown()
@@ -88,11 +100,10 @@ namespace sp {
 			}
 
 			void GLShader::ReadShaderFile(std::vector<String> lines, String** shaders) {
-				String renderType = "FORWARD";
-
 				for (uint i = 0; i < lines.size(); i++)
 				{
-					const char* str = lines[i].c_str();
+					String str = String(lines[i]);
+					str = StringReplace(str, '\t');
 
 					if (IGNORE_LINES) {
 						if (StartsWith(str, "#end")) {
@@ -141,14 +152,18 @@ namespace sp {
 								def.erase(j, rem.length());
 							def = StringReplace(def, '\"');
 
-							if (def != renderType) {
+							if (def != graphics::API::Context::GetRendererString()) {
+								IGNORE_LINES = true;
+							}
+
+							if (def == "0") {
 								IGNORE_LINES = true;
 							}
 						}
 					}
 					else if (type != ShaderType::UNKNOWN)
 					{
-						shaders[(int32)type - 1]->append(str);
+						shaders[(int32)type - 1]->append(lines[i].c_str());
 						shaders[(int32)type - 1]->append("\n");
 					}
 				}
@@ -799,6 +814,8 @@ namespace sp {
 
 			void GLShader::SetGSSystemUniformBuffer(byte* data, uint size, uint slot)
 			{
+				if (size == 0) return;
+
 				Bind();
 				SP_ASSERT(m_GSUniformBuffers.size() > slot);
 				ShaderUniformBufferDeclaration* declaration = m_GSUniformBuffers[slot];

@@ -16,7 +16,7 @@ namespace sp {
 		float Pitch;
 
 		FPSCamera::FPSCamera(const maths::mat4& projectionMatrix)
-			: Camera(projectionMatrix), m_MouseSensitivity(5.0f), m_Speed(50.0f), m_SprintSpeed(m_Speed * 4.0f), m_MouseWasGrabbed(false)
+			: Camera(projectionMatrix), m_MouseSensitivity(1.0f), m_Speed(2.0f), m_SprintSpeed(50.0f), m_MouseWasGrabbed(false)
 		{
 			debug::DebugMenu::Add("Camera/FPS Camera Speed", &m_Speed);
 			debug::DebugMenu::Add("Camera/FPS Camera Sprint Speed", &m_SprintSpeed);
@@ -56,36 +56,32 @@ namespace sp {
 
 				Yaw += mouse.x * m_MouseSensitivity * ts.GetSeconds();
 				Pitch += mouse.y * m_MouseSensitivity * ts.GetSeconds();
+				m_Rotation = GetOrientation();
 
 				Input::GetInputManager()->SetMousePosition(windowCenter);
 
-				Quaternion orientation = GetOrientation();
+				Quaternion rotationYaw = Quaternion::RotationY(-Yaw);
 
-				vec3 forward = GetForwardDirection(orientation);
-				vec3 right = GetRightDirection(orientation);
+				vec3 forward = GetForwardDirection(rotationYaw);
+				vec3 right = GetRightDirection(rotationYaw);
 				vec3 up = vec3::YAxis();
 				float speed = (Input::IsKeyPressed(SP_KEY_SHIFT) ? m_SprintSpeed : m_Speed) * ts.GetSeconds();
 
-				if (Input::IsKeyPressed(SP_KEY_CONTROL))
-					speed /= 10.0f;
-
 				if (Input::IsKeyPressed(SP_KEY_W))
-					m_Position += forward.Multiply(speed);
+					m_Position += forward * speed;
 				else if (Input::IsKeyPressed(SP_KEY_S))
-					m_Position -= forward.Multiply(speed);
+					m_Position -= forward * speed;
 
 				if (Input::IsKeyPressed(SP_KEY_A))
-					m_Position -= right.Multiply(speed);
+					m_Position -= right * speed;
 				else if (Input::IsKeyPressed(SP_KEY_D))
-					m_Position += right.Multiply(speed);
-
+					m_Position += right * speed;
 
 				if (Input::IsKeyPressed(SP_KEY_SPACE))
-					m_Position += up.Multiply(speed);
-				else if (Input::IsKeyPressed(SP_KEY_Z))
-					m_Position -= up.Multiply(speed);
+					m_Position += up * speed;
+				else if (Input::IsKeyPressed(SP_KEY_CONTROL))
+					m_Position -= up * speed;
 
-				m_Rotation = orientation;
 				SetViewMatrix();
 			}
 
@@ -99,7 +95,7 @@ namespace sp {
 
 		Quaternion FPSCamera::GetOrientation() const
 		{
-			return m_Rotation;
+			return Quaternion::RotationY(-Yaw) * Quaternion::RotationX(-Pitch);
 		}
 
 		vec3 FPSCamera::GetForwardDirection(const Quaternion& orientation) const

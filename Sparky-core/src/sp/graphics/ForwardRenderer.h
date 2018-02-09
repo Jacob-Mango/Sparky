@@ -19,6 +19,8 @@ namespace sp { namespace graphics {
 		std::vector<uint> m_VSSystemUniformBufferOffsets;
 		std::vector<uint> m_GSSystemUniformBufferOffsets;
 		std::vector<uint> m_PSSystemUniformBufferOffsets;
+
+		uint m_MaxLights;
 	public:
 		ForwardRenderer();
 		ForwardRenderer(uint width, uint height);
@@ -28,7 +30,7 @@ namespace sp { namespace graphics {
 		void BeginScene(Camera* camera) override;
 		void Submit(const RenderCommand& command) override;
 		void SubmitMesh(Mesh* mesh, const maths::mat4& transform, maths::mat4 joints[NUMBONES], Bone* rootBone) override;
-		void SubmitLightSetup(const LightSetup& lightSetup);
+		void SubmitLightSetup(LightSetup& lightSetup);
 		void EndScene() override;
 		void End() override;
 		void Present() override;

@@ -16,7 +16,7 @@ using namespace API;
 
 using namespace graphics;
 
-RenderLayer::RenderLayer() : Layer3D(spnew Scene(), spnew ForwardRenderer())
+RenderLayer::RenderLayer() : Layer3D(spnew Scene())
 {
 	m_Window->SetVsync(VSYNC_DISABLED);
 }
@@ -40,7 +40,7 @@ void RenderLayer::OnInit(Renderer3D* renderer, Scene* scene)
 
 	LightSetup* lights = spnew LightSetup();
 
-	light = spnew Light(vec3(0.0f, 5.0f, 0.0f), 1.0f);
+	light = spnew Light(vec3(0.0f, 10.0f, 0.0f), 1.0f, vec4(0.1, 0.1, 0.1, 0.1));
 	lights->Add(light);
 
 	scene->PushLightSetup(lights);
@@ -57,18 +57,15 @@ void RenderLayer::OnInit(Renderer3D* renderer, Scene* scene)
 	bricks = spnew PBRMaterialInstance("Bricks_V2");
 	water = spnew PBRMaterialInstance("Water");
 
-	scene->Add(spnew Plane(vec3(0, -1, 0), water));
+	scene->Add(spnew Plane(vec3(0, 0, 0), water));
 
-	scene->Add(spnew Ball(vec3(0, 0, -10), bricks));
-
-	for (int i = 0; i < 1; i++) {
-		int max = 25;
-		decimal x = (rand() % (max * 2)) - (max);
-		decimal z = (rand() % (max * 2)) - (max);
-
-		scene->Add(spnew Ball(vec3(x, 0, z), bricks));
+	int amount = 16;
+	int multiply = 32;
+	for (int x = -amount; x < amount; x++) {
+		for (int z = -amount; z < amount; z++) {
+			scene->Add(spnew Ball(vec3(x * multiply, 5, z * multiply), bricks));
+		}
 	}
-
 }
 
 void RenderLayer::OnTick()
@@ -80,7 +77,6 @@ void RenderLayer::OnUpdate(const Timestep& ts)
 {
 	water->SetUniform("u_Time", ts.GetElapsedSeconds());
 }
-
 
 void RenderLayer::OnRender(Renderer3D& renderer)
 {
@@ -97,9 +93,9 @@ void RenderLayer::OnEvent(Event& event)
 			switch (kpe->GetKeyCode())
 			{
 			case SP_KEY_R:
-				ShaderManager::Reload("PBRDeferred");
-				ShaderManager::Reload("DefaultShader");
-				ShaderManager::Reload("WaterShader");
+				ShaderManager::Reload("Deferred");
+				ShaderManager::Reload("Default");
+				ShaderManager::Reload("Water");
 				break;
 			}
 		}

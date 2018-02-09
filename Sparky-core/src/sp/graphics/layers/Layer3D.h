@@ -17,7 +17,7 @@ namespace sp { namespace graphics {
 		graphics::Scene* m_Scene;
 		Renderer3D* m_Renderer;
 	public:
-		Layer3D(graphics::Scene* scene, Renderer3D* renderer = spnew DeferredRenderer());
+		Layer3D(graphics::Scene* scene);
 		~Layer3D();
 
 		virtual void Init();

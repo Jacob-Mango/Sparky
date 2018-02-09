@@ -42,6 +42,7 @@ namespace sp { namespace graphics { namespace API {
 
 	void GLVertexArray::Draw(RenderType type, uint count) const
 	{
+		// SP_INFO(type == RenderType::TRIANGLES ? "Triangles" : (type == RenderType::POINTS ? "Points" : (type == RenderType::LINES ? "Lines" : "Unknown")));
 		GLCall(glDrawElements(SPRenderTypeToGL(type), count, GL_UNSIGNED_INT, NULL));
 	}
 

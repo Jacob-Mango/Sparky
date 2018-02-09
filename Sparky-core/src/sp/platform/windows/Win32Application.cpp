@@ -5,8 +5,9 @@
 #include <conio.h>
 #include <windows.h>
 
-#include "sp\utils\Log.h"
+#include "sp/utils/Log.h"
 #include "sp/maths/maths.h"
+#include "sp/graphics/Renderer3D.h"
 
 namespace sp {
 
@@ -16,11 +17,12 @@ namespace sp {
 		s_Instance = this;
 	}
 
-	Application::Application(const String& name, WindowProperties* properties, graphics::API::RenderAPI api)
+	Application::Application(const String& name, WindowProperties* properties, graphics::API::RenderAPI api, graphics::API::RendererType rendererType)
 		: m_Name(name), m_Properties(properties), m_Frametime(0.0f)
 	{
 		s_Instance = this;
 		graphics::API::Context::SetRenderAPI(api);
+		graphics::API::Context::SetRendererType(rendererType);
 	}
 
 	Application::~Application()

@@ -457,6 +457,11 @@ namespace sp { namespace graphics { namespace API {
 
 	}
 
+	bool D3DShader::Reload()
+	{
+		return false;
+	}
+
 	ShaderStruct* D3DShader::FindStruct(const String& name)
 	{
 		for (ShaderStruct* s : m_Structs)

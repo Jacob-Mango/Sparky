@@ -24,14 +24,14 @@ void AnimationComponent::SetJoint(int index, const maths::mat4& transform)
 	joints[index] = transform;
 }
 
-bool FindBone(graphics::Bone* bone, String name, int& index)
+bool FindBone(graphics::Bone* bone, String name, int& ID)
 {
 	if (StringEquals(bone->Name, name)) {
-		index = bone->Index;
+		ID = bone->ID;
 		return true;
 	}
 	for (int i = 0; i < bone->Children.size(); i++) {
-		if (FindBone(bone->Children[i], name, index)) return true;
+		if (FindBone(bone->Children[i], name, ID)) return true;
 	}
 	return false;
 }

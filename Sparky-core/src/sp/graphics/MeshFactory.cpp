@@ -140,11 +140,11 @@ namespace sp { namespace graphics { namespace MeshFactory {
 		data[23].normal = vec3(0.0f, 0.0f, -1.0f);
 
 		for (int i = 0; i < 24; i++) {
-			data[i].binormal = vec3(0, 0, 0);
-			data[i].tangent = vec3(0, 0, 0);
+			data[i].binormal = mat4::Rotate(90.0f, vec3(0, 1, 0)) * data[i].normal;
+			data[i].tangent = mat4::Rotate(90.0f, vec3(0, 0, 1)) * data[i].normal;
 			data[i].uv = vec3(0, 0, 0);
-			data[i].jointIndices = vec4(0, 0, 0, 0);
-			data[i].jointWeights = vec4(1, 1, 1, 1);
+			data[i].indices = vec4(0, 0, 0, 0);
+			data[i].weights = vec4(1, 1, 1, 1);
 		}
 
 		API::VertexBuffer* buffer = API::VertexBuffer::Create(API::BufferUsage::STATIC);
@@ -194,32 +194,32 @@ namespace sp { namespace graphics { namespace MeshFactory {
 		data[0].uv = (vec2) vec2(0.0f, 0.0f).Multiply(textureScale);
 		data[0].binormal = mat4::Rotate(90.0f, vec3(0, 1, 0)) * normal;
 		data[0].tangent = mat4::Rotate(90.0f, vec3(0, 0, 1)) * normal;
-		data[0].jointWeights = vec4(1);
-		data[0].jointIndices = vec4(0);
+		data[0].weights = vec4(1);
+		data[0].indices = vec4(0);
 
 		data[1].position = vec3(-size / 2.0f, 0.0f, size / 2.0f);
 		data[1].normal = normal;
 		data[1].uv = (vec2) vec2(0.0f, 1.0f).Multiply(textureScale);
 		data[1].binormal = mat4::Rotate(90.0f, vec3(0, 1, 0)) * normal;
 		data[1].tangent = mat4::Rotate(90.0f, vec3(0, 0, 1)) * normal;
-		data[1].jointWeights = vec4(1);
-		data[1].jointIndices = vec4(1);
+		data[1].weights = vec4(1);
+		data[1].indices = vec4(1);
 
 		data[2].position = vec3(size / 2.0f, 0.0f, size / 2.0f);
 		data[2].normal = normal;
 		data[2].uv = (vec2)vec2(1.0f, 1.0f).Multiply(textureScale);
 		data[2].binormal = mat4::Rotate(90.0f, vec3(0, 1, 0)) * normal;
 		data[2].tangent = mat4::Rotate(90.0f, vec3(0, 0, 1)) * normal;
-		data[2].jointWeights = vec4(1);
-		data[2].jointIndices = vec4(2);
+		data[2].weights = vec4(1);
+		data[2].indices = vec4(2);
 
 		data[3].position = vec3(size / 2.0f, 0.0f, -size / 2.0f);
 		data[3].normal = normal;
 		data[3].uv = (vec2)vec2(1.0f, 0.0f).Multiply(textureScale);
 		data[3].binormal = mat4::Rotate(90.0f, vec3(0, 1, 0)) * normal;
 		data[3].tangent = mat4::Rotate(90.0f, vec3(0, 0, 1)) * normal;
-		data[3].jointWeights = vec4(1);
-		data[3].jointIndices = vec4(3);
+		data[3].weights = vec4(1);
+		data[3].indices = vec4(3);
 		
 
 		API::VertexBuffer* buffer = API::VertexBuffer::Create(API::BufferUsage::STATIC);
@@ -246,7 +246,7 @@ namespace sp { namespace graphics { namespace MeshFactory {
 
 		API::IndexBuffer* ib = API::IndexBuffer::Create(indices, 6);
 
-		Mesh* mesh = new Mesh(va, ib, material, spnew Vertices { data, 4 }, indices, 6, spnew Bone());
+		Mesh* mesh = new Mesh(va, ib, material);
 
 		return mesh;
 	}
@@ -267,13 +267,13 @@ namespace sp { namespace graphics { namespace MeshFactory {
 			for (uint z = 0; z < vertexCount; z++)
 			{
 				uint index = (x * (int)vertexCount) + z;
-				data[index].position = vec3(x - (vertexCount / 2), 0, z - (vertexCount / 2)).Divide(((float)vertexCount - 1) * size);
+				data[index].position = vec3(x - (vertexCount / 2), 0, z - (vertexCount / 2));
 				data[index].normal = vec3(0, 1, 0);
 				data[index].uv = vec2(data[index].position.x, data[index].position.z);
 				data[index].binormal = mat4::Rotate(90.0f, vec3(0, 1, 0)) * vec3(0, 1, 0);
 				data[index].tangent = mat4::Rotate(90.0f, vec3(0, 0, 1)) * vec3(0, 1, 0);
-				data[index].jointWeights = vec4(1);
-				data[index].jointIndices = vec4(0);
+				data[index].weights = vec4(1);
+				data[index].indices = vec4(0);
 			}
 
 		}
@@ -349,8 +349,8 @@ namespace sp { namespace graphics { namespace MeshFactory {
 			data[index].uv = vec2(s * S, r * R);
 			data[index].tangent = vec3(1, 1, 1);
 			data[index].binormal = vec3(1, 1, 1);
-			data[index].jointWeights = vec4(1, 1, 1, 1);
-			data[index].jointIndices = vec4(0, 0, 0, 0);
+			data[index].weights = vec4(1, 1, 1, 1);
+			data[index].indices = vec4(0, 0, 0, 0);
 		}
 
 
@@ -383,7 +383,7 @@ namespace sp { namespace graphics { namespace MeshFactory {
 
 		API::IndexBuffer* ib = API::IndexBuffer::Create(&indices[0], rings * sectors * 4);
 
-		Mesh* mesh = new Mesh(va, ib, material, spnew Vertices{ data, 4 }, &indices[0], rings * sectors * 4, spnew Bone());
+		Mesh* mesh = new Mesh(va, ib, material);
 
 		return mesh;
 	}

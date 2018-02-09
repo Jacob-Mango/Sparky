@@ -103,8 +103,9 @@ namespace sp {
 			renderer.BeginScene(m_Camera);
 			renderer.SubmitLightSetup(*m_LightSetupStack[0]);
 
-			mat4* iden = spnew mat4[NUMBONES];
-			for (int i = 0; i < NUMBONES; i++) iden[i] = mat4::Identity();
+			mat4* temp = new mat4[NUMBONES];
+			for (int i = 0; i < NUMBONES; i++)
+				temp[i] = mat4::Identity();
 
 			for (Entity* entity : m_Entities)
 			{
@@ -120,7 +121,7 @@ namespace sp {
 					std::vector<maths::mat4> jointMatrix;
 
 					if (ac) jointMatrix.insert(jointMatrix.begin(), ac->joints, ac->joints + sizeof(ac->joints) / sizeof(ac->joints[0]));
-					else jointMatrix.insert(jointMatrix.begin(), iden, iden + sizeof(iden) / sizeof(iden[0]));
+					else jointMatrix.insert(jointMatrix.begin(), temp, temp + sizeof(temp) / sizeof(temp[0]));
 
 					renderer.SubmitMesh(mesh->mesh, *tc->transform, jointMatrix.data(), rootBone);
 				}

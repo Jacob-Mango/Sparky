@@ -3,6 +3,8 @@
 
 #include "sp/utils/Log.h"
 
+#include "sp/graphics/API/Context.h"
+
 #include <GL/glew.h>
 
 namespace sp { namespace graphics {

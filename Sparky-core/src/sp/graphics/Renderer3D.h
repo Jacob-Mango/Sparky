@@ -15,17 +15,10 @@ namespace sp { namespace graphics {
 	typedef std::vector<RenderCommand> CommandQueue;
 	typedef std::vector<RendererUniform> SystemUniformList;
 
-	//
-	// Base class for all 3D renderers.
-	// 
-	// Implementations:
-	//		- ForwardRenderer.h  (WIP)
-	//		- DeferredRenderer.h (WIP)
-	//
 	class SP_API Renderer3D
 	{
 	protected:
-		uint m_ScreenBufferWidth, m_ScreenBufferHeight; // TODO: Probably make a screen buffer (fb) class
+		uint m_ScreenBufferWidth, m_ScreenBufferHeight;
 
 		CommandQueue m_CommandQueue;
 		SystemUniformList m_SystemUniforms;
@@ -40,7 +33,7 @@ namespace sp { namespace graphics {
 		// TODO: Submit needs to be replaced by some sort of macro
 		virtual void Submit(const RenderCommand& command) = 0;
 		virtual void SubmitMesh(Mesh* mesh, const maths::mat4& transform, maths::mat4 joints[NUMBONES], Bone* rootBone) = 0;
-		virtual void SubmitLightSetup(const LightSetup& lightSetup) = 0;
+		virtual void SubmitLightSetup(LightSetup& lightSetup) = 0;
 		virtual void EndScene() = 0;
 		virtual void End() = 0;
 		virtual void Present() = 0;

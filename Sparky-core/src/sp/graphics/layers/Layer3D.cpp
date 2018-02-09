@@ -1,12 +1,23 @@
 #include "sp/sp.h"
 #include "Layer3D.h"
+#include "../shaders/Shader.h"
 
+#include "../API/Context.h"
 
 namespace sp { namespace graphics {
 
-	Layer3D::Layer3D(graphics::Scene* scene, Renderer3D* renderer)
-		: m_Scene(scene), m_Renderer(renderer)
+	Layer3D::Layer3D(graphics::Scene* scene)
+		: m_Scene(scene)
 	{
+		switch (graphics::API::Context::GetRendererType()) {
+		default:
+		case graphics::API::RendererType::FORWARD:
+			m_Renderer = new ForwardRenderer();
+			break;
+		case graphics::API::RendererType::DEFERRED:
+			m_Renderer = new DeferredRenderer();
+			break;
+		}
 	}
 
 	Layer3D::~Layer3D()

@@ -16,6 +16,8 @@ namespace sp { namespace graphics {
 		void Remove(Light* light);
 
 		inline const std::vector<Light*>& GetLights() const { return m_Lights; }
+
+		byte* GetLightData(uint start, uint max);
 	};
 
 } }

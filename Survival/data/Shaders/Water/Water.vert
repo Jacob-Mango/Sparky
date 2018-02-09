@@ -12,7 +12,7 @@ uniform mat4 sys_ProjectionMatrix;
 uniform mat4 sys_ViewMatrix;
 uniform mat4 sys_ModelMatrix;
 
-out DATA
+out VSDATA
 {
 	vec4 position;
 	vec3 normal;

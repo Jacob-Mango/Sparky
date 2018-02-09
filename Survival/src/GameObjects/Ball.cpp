@@ -13,27 +13,22 @@ using namespace graphics;
 
 Ball::Ball(const sp::maths::vec3& position, sp::graphics::MaterialInstance* mat)
 {
-	AddComponent(spnew MeshComponent(MeshFactory::CreateCube(1.0f, mat)));
+	AddComponent(spnew MeshComponent(MeshFactory::CreateCube(4.0f, mat)));
 	
-	maths::mat4 pos = maths::mat4::Identity();
-	pos.SetPosition(position);
-	TransformComponent* pc = spnew TransformComponent(pos);
-	AddComponent(pc);
+	maths::mat4* transform = spnew maths::mat4(1.0f);
+	transform->SetPosition(position);
+	AddComponent(spnew TransformComponent(transform));
 
 	AddComponent(spnew AnimationComponent());
 
 	m_ShouldUpdate = true;
 }
 
-
 void Ball::OnInit()
 {
 }
 
-float time = 0;
-
 void Ball::OnUpdate(const sp::Timestep& ts)
 {
-	maths::mat4* transform = GetComponent<TransformComponent>()->transform;
-	transform->Translate(maths::vec3(0, maths::sin(time * ts.GetSeconds()), 0));
+	// GetComponent<TransformComponent>()->transform->Translate();
 }

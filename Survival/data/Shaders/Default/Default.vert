@@ -15,7 +15,7 @@ uniform mat4 sys_ViewMatrix;
 uniform mat4 sys_ModelMatrix;
 uniform mat4 sys_JointMatrix[MAX_JOINTS];
 
-out DATA
+out VSDATA
 {
 	vec4 position;
 	vec3 normal;
@@ -33,15 +33,14 @@ void main()
 	boneTransform += sys_JointMatrix[int(jointIndices.z)] * jointWeights.z;
 	boneTransform += sys_JointMatrix[int(jointIndices.w)] * jointWeights.w;
 
-	mat4 model = sys_ModelMatrix;
-	mat4 modelAndBone = model;// * boneTransform;
-	vec4 pos = modelAndBone * vec4(position.xyz, 1.0);
+	mat4 transformedMat = sys_ModelMatrix;
+	vec4 transformedPos = transformedMat * vec4(position.xyz, 1.0);
 
-	gl_Position = sys_ProjectionMatrix * sys_ViewMatrix * pos;
+	gl_Position = sys_ProjectionMatrix * sys_ViewMatrix * transformedPos;
 
-	vs_out.position = pos;
-	vs_out.normal = normalize(vec3(modelAndBone * vec4(normal, 0)));
-	vs_out.binormal = normalize(vec3(model * vec4(binormal, 0)));
-	vs_out.tangent = normalize(vec3(model * vec4(tangent, 0)));
+	vs_out.position = transformedPos;
+	vs_out.normal = normalize(vec3(transformedMat * vec4(normal, 0)));
+	vs_out.binormal = normalize(vec3(sys_ModelMatrix * vec4(binormal, 0)));
+	vs_out.tangent = normalize(vec3(sys_ModelMatrix * vec4(tangent, 0)));
 	vs_out.uv = uv;
 }

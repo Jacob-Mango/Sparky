@@ -5,6 +5,8 @@
 #include "GLShaderUniform.h"
 #include "GLShaderResource.h"
 
+#include "sp/graphics/Renderer3D.h"
+
 namespace sp { namespace graphics { namespace API {
 
 	struct GLShaderErrorInfo
@@ -42,10 +44,11 @@ namespace sp { namespace graphics { namespace API {
 		GLShader(const String& name, const String& source);
 		~GLShader();
 
-		void Init();
+		bool Init();
 		void Shutdown();
 		void Bind() const override;
 		void Unbind() const override;
+		bool Reload() override;
 
 		void SetVSSystemUniformBuffer(byte* data, uint size, uint slot) override;
 		void SetGSSystemUniformBuffer(byte* data, uint size, uint slot) override;

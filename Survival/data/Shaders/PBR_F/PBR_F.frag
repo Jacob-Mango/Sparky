@@ -2,7 +2,7 @@
 
 layout(location = 0) out vec4 color;
 
-in DATA
+in FSDATA
 {
 	vec4 position;
 	vec3 normal;
@@ -15,10 +15,6 @@ struct Light
 {
 	vec3 color;
 	vec3 position;
-	float p0;
-	vec3 direction;
-	float p1;
-	vec3 lightVector;
 	float intensity;
 };
 
@@ -38,7 +34,7 @@ struct Attributes
 	vec3 tangent;
 };
 
-uniform Light sys_LightSetup[64];
+uniform Light sys_LightSetup[4];
 uniform vec3 sys_CameraPosition;
 
 // PBR Inputs
@@ -62,7 +58,6 @@ uniform float u_UsingAlbedoMap;
 uniform float u_UsingSpecularMap;
 uniform float u_UsingGlossMap;
 uniform float u_UsingNormalMap;
-
 
 #define PI 3.1415926535897932384626433832795
 #define GAMMA 2.2
@@ -120,8 +115,6 @@ float GetRoughness()
 	return 1.0 - GetGloss();
 }
 
-float nothingness;
-
 vec3 FinalGamma(vec3 color)
 {
 	return pow(color, vec3(1.0 / GAMMA));
@@ -176,7 +169,7 @@ vec3 GGX(Light light, Material material, vec3 eye)
 	float G_SmithV = NdotV * (1.0 - k) + k;
 	float G = 0.25 / (G_SmithL * G_SmithV);
 
-	return G * D * F * nothingness;
+	return G * D * F;
 }
 
 vec3 RadianceIBLIntegration(float NdotV, float roughness, vec3 specular)
@@ -256,7 +249,7 @@ void main()
 	vec4 diffuse = vec4(0.0);
 	vec3 specular = vec3(0.0);
 
-	for (int i = 0; i < 64; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		Light light = sys_LightSetup[i];
 		light.intensity = Attenuate(light);
@@ -272,5 +265,5 @@ void main()
 	vec3 spec = (specular + IBL(material, eye)) * visibility;
 	vec3 finalColor = FinalGamma(diff + spec);
 
-	color = vec4(finalColor, 1.0) + vec4(0.5, 0.5, 0.5, 1);
+	color = vec4(finalColor, 1.0);
 }

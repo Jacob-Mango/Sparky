@@ -60,6 +60,7 @@ namespace sp { namespace graphics { namespace API {
 
 		void Bind() const override;
 		void Unbind() const override;
+		bool Reload() override;
 
 		void SetVSSystemUniformBuffer(byte* data, uint size, uint slot) override;
 		void SetGSSystemUniformBuffer(byte* data, uint size, uint slot) override;
@@ -68,6 +69,7 @@ namespace sp { namespace graphics { namespace API {
 		void SetVSUserUniformBuffer(byte* data, uint size) override;
 		void SetGSUserUniformBuffer(byte* data, uint size) override;
 		void SetPSUserUniformBuffer(byte* data, uint size) override;
+
 
 		inline const String& GetName() const override { return m_Name; }
 		inline const String& GetFilePath() const override { return m_FilePath; }

@@ -152,6 +152,7 @@ namespace sp { namespace graphics {
 		Vertices* vertices = spnew Vertices{ (graphics::Vertex*)format.vertexData, format.vertexBufferSize / sizeof(Vertex) };
 
 		std::vector<Bone*> bones;
+		std::map<Bone*, int> parents;
 		bones.reserve(NUMBONES);
 
 		for (int i = 0; i < format.boneInfoBufferSize; i)
@@ -159,13 +160,13 @@ namespace sp { namespace graphics {
 			Bone* bone = spnew Bone();
 
 
-			uint index = toInt(format.boneInfoData, i);
+			uint id = toInt(format.boneInfoData, i);
 			i += 4;
-			bone->Index = index;
+			bone->ID = id;
 
 			uint parentIndex = toInt(format.boneInfoData, i);
 			i += 4;
-			bone->ParentIndex = parentIndex;
+			parents[bone] = parentIndex;
 
 			uint nameSize = toInt(format.boneInfoData, i);
 			i += 4;
@@ -179,7 +180,7 @@ namespace sp { namespace graphics {
 
 			float* elements = toData<float*>(format.boneInfoData, i, i + boneOffsetSize);
 			
-			bone->BoneOffset = mat4(elements);
+			bone->Offset = mat4(elements);
 
 			i += boneOffsetSize;
 
@@ -188,22 +189,24 @@ namespace sp { namespace graphics {
 
 		for (int i = 0; i < bones.size(); i++) {
 			Bone* currentBone = bones[i];
-			if (currentBone->ParentIndex < 0 || currentBone->ParentIndex >= NUMBONES) continue;
+			uint pid = parents[currentBone];
+			if (pid < 0 || pid >= NUMBONES) continue;
 			if (currentBone->Parent != nullptr) continue;
-			Bone* parent = bones[currentBone->ParentIndex];
+
+			Bone* parent = bones[pid];
 			currentBone->Parent = parent;
 			currentBone->Parent->Children.push_back(currentBone);
 		}
 
-		Bone* parent = nullptr;
+		Bone* root = nullptr;
 		for (int i = 0; i < bones.size(); i++) {
 			if (bones[i]->Parent == nullptr) {
-				parent = bones[i];
+				root = bones[i];
 				break;
 			}
 		}
 
-		m_Mesh = spnew Mesh(va, ib, nullptr, vertices, (uint*)format.indexData, format.indexBufferSize / sizeof(uint*), parent);
+		m_Mesh = spnew Mesh(va, ib, nullptr, root);
 
 #ifdef SP_DEBUG
 		m_Mesh->SetDebugData((Vertex*)format.vertexData, format.vertexBufferSize / sizeof(Vertex));

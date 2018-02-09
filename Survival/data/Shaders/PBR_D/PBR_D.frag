@@ -15,10 +15,6 @@ struct Light
 {
 	vec3 color;
 	vec3 position;
-	float p0;
-	vec3 direction;
-	float p1;
-	vec3 lightVector;
 	float intensity;
 };
 
@@ -46,15 +42,13 @@ uniform sampler2D u_Position;
 uniform sampler2D u_Albedo;
 uniform sampler2D u_SpecularRoughness;
 uniform sampler2D u_Normal;
-//uniform sampler2D u_Tangent;
-//uniform sampler2D u_Binormal;
+uniform sampler2D u_Tangent;
+uniform sampler2D u_Binormal;
 
 uniform sampler2D u_PreintegratedFG;
 uniform samplerCube u_EnvironmentMap;
 
 uniform vec3 u_CameraPosition;
-
-float nothingness;
 
 vec3 FinalGamma(vec3 color)
 {
@@ -110,7 +104,7 @@ vec3 GGX(Light light, Material material, vec3 eye)
 	float G_SmithV = NdotV * (1.0 - k) + k;
 	float G = 0.25 / (G_SmithL * G_SmithV);
 
-	return G * D * F * nothingness;
+	return G * D * F;
 }
 
 vec3 RadianceIBLIntegration(float NdotV, float roughness, vec3 specular)
@@ -160,15 +154,8 @@ void main()
 
 	g_Attributes.position = texture(u_Position, fs_in.uv).xyz;
 	g_Attributes.normal = normalize(texture(u_Normal, fs_in.uv).xyz * vec3(10, 10, 10));
-	//g_Attributes.tangent = texture(u_Tangent, fs_in.uv).xyz;
-	//g_Attributes.binormal = texture(u_Binormal, fs_in.uv).xyz;
-
-	if (g_Attributes.normal == vec3(0, 0, 0) && g_Attributes.position == vec3(0, 0, 0)) {
-		nothingness = 0;
-	}
-	else {
-		nothingness = 1;
-	}
+	g_Attributes.tangent = texture(u_Tangent, fs_in.uv).xyz;
+	g_Attributes.binormal = texture(u_Binormal, fs_in.uv).xyz;
 
 	vec3 eye = normalize(u_CameraPosition - g_Attributes.position);
 
