@@ -129,7 +129,7 @@ namespace sp { namespace graphics {
 
 		fclose(f);
 
-		ShaderManager::Get("DefaultShader")->Bind();
+		ShaderManager::Get("Default")->Bind();
 
 		API::VertexBuffer* buffer = API::VertexBuffer::Create(API::BufferUsage::STATIC);
 		buffer->SetData(format.vertexBufferSize, format.vertexData);

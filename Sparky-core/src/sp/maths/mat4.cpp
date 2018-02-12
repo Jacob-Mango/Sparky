@@ -287,11 +287,13 @@ namespace sp {
 
 		mat4 mat4::Translate(const vec3& translation)
 		{
-			mat4 result(1.0f);
+			mat4 result = mat4::Identity();
 
-			result.elements[3 + 0 * 4] += translation.x;
-			result.elements[3 + 1 * 4] += translation.y;
-			result.elements[3 + 2 * 4] += translation.z;
+			result.SetPosition(translation);
+
+			//result.elements[3 + 0 * 4] = translation.x;
+			//result.elements[3 + 1 * 4] = translation.y;
+			//result.elements[3 + 2 * 4] = translation.z;
 
 			return result;
 		}

@@ -12,12 +12,16 @@ namespace sp {
 			{
 				maths::vec4 color;
 				maths::vec3 position;
+				maths::vec3 direction;
+				maths::vec3 vector;
 				float intensity;
 			};
 			
 			Light() {
 				color = maths::vec4();
 				position = maths::vec3(0);
+				direction = maths::vec3(0);
+				vector = maths::vec3(0);
 				intensity = 0;
 			}
 

@@ -3,7 +3,7 @@
 #define PI 3.1415926535897932384626433832795
 #define GAMMA 2.2
 
-layout(location = 0) out vec4 color;
+layout(location = 0) out vec4 out_Color;
 
 in DATA
 {
@@ -15,6 +15,8 @@ struct Light
 {
 	vec3 color;
 	vec3 position;
+	vec3 direction;
+	vec3 vector;
 	float intensity;
 };
 
@@ -62,10 +64,10 @@ float FresnelSchlick(float f0, float fd90, float view)
 
 float Disney(Light light, Material material, vec3 eye)
 {
-	vec3 halfVector = normalize(light.lightVector + eye);
+	vec3 halfVector = normalize(light.vector + eye);
 
-	float NdotL = max(dot(g_Attributes.normal, light.lightVector), 0.0);
-	float LdotH = max(dot(light.lightVector, halfVector), 0.0);
+	float NdotL = max(dot(g_Attributes.normal, light.vector), 0.0);
+	float LdotH = max(dot(light.vector, halfVector), 0.0);
 	float NdotV = max(dot(g_Attributes.normal, eye), 0.0);
 
 	float energyBias = mix(0.0, 0.5, material.roughness);
@@ -81,7 +83,7 @@ float Disney(Light light, Material material, vec3 eye)
 
 vec3 GGX(Light light, Material material, vec3 eye)
 {
-	vec3 h = normalize(light.lightVector + eye);
+	vec3 h = normalize(light.vector + eye);
 	float NdotH = max(dot(g_Attributes.normal, h), 0.0);
 
 	float rough2 = max(material.roughness * material.roughness, 2.0e-3); // capped so spec highlights don't disappear
@@ -93,8 +95,8 @@ vec3 GGX(Light light, Material material, vec3 eye)
 	// Fresnel
 	vec3 reflectivity = material.specular;
 	float fresnel = 1.0;
-	float NdotL = clamp(dot(g_Attributes.normal, light.lightVector), 0.0, 1.0);
-	float LdotH = clamp(dot(light.lightVector, h), 0.0, 1.0);
+	float NdotL = clamp(dot(g_Attributes.normal, light.vector), 0.0, 1.0);
+	float LdotH = clamp(dot(light.vector, h), 0.0, 1.0);
 	float NdotV = clamp(dot(g_Attributes.normal, eye), 0.0, 1.0);
 	vec3 F = reflectivity + (fresnel - fresnel * reflectivity) * exp2((-5.55473 * LdotH - 6.98316) * LdotH);
 
@@ -144,11 +146,15 @@ vec3 Specular(Light light, Material material, vec3 eye)
 float Attenuate(Light light)
 {
 	vec3 direction = normalize(light.position - g_Attributes.position);
-	return light.intensity * 1.0 / (dot(direction, direction) + 0.01);
+	return light.intensity * 1.0 / (dot(direction, light.direction) + 0.01);
 }
 
 void main()
 {
+	u_LightSetup[0].position = vec3(0, 10, 0);
+	u_LightSetup[0].intensity = 1.0;
+	u_LightSetup[0].color = vec3(0.8, 0.8, 0.8);
+
 	vec4 albedo = texture(u_Albedo, fs_in.uv);
 	vec4 specRoughness = texture(u_SpecularRoughness, fs_in.uv);
 
@@ -171,9 +177,9 @@ void main()
 	{
 		Light light = u_LightSetup[i];
 		light.intensity = Attenuate(light);
-		light.lightVector = normalize(light.position - vec3(g_Attributes.position));
+		light.vector = normalize(light.position - vec3(g_Attributes.position));
 
-		float NdotL = clamp(dot(g_Attributes.normal, light.lightVector), 0.1, 1.0);
+		float NdotL = clamp(dot(g_Attributes.normal, light.vector), 0.1, 1.0);
 		diffuse += NdotL * Diffuse(light, material, eye) * vec4(light.color, 1.0) * light.intensity;
 		specular += NdotL * Specular(light, material, eye) * light.color * light.intensity;
 	}
@@ -183,5 +189,7 @@ void main()
 	vec3 spec = (specular + IBL(material, eye)) * visibility;
 	vec3 finalColor = FinalGamma(diff + spec);
 
-	color = vec4(finalColor, 1.0);
+	finalColor += vec3(albedo.rgb);
+	finalColor += vec3(1, 1, 1);
+	out_Color = vec4(finalColor, 1.0);
 };

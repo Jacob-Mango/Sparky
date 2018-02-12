@@ -269,7 +269,7 @@ namespace sp { namespace graphics { namespace MeshFactory {
 				uint index = (x * (int)vertexCount) + z;
 				data[index].position = vec3(x - (vertexCount / 2), 0, z - (vertexCount / 2));
 				data[index].normal = vec3(0, 1, 0);
-				data[index].uv = vec2(data[index].position.x, data[index].position.z);
+				data[index].uv = vec2(data[index].position.x / vertexCount, data[index].position.z / vertexCount);
 				data[index].binormal = mat4::Rotate(90.0f, vec3(0, 1, 0)) * vec3(0, 1, 0);
 				data[index].tangent = mat4::Rotate(90.0f, vec3(0, 0, 1)) * vec3(0, 1, 0);
 				data[index].weights = vec4(1);

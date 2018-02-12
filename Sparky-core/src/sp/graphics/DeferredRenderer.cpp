@@ -47,12 +47,10 @@ namespace sp {
 		void DeferredRenderer::Init()
 		{
 			m_FrameBuffer = API::FrameBuffer2D::Create(m_ScreenBufferWidth, m_ScreenBufferHeight, {
-					API::TextureParameters(API::TextureFormat::RGBA, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
-					API::TextureParameters(API::TextureFormat::RGBA, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
-					API::TextureParameters(API::TextureFormat::RGBA, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
-					API::TextureParameters(API::TextureFormat::RGBA, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
-					API::TextureParameters(API::TextureFormat::RGBA, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
-					API::TextureParameters(API::TextureFormat::RGBA, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
+					API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
+					API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
+					API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
+					API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
 				});
 
 			m_MaxLights = 64;
@@ -166,8 +164,8 @@ namespace sp {
 
 		void DeferredRenderer::SubmitLightSetup(LightSetup& lightSetup)
 		{
-			byte* data = lightSetup.GetLightData(0, m_MaxLights);
-			m_Material->SetUniformData("u_LightSetup", data, m_MaxLights * sizeof(Light));
+			//byte* data = lightSetup.GetLightData(0, m_MaxLights);
+			//m_Material->SetUniformData("u_LightSetup", data, m_MaxLights * sizeof(Light));
 		}
 
 		void DeferredRenderer::EndScene()
@@ -188,7 +186,7 @@ namespace sp {
 		void DeferredRenderer::Present()
 		{
 			m_FrameBuffer->Bind();
-			m_FrameBuffer->SetClearColor(maths::vec4(1, 0, 1, 1));
+			m_FrameBuffer->SetClearColor(maths::vec4(0));
 			m_FrameBuffer->Clear();
 			for (uint i = 0; i < m_CommandQueue.size(); i++)
 			{
@@ -201,6 +199,7 @@ namespace sp {
 				memcpy(m_VSSystemUniformBuffer + m_VSSystemUniformBufferOffsets[VSSystemUniformIndex_JointMatrix], &command.bones, sizeof(mat4) * NUMBONES);
 
 				SetSystemUniforms(command.shader);
+
 				command.mesh->Render(*this);
 			}
 			m_FrameBuffer->Unbind();
@@ -216,6 +215,7 @@ namespace sp {
 			m_Material->SetUniform("u_ProjectionMatrix", maths::mat4::Orthographic(-aspectX, aspectX, aspectY, -aspectY, -10.0f, 10.0f));
 			m_Material->SetUniform("u_ModelMatrix", maths::mat4::Scale(vec3(aspectX, -aspectY)));
 			m_Material->SetTexture("u_PreintegratedFG", m_PreintegratedFG);
+			m_Material->SetTexture("u_EnvironmentMap", m_PreintegratedFG);
 
 			m_Shader->Bind();
 			m_Material->Bind();
@@ -225,8 +225,6 @@ namespace sp {
 			m_Material->SetTexture("u_Albedo", textures[1]);
 			m_Material->SetTexture("u_SpecularRoughness", textures[2]);
 			m_Material->SetTexture("u_Normal", textures[3]);
-			m_Material->SetTexture("u_Tangent", textures[4]);
-			m_Material->SetTexture("u_Binormal", textures[5]);
 
 			m_VertexArray->Bind();
 			m_IndexBuffer->Bind();

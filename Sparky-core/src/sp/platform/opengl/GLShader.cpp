@@ -57,12 +57,12 @@ namespace sp {
 				PreProcess(m_Source, shaders);
 				Parse(m_VertexSource, m_GeometrySource, m_FragmentSource);
 
-				_SP_WARN("Vertex:\n");
-				_SP_INFO(m_VertexSource);
-				_SP_WARN("Geometry:\n");
-				_SP_INFO(m_GeometrySource);
-				_SP_WARN("Fragment:\n");
-				_SP_INFO(m_FragmentSource);
+				//_SP_WARN("Vertex:\n");
+				//_SP_INFO(m_VertexSource);
+				//_SP_WARN("Geometry:\n");
+				//_SP_INFO(m_GeometrySource);
+				//_SP_WARN("Fragment:\n");
+				//_SP_INFO(m_FragmentSource);
 
 				GLShaderErrorInfo error;
 				m_Handle = Compile(shaders, error);
@@ -138,7 +138,7 @@ namespace sp {
 								file.erase(j, rem.length());
 							file = StringReplace(file, '\"');
 							SP_WARN("Including file \'", file, "\' into shader.");
-
+							VFS::Get()->ReadTextFile(file);
 							ReadShaderFile(GetLines(VFS::Get()->ReadTextFile(file)), shaders);
 						}
 					}

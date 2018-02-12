@@ -18,8 +18,8 @@ namespace sp {
 			bool m_ShouldUpdate;
 		public:
 			Entity();
-			Entity(graphics::Sprite* sprite, maths::mat4* transform = &maths::mat4::Identity());
-			Entity(graphics::Mesh* mesh, maths::mat4* transform = &maths::mat4::Identity());
+			Entity(graphics::Sprite* sprite, maths::mat4* transform = spnew maths::mat4(1.0));
+			Entity(graphics::Mesh* mesh, maths::mat4* transform = spnew maths::mat4(1.0));
 
 			void AddComponent(component::Component* component);
 

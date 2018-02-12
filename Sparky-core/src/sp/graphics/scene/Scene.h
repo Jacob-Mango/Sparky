@@ -36,8 +36,6 @@ namespace sp { namespace graphics {
 
 		inline graphics::Camera* GetCamera() const { return m_Camera; }
 		inline const std::vector<entity::Entity*>& GetEntities() const { return m_Entities; }
-
-		void CreateHeightMap();
 	};
 
 } }

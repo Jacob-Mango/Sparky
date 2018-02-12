@@ -16,7 +16,7 @@ namespace sp {
 		float Pitch;
 
 		FPSCamera::FPSCamera(const maths::mat4& projectionMatrix)
-			: Camera(projectionMatrix), m_MouseSensitivity(1.0f), m_Speed(2.0f), m_SprintSpeed(50.0f), m_MouseWasGrabbed(false)
+			: Camera(projectionMatrix), m_MouseSensitivity(1.0f), m_Speed(50.0f), m_SprintSpeed(500.0f), m_MouseWasGrabbed(false)
 		{
 			debug::DebugMenu::Add("Camera/FPS Camera Speed", &m_Speed);
 			debug::DebugMenu::Add("Camera/FPS Camera Sprint Speed", &m_SprintSpeed);
@@ -40,16 +40,21 @@ namespace sp {
 
 			if (Input::IsMouseButtonPressed(SP_MOUSE_RIGHT))
 			{
-				if (!Input::GetInputManager()->IsMouseGrabbed())
+				if (!Input::GetInputManager()->IsMouseGrabbed() && !debug::DebugMenu::IsVisible())
 				{
 					Input::GetInputManager()->SetMouseGrabbed(true);
 					Input::GetInputManager()->SetMouseCursor(SP_NO_CURSOR);
+					Input::GetInputManager()->SetMousePosition(windowCenter);
 				}
+			}
+			else if (Input::IsKeyPressed(SP_KEY_ESCAPE))
+			{
+				Input::GetInputManager()->SetMouseGrabbed(false);
+				Input::GetInputManager()->SetMouseCursor(1);
 			}
 
 			if (Input::GetInputManager()->IsMouseGrabbed())
 			{
-				m_MouseWasGrabbed = true;
 				vec2 mouse = Input::GetInputManager()->GetMousePosition();
 				mouse.x -= windowCenter.x;
 				mouse.y -= windowCenter.y;
@@ -85,12 +90,6 @@ namespace sp {
 				SetViewMatrix();
 			}
 
-			if (Input::IsKeyPressed(SP_KEY_ESCAPE))
-			{
-				Input::GetInputManager()->SetMouseGrabbed(false);
-				Input::GetInputManager()->SetMouseCursor(1);
-				m_MouseWasGrabbed = false;
-			}
 		}
 
 		Quaternion FPSCamera::GetOrientation() const

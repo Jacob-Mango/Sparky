@@ -4,8 +4,6 @@ layout(location = 0) out vec4 gPosition;
 layout(location = 1) out vec4 gAlebdo;
 layout(location = 2) out vec4 gSpecularRoughness;
 layout(location = 3) out vec4 gNormal;
-layout(location = 4) out vec4 gTangent;
-layout(location = 5) out vec4 gBinormal;
 
 in FSDATA
 {
@@ -49,7 +47,7 @@ uniform float u_UsingGlossMap;
 uniform float u_UsingNormalMap;
 
 #define PI 3.1415926535897932384626433832795
-#define GAMMA 2.2
+#define GAMMA 1
 
 vec4 GammaCorrectTexture(sampler2D tex, vec2 uv)
 {
@@ -101,11 +99,7 @@ void main()
 {
 	g_Attributes.position = fs_in.position.xyz;
 	g_Attributes.normal = normalize(fs_in.normal);
-	g_Attributes.tangent = normalize(fs_in.tangent);
-	g_Attributes.binormal = normalize(fs_in.binormal);
-
-	if (u_UsingNormalMap > 0.0)
-		g_Attributes.normal = GetNormal();
+	g_Attributes.normal = GetNormal();
 
 	Material material;
 	material.albedo = GetAlbedoMap();
@@ -116,6 +110,4 @@ void main()
 	gAlebdo = material.albedo;
 	gSpecularRoughness = vec4(material.specular, material.roughness);
 	gNormal = vec4(g_Attributes.normal, 1.0);
-	gBinormal = vec4(g_Attributes.binormal, 1.0);
-	gTangent = vec4(g_Attributes.tangent, 1.0);
 }

@@ -82,6 +82,7 @@ namespace sp {
 			// Strip carriage returns
 			result.erase(std::remove(result.begin(), result.end(), '\r'), result.end());
 		}
+		CloseHandle(file);
 		return success ? result : String();
 	}
 
