@@ -1,12 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="src\sp\entity\component\AnimationComponent.cpp" />
-    <ClCompile Include="src\sp\entity\component\CameraComponent.cpp" />
     <ClCompile Include="src\sp\app\Input.cpp" />
     <ClCompile Include="src\sp\debug\DebugMenuItem.cpp" />
     <ClCompile Include="src\sp\debug\DebugMenuSlider.cpp" />
-    <ClCompile Include="src\sp\entity\component\SpriteComponent.cpp" />
     <ClCompile Include="src\sp\events\WindowEvent.cpp" />
     <ClCompile Include="src\sp\graphics\API\Texture2D.cpp" />
     <ClCompile Include="src\sp\graphics\API\TextureCube.cpp" />
@@ -71,10 +68,6 @@
     <ClCompile Include="src\sp\debug\DebugLayer.cpp" />
     <ClCompile Include="src\sp\debug\DebugMenu.cpp" />
     <ClCompile Include="src\sp\embedded\Embedded.cpp" />
-    <ClCompile Include="src\sp\entity\component\Component.cpp" />
-    <ClCompile Include="src\sp\entity\component\MeshComponent.cpp" />
-    <ClCompile Include="src\sp\entity\component\TransformComponent.cpp" />
-    <ClCompile Include="src\sp\entity\Entity.cpp" />
     <ClCompile Include="src\sp\events\Event.cpp" />
     <ClCompile Include="src\sp\events\KeyEvent.cpp" />
     <ClCompile Include="src\sp\events\MouseEvent.cpp" />
@@ -125,18 +118,22 @@
     <ClCompile Include="src\sp\maths\vec2.cpp" />
     <ClCompile Include="src\sp\maths\vec3.cpp" />
     <ClCompile Include="src\sp\maths\vec4.cpp" />
-    <ClCompile Include="src\sp\graphics\scene\Scene2D.cpp" />
-    <ClCompile Include="src\sp\graphics\scene\Scene.cpp" />
+    <ClCompile Include="src\sp\scene\Node.cpp" />
+    <ClCompile Include="src\sp\scene\component\AnimationComponent.cpp" />
+    <ClCompile Include="src\sp\scene\component\CameraComponent.cpp" />
+    <ClCompile Include="src\sp\scene\component\Component.cpp" />
+    <ClCompile Include="src\sp\scene\component\MeshComponent.cpp" />
+    <ClCompile Include="src\sp\scene\component\SpriteComponent.cpp" />
+    <ClCompile Include="src\sp\scene\Object.cpp" />
+    <ClCompile Include="src\sp\scene\Scene.cpp" />
+    <ClCompile Include="src\sp\scene\Scene2D.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\sp\entity\component\CameraComponent.h" />
     <ClInclude Include="src\sp\graphics\API\RenderType.h" />
-    <ClInclude Include="src\sp\entity\component\AnimationComponent.h" />
     <ClInclude Include="src\sp\app\Input.h" />
     <ClInclude Include="src\sp\debug\DebugMenuAction.h" />
     <ClInclude Include="src\sp\debug\DebugMenuItem.h" />
     <ClInclude Include="src\sp\debug\DebugMenuSlider.h" />
-    <ClInclude Include="src\sp\entity\component\SpriteComponent.h" />
     <ClInclude Include="src\sp\events\WindowEvent.h" />
     <ClInclude Include="src\sp\graphics\API\VertexBuffer.h" />
     <ClInclude Include="src\sp\graphics\camera\FPSCamera.h" />
@@ -201,11 +198,6 @@
     <ClInclude Include="src\sp\debug\DebugLayer.h" />
     <ClInclude Include="src\sp\debug\DebugMenu.h" />
     <ClInclude Include="src\sp\embedded\Embedded.h" />
-    <ClInclude Include="src\sp\entity\component\Component.h" />
-    <ClInclude Include="src\sp\entity\component\Components.h" />
-    <ClInclude Include="src\sp\entity\component\MeshComponent.h" />
-    <ClInclude Include="src\sp\entity\component\TransformComponent.h" />
-    <ClInclude Include="src\sp\entity\Entity.h" />
     <ClInclude Include="src\sp\events\Event.h" />
     <ClInclude Include="src\sp\events\EventDispatcher.h" />
     <ClInclude Include="src\sp\events\Events.h" />
@@ -268,8 +260,16 @@
     <ClInclude Include="src\sp\maths\vec2.h" />
     <ClInclude Include="src\sp\maths\vec3.h" />
     <ClInclude Include="src\sp\maths\vec4.h" />
-    <ClInclude Include="src\sp\graphics\scene\Scene2D.h" />
-    <ClInclude Include="src\sp\graphics\scene\Scene.h" />
+    <ClInclude Include="src\sp\scene\Node.h" />
+    <ClInclude Include="src\sp\scene\component\AnimationComponent.h" />
+    <ClInclude Include="src\sp\scene\component\CameraComponent.h" />
+    <ClInclude Include="src\sp\scene\component\Component.h" />
+    <ClInclude Include="src\sp\scene\component\Components.h" />
+    <ClInclude Include="src\sp\scene\component\MeshComponent.h" />
+    <ClInclude Include="src\sp\scene\component\SpriteComponent.h" />
+    <ClInclude Include="src\sp\scene\Object.h" />
+    <ClInclude Include="src\sp\scene\Scene.h" />
+    <ClInclude Include="src\sp\scene\Scene2D.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\sp\embedded\files\SourceSansPro-Light.embed" />

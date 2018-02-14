@@ -13,11 +13,11 @@ namespace sp { namespace graphics {
 		float height = Application::GetApplication().GetWindowHeight();
 
 		m_Renderer = spnew Renderer2D(width, height);
-		m_Scene = spnew graphics::Scene2D(projectionMatrix);
+		m_Scene = spnew scene::Scene2D(projectionMatrix);
 		m_Renderer->SetCamera(m_Scene->GetCamera());
 	}
 
-	Layer2D::Layer2D(graphics::Scene2D* scene)
+	Layer2D::Layer2D(scene::Scene2D* scene)
 		: m_Scene(scene)
 	{
 		float width = Application::GetApplication().GetWindowWidth();
@@ -44,9 +44,9 @@ namespace sp { namespace graphics {
 
 	Sprite* Layer2D::Add(Sprite* sprite)
 	{
-		maths::mat4* pos = &maths::mat4::Identity();
-		pos->SetPosition(sprite->GetPosition());
-		m_Scene->Add(spnew entity::Entity(sprite, pos));
+		maths::mat4 pos = maths::mat4::Identity();
+		pos.SetPosition(sprite->GetPosition());
+		m_Scene->Add(spnew scene::Object(sprite, pos));
 		return sprite;
 	}
 

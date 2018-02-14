@@ -6,7 +6,7 @@
 
 namespace sp { namespace graphics {
 
-	Layer3D::Layer3D(graphics::Scene* scene)
+	Layer3D::Layer3D(scene::Scene* scene)
 		: m_Scene(scene)
 	{
 		switch (graphics::API::Context::GetRendererType()) {
@@ -32,7 +32,7 @@ namespace sp { namespace graphics {
 		m_Renderer->Init();
 	}
 
-	void Layer3D::OnInit(Renderer3D* renderer, graphics::Scene* scene)
+	void Layer3D::OnInit(Renderer3D* renderer, scene::Scene* scene)
 	{
 	}
 

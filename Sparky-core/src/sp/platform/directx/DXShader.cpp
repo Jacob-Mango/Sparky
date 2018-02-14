@@ -38,9 +38,6 @@ namespace sp { namespace graphics { namespace API {
 	D3DShader::D3DShader(const String& name, const String& source)
 		: m_Name(name)
 	{
-		m_VSUserUniformBuffer = nullptr;
-		m_PSUserUniformBuffer = nullptr;
-
 		Load(source);
 		Parse(source);
 		CreateBuffers();
@@ -177,11 +174,11 @@ namespace sp { namespace graphics { namespace API {
 
 		D3DShaderUniformBufferDeclaration* buffer = nullptr;
 
-		uint shaderType;
+		ShaderType shaderType;
 		if (StartsWith(bufferName, "VS"))
-			shaderType = 0;
+			shaderType = ShaderType::VERTEX;
 		else if (StartsWith(bufferName, "PS"))
-			shaderType = 1;
+			shaderType = ShaderType::FRAGMENT;
 		else
 			SP_ASSERT(false);
 
@@ -205,29 +202,11 @@ namespace sp { namespace graphics { namespace API {
 				buffer = new D3DShaderUniformBufferDeclaration(bufferName, reg, shaderType);
 				if (StartsWith(name, "sys_"))
 				{
-					switch (shaderType)
-					{
-					case 0:
-						m_VSUniformBuffers.push_back(buffer);
-						break;
-					case 1:
-						m_PSUniformBuffers.push_back(buffer);
-						break;
-					}
+					m_UniformBuffers[shaderType].push_back(buffer);
 				}
 				else
 				{
-					switch (shaderType)
-					{
-					case 0:
-						SP_ASSERT(m_VSUserUniformBuffer == nullptr);
-						m_VSUserUniformBuffer = buffer;
-						break;
-					case 1:
-						SP_ASSERT(m_PSUserUniformBuffer == nullptr);
-						m_PSUserUniformBuffer = buffer;
-						break;
-					}
+					m_UserUniformBuffers[shaderType] = buffer;
 				}
 			}
 			D3DShaderUniformDeclaration::Type t = D3DShaderUniformDeclaration::StringToType(type);
@@ -285,91 +264,55 @@ namespace sp { namespace graphics { namespace API {
 
 	void D3DShader::CreateBuffers()
 	{
-		// Note: We only support a single uniform buffer per shader
-		m_VSConstantBuffersCount = m_VSUniformBuffers.size() + (m_VSUserUniformBuffer ? 1 : 0);
-		m_VSConstantBuffers = new ID3D11Buffer*[m_VSConstantBuffersCount];
+		for (auto shader : m_UniformBuffers) {
+			// Note: We only support a single uniform buffer per shader
+			m_ConstantBuffersCount[shader.first] = m_UniformBuffers.size() + (m_UserUniformBuffers[shader.first] ? 1 : 0);
+			m_ConstantBuffers[shader.first] = new ID3D11Buffer*[m_ConstantBuffersCount[shader.first]];
 
-		for (uint i = 0; i < m_VSUniformBuffers.size(); i++)
-		{
-			D3DShaderUniformBufferDeclaration* decl = (D3DShaderUniformBufferDeclaration*)m_VSUniformBuffers[i];
+			for (uint i = 0; i < shader.second.size(); i++)
+			{
+				D3DShaderUniformBufferDeclaration* decl = (D3DShaderUniformBufferDeclaration*)shader.second[i];
 
-			D3D11_BUFFER_DESC desc;
-			ZeroMemory(&desc, sizeof(D3D11_BUFFER_DESC));
-			desc.ByteWidth = decl->GetSize();
-			desc.Usage = D3D11_USAGE_DYNAMIC;
-			desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+				D3D11_BUFFER_DESC desc;
+				ZeroMemory(&desc, sizeof(D3D11_BUFFER_DESC));
+				desc.ByteWidth = decl->GetSize();
+				desc.Usage = D3D11_USAGE_DYNAMIC;
+				desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+				desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-			D3D11_SUBRESOURCE_DATA data;
-			data.pSysMem = new byte[desc.ByteWidth];
-			data.SysMemPitch = 0;
-			data.SysMemSlicePitch = 0;
-			D3DContext::GetDevice()->CreateBuffer(&desc, &data, &m_VSConstantBuffers[decl->GetRegister()]);
+				D3D11_SUBRESOURCE_DATA data;
+				data.pSysMem = new byte[desc.ByteWidth];
+				data.SysMemPitch = 0;
+				data.SysMemSlicePitch = 0;
+				D3DContext::GetDevice()->CreateBuffer(&desc, &data, &m_ConstantBuffers[shader.first][decl->GetRegister()]);
+			}
 		}
 
-		if (m_VSUserUniformBuffer)
-		{
-			D3DShaderUniformBufferDeclaration* decl = m_VSUserUniformBuffer;
+		for (auto shader : m_UserUniformBuffers) {
+			if (shader.second)
+			{
+				D3D11_BUFFER_DESC desc;
+				ZeroMemory(&desc, sizeof(D3D11_BUFFER_DESC));
+				desc.ByteWidth = shader.second->GetSize();
+				desc.Usage = D3D11_USAGE_DYNAMIC;
+				desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+				desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-			D3D11_BUFFER_DESC desc;
-			ZeroMemory(&desc, sizeof(D3D11_BUFFER_DESC));
-			desc.ByteWidth = decl->GetSize();
-			desc.Usage = D3D11_USAGE_DYNAMIC;
-			desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-			D3D11_SUBRESOURCE_DATA data;
-			data.pSysMem = new byte[desc.ByteWidth];
-			data.SysMemPitch = 0;
-			data.SysMemSlicePitch = 0;
-			D3DContext::GetDevice()->CreateBuffer(&desc, &data, &m_VSConstantBuffers[decl->GetRegister()]);
-		}
-
-		m_PSConstantBuffersCount = m_PSUniformBuffers.size() + (m_PSUserUniformBuffer ? 1 : 0);
-		m_PSConstantBuffers = new ID3D11Buffer*[m_PSConstantBuffersCount];
-
-		for (uint i = 0; i < m_PSUniformBuffers.size(); i++)
-		{
-			D3DShaderUniformBufferDeclaration* decl = (D3DShaderUniformBufferDeclaration*)m_PSUniformBuffers[i];
-
-			D3D11_BUFFER_DESC desc;
-			ZeroMemory(&desc, sizeof(D3D11_BUFFER_DESC));
-			desc.ByteWidth = decl->GetSize();
-			desc.Usage = D3D11_USAGE_DYNAMIC;
-			desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-			D3D11_SUBRESOURCE_DATA data;
-			data.pSysMem = new byte[desc.ByteWidth];
-			data.SysMemPitch = 0;
-			data.SysMemSlicePitch = 0;
-			D3DContext::GetDevice()->CreateBuffer(&desc, &data, &m_PSConstantBuffers[decl->GetRegister()]);
-		}
-
-		if (m_PSUserUniformBuffer)
-		{
-			D3DShaderUniformBufferDeclaration* decl = m_PSUserUniformBuffer;
-
-			D3D11_BUFFER_DESC desc;
-			ZeroMemory(&desc, sizeof(D3D11_BUFFER_DESC));
-			desc.ByteWidth = decl->GetSize();
-			desc.Usage = D3D11_USAGE_DYNAMIC;
-			desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-			D3D11_SUBRESOURCE_DATA data;
-			data.pSysMem = new byte[desc.ByteWidth];
-			data.SysMemPitch = 0;
-			data.SysMemSlicePitch = 0;
-			D3DContext::GetDevice()->CreateBuffer(&desc, &data, &m_PSConstantBuffers[decl->GetRegister()]);
+				D3D11_SUBRESOURCE_DATA data;
+				data.pSysMem = new byte[desc.ByteWidth];
+				data.SysMemPitch = 0;
+				data.SysMemSlicePitch = 0;
+				D3DContext::GetDevice()->CreateBuffer(&desc, &data, &m_ConstantBuffers[shader.first][shader.second->GetRegister()]);
+			}
 		}
 	}
 
-	void D3DShader::SetVSSystemUniformBuffer(byte* data, uint size, uint slot)
+	void D3DShader::SetSystemUniformBuffer(ShaderType type, byte* data, uint size, uint slot)
 	{
-		if (m_VSUserUniformBuffer)
-			SP_ASSERT(slot != m_VSUserUniformBuffer->GetRegister());
-		ID3D11Buffer* cbuffer = m_VSConstantBuffers[slot];
+		if (m_UserUniformBuffers[type])
+			SP_ASSERT(slot != m_UserUniformBuffers[type]->GetRegister());
+
+		ID3D11Buffer* cbuffer = m_ConstantBuffers[type][slot];
 
 		D3D11_MAPPED_SUBRESOURCE msr;
 		memset(&msr, 0, sizeof(D3D11_MAPPED_SUBRESOURCE));
@@ -379,59 +322,9 @@ namespace sp { namespace graphics { namespace API {
 		D3DContext::GetDeviceContext()->Unmap(cbuffer, NULL);
 	}
 
-	void D3DShader::SetGSSystemUniformBuffer(byte* data, uint size, uint slot)
+	void D3DShader::SetUserUniformBuffer(ShaderType type, byte* data, uint size)
 	{
-		SP_ASSERT(!m_GSUserUniformBuffer || slot != m_GSUserUniformBuffer->GetRegister());
-		ID3D11Buffer* cbuffer = m_GSConstantBuffers[slot];
-
-		D3D11_MAPPED_SUBRESOURCE msr;
-		memset(&msr, 0, sizeof(D3D11_MAPPED_SUBRESOURCE));
-
-		D3DContext::GetDeviceContext()->Map(cbuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &msr);
-		memcpy(msr.pData, data, size);
-		D3DContext::GetDeviceContext()->Unmap(cbuffer, NULL);
-	}
-
-	void D3DShader::SetPSSystemUniformBuffer(byte* data, uint size, uint slot)
-	{
-		SP_ASSERT(!m_PSUserUniformBuffer || slot != m_PSUserUniformBuffer->GetRegister());
-		ID3D11Buffer* cbuffer = m_PSConstantBuffers[slot];
-
-		D3D11_MAPPED_SUBRESOURCE msr;
-		memset(&msr, 0, sizeof(D3D11_MAPPED_SUBRESOURCE));
-
-		D3DContext::GetDeviceContext()->Map(cbuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &msr);
-		memcpy(msr.pData, data, size);
-		D3DContext::GetDeviceContext()->Unmap(cbuffer, NULL);
-	}
-
-	void D3DShader::SetVSUserUniformBuffer(byte* data, uint size)
-	{
-		ID3D11Buffer* cbuffer = m_VSConstantBuffers[m_VSUserUniformBuffer->GetRegister()];
-
-		D3D11_MAPPED_SUBRESOURCE msr;
-		memset(&msr, 0, sizeof(D3D11_MAPPED_SUBRESOURCE));
-
-		D3DContext::GetDeviceContext()->Map(cbuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &msr);
-		memcpy(msr.pData, data, size);
-		D3DContext::GetDeviceContext()->Unmap(cbuffer, NULL);
-	}
-
-	void D3DShader::SetGSUserUniformBuffer(byte* data, uint size)
-	{
-		ID3D11Buffer* cbuffer = m_GSConstantBuffers[m_GSUserUniformBuffer->GetRegister()];
-
-		D3D11_MAPPED_SUBRESOURCE msr;
-		memset(&msr, 0, sizeof(D3D11_MAPPED_SUBRESOURCE));
-
-		D3DContext::GetDeviceContext()->Map(cbuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &msr);
-		memcpy(msr.pData, data, size);
-		D3DContext::GetDeviceContext()->Unmap(cbuffer, NULL);
-	}
-
-	void D3DShader::SetPSUserUniformBuffer(byte* data, uint size)
-	{
-		ID3D11Buffer* cbuffer = m_PSConstantBuffers[m_PSUserUniformBuffer->GetRegister()];
+		ID3D11Buffer* cbuffer = m_ConstantBuffers[type][m_UserUniformBuffers[type]->GetRegister()];
 
 		D3D11_MAPPED_SUBRESOURCE msr;
 		memset(&msr, 0, sizeof(D3D11_MAPPED_SUBRESOURCE));
@@ -448,8 +341,8 @@ namespace sp { namespace graphics { namespace API {
 		D3DContext::GetDeviceContext()->VSSetShader(m_Data.vertexShader, NULL, 0);
 		D3DContext::GetDeviceContext()->PSSetShader(m_Data.pixelShader, NULL, 0);
 
-		D3DContext::GetDeviceContext()->VSSetConstantBuffers(0, m_VSConstantBuffersCount, m_VSConstantBuffers);
-		D3DContext::GetDeviceContext()->PSSetConstantBuffers(0, m_PSConstantBuffersCount, m_PSConstantBuffers);
+		//D3DContext::GetDeviceContext()->VSSetConstantBuffers(0, m_ConstantBuffersCount[ShaderType::VERTEX], m_ConstantBuffers[ShaderType::VERTEX]);
+		//D3DContext::GetDeviceContext()->PSSetConstantBuffers(0, m_ConstantBuffersCount[ShaderType::FRAGMENT], m_ConstantBuffers[ShaderType::FRAGMENT]);
 	}
 
 	void D3DShader::Unbind() const

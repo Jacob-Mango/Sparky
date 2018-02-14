@@ -42,7 +42,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -55,7 +55,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -69,7 +69,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Emscripten|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -98,16 +98,16 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SolutionDir)Dependencies\Box2D\src;$(SolutionDir)Dependencies\gorilla-audio\src;$(SolutionDir)Dependencies\FreeType;$(SolutionDir)Dependencies\FreeType\include;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\32\include;$(SolutionDir)Dependencies\GLFW\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)bin\$(Configuration);$(SolutionDir)Dependencies\libogg\bin;$(SolutionDir)Dependencies\OpenAL\libs\Win32;$(SolutionDir)Dependencies\GLEW\32\lib;$(SolutionDir)Dependencies\GLFW\lib-vc2013;$(SolutionDir)Dependencies\libvorbis\bin;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)bin\$(Configuration)\Intermediates\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(PlatformArchitecture)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\$(PlatformArchitecture)\$(Configuration)\Intermediates\$(ProjectName)\</IntDir>
     <TargetName>SPCore</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>SPCore64</TargetName>
     <IncludePath>$(SolutionDir)Dependencies\Box2D\src;$(SolutionDir)Dependencies\gorilla-audio\src;$(SolutionDir)Dependencies\FreeType;$(SolutionDir)Dependencies\FreeType\include;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\64\include;$(SolutionDir)Dependencies\GLFW\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)bin\$(Configuration);$(SolutionDir)Dependencies\libogg\bin;$(SolutionDir)Dependencies\OpenAL\libs\Win64;$(SolutionDir)Dependencies\GLEW\64\lib;$(SolutionDir)Dependencies\GLFW\lib-vc2013;$(SolutionDir)Dependencies\libvorbis\bin;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)bin\$(Configuration)\Intermediates\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(PlatformArchitecture)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\$(PlatformArchitecture)\$(Configuration)\Intermediates\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Emscripten|Win32'">
     <IncludePath>C:\Program Files\Emscripten\emscripten\1.30.0\system\include;$(SolutionDir)Dependencies\libvorbis\include;$(SolutionDir)Dependencies\OpenAL\include;$(ProjectDir)ext\freetype\include;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\include;$(IncludePath)</IncludePath>
@@ -124,16 +124,16 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolutionDir)Dependencies\Box2D\src;$(SolutionDir)Dependencies\gorilla-audio\src;$(SolutionDir)Dependencies\FreeType;$(SolutionDir)Dependencies\FreeType\include;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\32\include;$(SolutionDir)Dependencies\GLFW\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)bin\$(Configuration);$(SolutionDir)Dependencies\libogg\bin;$(SolutionDir)Dependencies\OpenAL\libs\Win32;$(SolutionDir)Dependencies\GLEW\32\lib;$(SolutionDir)Dependencies\GLFW\lib-vc2013;$(SolutionDir)Dependencies\libvorbis\bin;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)bin\$(Configuration)\Intermediates\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(PlatformArchitecture)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\$(PlatformArchitecture)\$(Configuration)\Intermediates\$(ProjectName)\</IntDir>
     <TargetName>SPCore</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>SPCore64</TargetName>
     <IncludePath>$(SolutionDir)Dependencies\Box2D\src;$(SolutionDir)Dependencies\gorilla-audio\src;$(SolutionDir)Dependencies\FreeType;$(SolutionDir)Dependencies\FreeType\include;$(SolutionDir)Dependencies\FreeImage\include;$(SolutionDir)Dependencies\GLEW\64\include;$(SolutionDir)Dependencies\GLFW\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)bin\$(Configuration);$(SolutionDir)Dependencies\libogg\bin;$(SolutionDir)Dependencies\OpenAL\libs\Win64;$(SolutionDir)Dependencies\GLEW\64\lib;$(SolutionDir)Dependencies\GLFW\lib-vc2013;$(SolutionDir)Dependencies\libvorbis\bin;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)bin\$(Configuration)\Intermediates\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(PlatformArchitecture)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\$(PlatformArchitecture)\$(Configuration)\Intermediates\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -310,12 +310,9 @@ xcopy /f /y $"(SolutionDir)Dependencies\OpenAL\bin\x86\OpenAL32.dll" "$(Solution
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\sp\entity\component\AnimationComponent.cpp" />
-    <ClCompile Include="src\sp\entity\component\CameraComponent.cpp" />
     <ClCompile Include="src\sp\app\Input.cpp" />
     <ClCompile Include="src\sp\debug\DebugMenuItem.cpp" />
     <ClCompile Include="src\sp\debug\DebugMenuSlider.cpp" />
-    <ClCompile Include="src\sp\entity\component\SpriteComponent.cpp" />
     <ClCompile Include="src\sp\events\WindowEvent.cpp" />
     <ClCompile Include="src\sp\graphics\API\Texture2D.cpp" />
     <ClCompile Include="src\sp\graphics\API\TextureCube.cpp" />
@@ -440,62 +437,6 @@ xcopy /f /y $"(SolutionDir)Dependencies\OpenAL\bin\x86\OpenAL32.dll" "$(Solution
     <ClCompile Include="src\sp\debug\DebugLayer.cpp" />
     <ClCompile Include="src\sp\debug\DebugMenu.cpp" />
     <ClCompile Include="src\sp\embedded\Embedded.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Emscripten|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Emscripten|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Emscripten|Win32'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Emscripten|x64'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">sp/sp.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="src\sp\entity\component\Component.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Emscripten|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Emscripten|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Emscripten|Win32'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Emscripten|x64'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">sp/sp.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="src\sp\entity\component\MeshComponent.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Emscripten|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Emscripten|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Emscripten|Win32'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Emscripten|x64'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">sp/sp.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="src\sp\entity\component\TransformComponent.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Emscripten|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Emscripten|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Emscripten|Win32'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Emscripten|x64'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sp/sp.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">sp/sp.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="src\sp\entity\Entity.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sp/sp.h</PrecompiledHeaderFile>
@@ -943,7 +884,7 @@ xcopy /f /y $"(SolutionDir)Dependencies\OpenAL\bin\x86\OpenAL32.dll" "$(Solution
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sp/sp.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">sp/sp.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="src\sp\graphics\scene\Scene2D.cpp">
+    <ClCompile Include="src\sp\scene\Scene2D.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sp/sp.h</PrecompiledHeaderFile>
@@ -957,7 +898,7 @@ xcopy /f /y $"(SolutionDir)Dependencies\OpenAL\bin\x86\OpenAL32.dll" "$(Solution
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sp/sp.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">sp/sp.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="src\sp\graphics\scene\Scene.cpp">
+    <ClCompile Include="src\sp\scene\Scene.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sp/sp.h</PrecompiledHeaderFile>
@@ -971,6 +912,13 @@ xcopy /f /y $"(SolutionDir)Dependencies\OpenAL\bin\x86\OpenAL32.dll" "$(Solution
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sp/sp.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">sp/sp.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="src\sp\scene\component\AnimationComponent.cpp" />
+    <ClCompile Include="src\sp\scene\component\CameraComponent.cpp" />
+    <ClCompile Include="src\sp\scene\component\Component.cpp" />
+    <ClCompile Include="src\sp\scene\component\MeshComponent.cpp" />
+    <ClCompile Include="src\sp\scene\component\SpriteComponent.cpp" />
+    <ClCompile Include="src\sp\scene\Object.cpp" />
+    <ClCompile Include="src\sp\scene\Node.cpp" />
     <ClCompile Include="src\sp\sp.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -1009,14 +957,11 @@ xcopy /f /y $"(SolutionDir)Dependencies\OpenAL\bin\x86\OpenAL32.dll" "$(Solution
     <ClCompile Include="src\sp\utils\ImageLoad.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\sp\entity\component\CameraComponent.h" />
     <ClInclude Include="src\sp\graphics\API\RenderType.h" />
-    <ClInclude Include="src\sp\entity\component\AnimationComponent.h" />
     <ClInclude Include="src\sp\app\Input.h" />
     <ClInclude Include="src\sp\debug\DebugMenuAction.h" />
     <ClInclude Include="src\sp\debug\DebugMenuItem.h" />
     <ClInclude Include="src\sp\debug\DebugMenuSlider.h" />
-    <ClInclude Include="src\sp\entity\component\SpriteComponent.h" />
     <ClInclude Include="src\sp\events\WindowEvent.h" />
     <ClInclude Include="src\sp\graphics\API\VertexBuffer.h" />
     <ClInclude Include="src\sp\graphics\camera\FPSCamera.h" />
@@ -1092,11 +1037,6 @@ xcopy /f /y $"(SolutionDir)Dependencies\OpenAL\bin\x86\OpenAL32.dll" "$(Solution
     <ClInclude Include="src\sp\debug\DebugLayer.h" />
     <ClInclude Include="src\sp\debug\DebugMenu.h" />
     <ClInclude Include="src\sp\embedded\Embedded.h" />
-    <ClInclude Include="src\sp\entity\component\Component.h" />
-    <ClInclude Include="src\sp\entity\component\Components.h" />
-    <ClInclude Include="src\sp\entity\component\MeshComponent.h" />
-    <ClInclude Include="src\sp\entity\component\TransformComponent.h" />
-    <ClInclude Include="src\sp\entity\Entity.h" />
     <ClInclude Include="src\sp\events\Event.h" />
     <ClInclude Include="src\sp\events\EventDispatcher.h" />
     <ClInclude Include="src\sp\events\Events.h" />
@@ -1135,8 +1075,16 @@ xcopy /f /y $"(SolutionDir)Dependencies\OpenAL\bin\x86\OpenAL32.dll" "$(Solution
     <ClInclude Include="src\sp\graphics\TextureManager.h" />
     <ClInclude Include="src\sp\app\Window.h" />
     <ClCompile Include="src\sp\platform\windows\Win32MemoryManager.cpp" />
-    <ClInclude Include="src\sp\graphics\scene\Scene2D.h" />
-    <ClInclude Include="src\sp\graphics\scene\Scene.h" />
+    <ClInclude Include="src\sp\scene\Scene2D.h" />
+    <ClInclude Include="src\sp\scene\Scene.h" />
+    <ClInclude Include="src\sp\scene\component\AnimationComponent.h" />
+    <ClInclude Include="src\sp\scene\component\CameraComponent.h" />
+    <ClInclude Include="src\sp\scene\component\Component.h" />
+    <ClInclude Include="src\sp\scene\component\Components.h" />
+    <ClInclude Include="src\sp\scene\component\MeshComponent.h" />
+    <ClInclude Include="src\sp\scene\component\SpriteComponent.h" />
+    <ClInclude Include="src\sp\scene\Object.h" />
+    <ClInclude Include="src\sp\scene\Node.h" />
     <ClInclude Include="src\sp\sp.h" />
     <ClInclude Include="src\sp\String.h" />
     <ClInclude Include="src\sp\system\Allocator.h" />

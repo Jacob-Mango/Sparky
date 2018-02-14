@@ -22,49 +22,19 @@ namespace sp {
 
 		Material::~Material()
 		{
-			spdel[] m_VSUserUniformBuffer;
-			spdel[] m_GSUserUniformBuffer;
-			spdel[] m_PSUserUniformBuffer;
 		}
 
 		void Material::AllocateStorage()
 		{
-			m_VSUserUniformBuffer = nullptr;
-			m_VSUserUniformBufferSize = 0;
-
-			m_GSUserUniformBuffer = nullptr;
-			m_GSUserUniformBufferSize = 0;
-
-			m_PSUserUniformBuffer = nullptr;
-			m_PSUserUniformBufferSize = 0;
-
-			m_VSUserUniforms = nullptr;
-			m_GSUserUniforms = nullptr;
-			m_PSUserUniforms = nullptr;
-
-			const ShaderUniformBufferDeclaration* vsBuffer = m_Shader->GetVSUserUniformBuffer();
-			if (vsBuffer)
-			{
-				m_VSUserUniformBufferSize = vsBuffer->GetSize();
-				m_VSUserUniformBuffer = spnew byte[m_VSUserUniformBufferSize];
-				memset(m_VSUserUniformBuffer, 0, m_VSUserUniformBufferSize);
-				m_VSUserUniforms = &vsBuffer->GetUniformDeclarations();
-			}
-			const ShaderUniformBufferDeclaration* gsBuffer = m_Shader->GetGSUserUniformBuffer();
-			if (gsBuffer)
-			{
-				m_GSUserUniformBufferSize = gsBuffer->GetSize();
-				m_GSUserUniformBuffer = spnew byte[m_GSUserUniformBufferSize];
-				memset(m_GSUserUniformBuffer, 0, m_GSUserUniformBufferSize);
-				m_GSUserUniforms = &gsBuffer->GetUniformDeclarations();
-			}
-			const ShaderUniformBufferDeclaration* psBuffer = m_Shader->GetPSUserUniformBuffer();
-			if (psBuffer)
-			{
-				m_PSUserUniformBufferSize = psBuffer->GetSize();
-				m_PSUserUniformBuffer = spnew byte[m_PSUserUniformBufferSize];
-				memset(m_PSUserUniformBuffer, 0, m_PSUserUniformBufferSize);
-				m_PSUserUniforms = &psBuffer->GetUniformDeclarations();
+			for (auto user : m_Shader->) {
+				const ShaderUniformBufferDeclaration* buffer = m_Shader->GetUserUniformBuffer(user.first);
+				if (buffer)
+				{
+					m_UserUniformBuffersSize[user.first] = buffer->GetSize();
+					m_UserUniformBuffers[user.first] = spnew byte[m_UserUniformBuffersSize[user.first]];
+					memset(m_UserUniformBuffers[user.first], 0, m_UserUniformBuffersSize[user.first]);
+					m_UserUniforms[user.first] = buffer->GetUniformDeclarations();
+				}
 			}
 		}
 
@@ -72,12 +42,10 @@ namespace sp {
 		{
 			m_Shader->Bind();
 
-			if (m_VSUserUniformBuffer)
-				m_Shader->SetVSUserUniformBuffer(m_VSUserUniformBuffer, m_VSUserUniformBufferSize);
-			if (m_GSUserUniformBuffer)
-				m_Shader->SetGSUserUniformBuffer(m_GSUserUniformBuffer, m_GSUserUniformBufferSize);
-			if (m_PSUserUniformBuffer)
-				m_Shader->SetPSUserUniformBuffer(m_PSUserUniformBuffer, m_PSUserUniformBufferSize);
+			for (auto user : m_UserUniformBuffers) {
+				if (user.second)
+					m_Shader->SetUserUniformBuffer(user.first, user.second, m_UserUniformBuffersSize[user.first]);
+			}
 
 			for (uint i = 0; i < m_Textures.size(); i++)
 			{
@@ -124,36 +92,15 @@ namespace sp {
 
 		ShaderUniformDeclaration* Material::FindUniformDeclaration(const String& name, byte** outBuffer)
 		{
-			if (m_VSUserUniforms)
-			{
-				for (ShaderUniformDeclaration* uniform : *m_VSUserUniforms)
-				{
-					if (uniform->GetName() == name)
+			for (auto user : m_UserUniformBuffers) {
+				if (user.second) {
+					for (ShaderUniformDeclaration* uniform : m_UserUniforms[user.first])
 					{
-						*outBuffer = m_VSUserUniformBuffer;
-						return uniform;
-					}
-				}
-			}
-			if (m_GSUserUniforms)
-			{
-				for (ShaderUniformDeclaration* uniform : *m_GSUserUniforms)
-				{
-					if (uniform->GetName() == name)
-					{
-						*outBuffer = m_GSUserUniformBuffer;
-						return uniform;
-					}
-				}
-			}
-			if (m_PSUserUniforms)
-			{
-				for (ShaderUniformDeclaration* uniform : *m_PSUserUniforms)
-				{
-					if (uniform->GetName() == name)
-					{
-						*outBuffer = m_PSUserUniformBuffer;
-						return uniform;
+						if (uniform->GetName() == name)
+						{
+							*outBuffer = user.second;
+							return uniform;
+						}
 					}
 				}
 			}
@@ -175,9 +122,9 @@ namespace sp {
 			: m_Material(material)
 		{
 			AllocateStorage();
-			memcpy(m_VSUserUniformBuffer, m_Material->m_VSUserUniformBuffer, m_VSUserUniformBufferSize);
-			memcpy(m_GSUserUniformBuffer, m_Material->m_GSUserUniformBuffer, m_GSUserUniformBufferSize);
-			memcpy(m_PSUserUniformBuffer, m_Material->m_PSUserUniformBuffer, m_PSUserUniformBufferSize);
+			for (auto user : m_Material->m_UserUniformBuffers) {
+				memcpy(m_UserUniformBuffers[user.first], user.second, m_UserUniformBuffersSize[user.first]);
+			}
 
 			m_Resources = &m_Material->GetShader()->GetResources();
 			m_RenderFlags = material->m_RenderFlags;
@@ -191,42 +138,25 @@ namespace sp {
 
 		void MaterialInstance::AllocateStorage()
 		{
-			const ShaderUniformBufferDeclaration* vsBuffer = m_Material->m_Shader->GetVSUserUniformBuffer();
-			if (vsBuffer)
-			{
-				m_VSUserUniformBufferSize = vsBuffer->GetSize();
-				m_VSUserUniformBuffer = new byte[m_VSUserUniformBufferSize];
-				m_VSUserUniforms = &vsBuffer->GetUniformDeclarations();
+			for (auto user : m_UserUniformBuffers) {
+				const ShaderUniformBufferDeclaration* buffer = m_Material->m_Shader->GetUserUniformBuffer(user.first);
+				if (buffer)
+				{
+					m_UserUniformBuffersSize[user.first] = buffer->GetSize();
+					m_UserUniformBuffers[user.first] = spnew byte[m_UserUniformBuffersSize[user.first]];
+					m_UserUniforms[user.first] = buffer->GetUniformDeclarations();
+				}
 			}
-
-			const ShaderUniformBufferDeclaration* gsBuffer = m_Material->m_Shader->GetGSUserUniformBuffer();
-			if (gsBuffer)
-			{
-				m_GSUserUniformBufferSize = gsBuffer->GetSize();
-				m_GSUserUniformBuffer = new byte[m_GSUserUniformBufferSize];
-				m_GSUserUniforms = &gsBuffer->GetUniformDeclarations();
-			}
-
-			const ShaderUniformBufferDeclaration* psBuffer = m_Material->m_Shader->GetPSUserUniformBuffer();
-			if (psBuffer)
-			{
-				m_PSUserUniformBufferSize = psBuffer->GetSize();
-				m_PSUserUniformBuffer = new byte[m_PSUserUniformBufferSize];
-				m_PSUserUniforms = &psBuffer->GetUniformDeclarations();
-			}
-
 		}
 
 		void MaterialInstance::Bind()
 		{
 			m_Material->Bind();
 
-			if (m_VSUserUniformBuffer)
-				m_Material->m_Shader->SetVSUserUniformBuffer(m_VSUserUniformBuffer, m_VSUserUniformBufferSize);
-			if (m_GSUserUniformBuffer)
-				m_Material->m_Shader->SetGSUserUniformBuffer(m_GSUserUniformBuffer, m_GSUserUniformBufferSize);
-			if (m_PSUserUniformBuffer)
-				m_Material->m_Shader->SetPSUserUniformBuffer(m_PSUserUniformBuffer, m_PSUserUniformBufferSize);
+			for (auto user : m_UserUniformBuffers) {
+				if (user.second)
+					m_Material->m_Shader->SetUserUniformBuffer(user.first, user.second, m_UserUniformBuffersSize[user.first]);
+			}
 
 			for (uint i = 0; i < m_Textures.size(); i++)
 			{
@@ -268,36 +198,15 @@ namespace sp {
 
 		ShaderUniformDeclaration* MaterialInstance::FindUniformDeclaration(const String& name, byte** outBuffer)
 		{
-			if (m_VSUserUniforms)
-			{
-				for (ShaderUniformDeclaration* uniform : *m_VSUserUniforms)
-				{
-					if (uniform->GetName() == name)
+			for (auto user : m_UserUniformBuffers) {
+				if (user.second) {
+					for (ShaderUniformDeclaration* uniform : m_UserUniforms[user.first])
 					{
-						*outBuffer = m_VSUserUniformBuffer;
-						return uniform;
-					}
-				}
-			}
-			if (m_GSUserUniforms)
-			{
-				for (ShaderUniformDeclaration* uniform : *m_GSUserUniforms)
-				{
-					if (uniform->GetName() == name)
-					{
-						*outBuffer = m_GSUserUniformBuffer;
-						return uniform;
-					}
-				}
-			}
-			if (m_PSUserUniforms)
-			{
-				for (ShaderUniformDeclaration* uniform : *m_PSUserUniforms)
-				{
-					if (uniform->GetName() == name)
-					{
-						*outBuffer = m_PSUserUniformBuffer;
-						return uniform;
+						if (uniform->GetName() == name)
+						{
+							*outBuffer = user.second;
+							return uniform;
+						}
 					}
 				}
 			}

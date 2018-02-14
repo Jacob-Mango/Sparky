@@ -16,11 +16,6 @@ namespace sp { namespace graphics { namespace API {
 		uint line[4];
 	};
 
-	enum class ShaderType
-	{
-		UNKNOWN, VERTEX, GEOMETRY, FRAGMENT
-	};
-
 	class GLShader : public Shader
 	{
 	private:
@@ -30,14 +25,12 @@ namespace sp { namespace graphics { namespace API {
 		uint m_Handle;
 		String m_Name, m_Path;
 		String m_Source;
-		String m_VertexSource, m_GeometrySource, m_FragmentSource;
 
-		ShaderUniformBufferList m_VSUniformBuffers;
-		ShaderUniformBufferList m_GSUniformBuffers;
-		ShaderUniformBufferList m_PSUniformBuffers;
-		GLShaderUniformBufferDeclaration* m_VSUserUniformBuffer;
-		GLShaderUniformBufferDeclaration* m_GSUserUniformBuffer;
-		GLShaderUniformBufferDeclaration* m_PSUserUniformBuffer;
+		std::map<ShaderType, ShaderUniformBufferList> m_UniformBuffers;
+		std::map<ShaderType, GLShaderUniformBufferDeclaration*> m_UserUniformBuffers;
+
+		std::vector<ShaderType> m_ShaderTypes;
+
 		ShaderResourceList m_Resources;
 		ShaderStructList m_Structs;
 	public:
@@ -50,13 +43,8 @@ namespace sp { namespace graphics { namespace API {
 		void Unbind() const override;
 		bool Reload() override;
 
-		void SetVSSystemUniformBuffer(byte* data, uint size, uint slot) override;
-		void SetGSSystemUniformBuffer(byte* data, uint size, uint slot) override;
-		void SetPSSystemUniformBuffer(byte* data, uint size, uint slot) override;
-
-		void SetVSUserUniformBuffer(byte* data, uint size) override;
-		void SetGSUserUniformBuffer(byte* data, uint size) override;
-		void SetPSUserUniformBuffer(byte* data, uint size) override;
+		void SetSystemUniformBuffer(ShaderType type, byte* data, uint size, uint slot) override;
+		void SetUserUniformBuffer(ShaderType type, byte* data, uint size) override;
 
 		void SetUniform(const String& name, byte* data);
 		void ResolveAndSetUniformField(const GLShaderUniformDeclaration& field, byte* data, int32 offset);
@@ -64,21 +52,21 @@ namespace sp { namespace graphics { namespace API {
 		inline const String& GetName() const override { return m_Name; }
 		inline const String& GetFilePath() const override { return m_Path; }
 
-		inline const ShaderUniformBufferList& GetVSSystemUniforms() const override { return m_VSUniformBuffers; }
-		inline const ShaderUniformBufferList& GetGSSystemUniforms() const override { return m_GSUniformBuffers; }
-		inline const ShaderUniformBufferList& GetPSSystemUniforms() const override { return m_PSUniformBuffers; }
-		inline const ShaderUniformBufferDeclaration* GetVSUserUniformBuffer() const override { return m_VSUserUniformBuffer; }
-		inline const ShaderUniformBufferDeclaration* GetGSUserUniformBuffer() const override { return m_GSUserUniformBuffer; }
-		inline const ShaderUniformBufferDeclaration* GetPSUserUniformBuffer() const override { return m_PSUserUniformBuffer; }
+		inline const ShaderUniformBufferList& GetSystemUniforms(ShaderType type) const override { return m_UniformBuffers.at(type); }
+		inline const ShaderUniformBufferDeclaration* GetUserUniformBuffer(ShaderType type) const override { return m_UserUniformBuffers.at(type); }
+
+		inline const std::vector<ShaderType> GetShaderTypes() { return m_ShaderTypes; }
+
 		inline const ShaderResourceList& GetResources() const override { return m_Resources; }
 	private:
-		static uint Compile(String** shaders, GLShaderErrorInfo& info = GLShaderErrorInfo());
-		static void PreProcess(const String& source, String** shaders);
-		static void ReadShaderFile(std::vector<String> lines, String** shaders);
+		static GLuint CompileShader(ShaderType type, const char* source, uint program, GLShaderErrorInfo& info);
+		static uint Compile(std::map<ShaderType, String>* sources, GLShaderErrorInfo& info = GLShaderErrorInfo());
+		static void PreProcess(const String& source, std::map<ShaderType, String>* sources);
+		static void ReadShaderFile(std::vector<String> lines, std::map<ShaderType, String>* sources);
 
-		void Parse(const String& vertexSource, const String& geometrySource, const String& fragmentSource);
-		void ParseUniform(const String& statement, uint shaderType);
-		void ParseUniformStruct(const String& block, uint shaderType);
+		void Parse(std::map<ShaderType, String>* sources);
+		void ParseUniform(const String& statement, ShaderType shaderType);
+		void ParseUniformStruct(const String& block, ShaderType shaderType);
 
 		bool IsTypeStringResource(const String& type);
 

@@ -47,6 +47,8 @@ namespace sp { namespace graphics {
 		void EndScene() override;
 		void End() override;
 		void Present() override;
+
+		void SetScreenBufferSize(uint width, uint height) override;
 	private:
 		void SetSystemUniforms(API::Shader* shader);
 

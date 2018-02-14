@@ -34,6 +34,13 @@ namespace sp {
 			PSSystemUniformIndex_Size
 		};
 
+		std::vector<API::TextureParameters> framebufferParameters = {
+			API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
+			API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
+			API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
+			API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
+		};
+
 		DeferredRenderer::DeferredRenderer()
 		{
 			SetScreenBufferSize(Application::GetApplication().GetWindowWidth(), Application::GetApplication().GetWindowHeight());
@@ -44,14 +51,21 @@ namespace sp {
 			SetScreenBufferSize(width, height);
 		}
 
+		void DeferredRenderer::SetScreenBufferSize(uint width, uint height)
+		{
+			m_ScreenBufferWidth = width;
+			m_ScreenBufferHeight = height;
+
+			float w = m_ScreenBufferWidth * 2;
+			float h = m_ScreenBufferHeight * 2;
+
+			m_FrameBuffer = API::FrameBuffer2D::Create(w, h, framebufferParameters);
+			FontManager::SetScale(maths::vec2(w / 32.0f, h / 18.0f));
+		}
+
 		void DeferredRenderer::Init()
 		{
-			m_FrameBuffer = API::FrameBuffer2D::Create(m_ScreenBufferWidth, m_ScreenBufferHeight, {
-					API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
-					API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
-					API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
-					API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
-				});
+			m_FrameBuffer = API::FrameBuffer2D::Create(m_ScreenBufferWidth, m_ScreenBufferHeight, framebufferParameters);
 
 			m_MaxLights = 64;
 
@@ -178,9 +192,9 @@ namespace sp {
 
 		void DeferredRenderer::SetSystemUniforms(API::Shader* shader)
 		{
-			shader->SetVSSystemUniformBuffer(m_VSSystemUniformBuffer, m_VSSystemUniformBufferSize, 0);
-			// shader->SetGSSystemUniformBuffer(m_GSSystemUniformBuffer, m_GSSystemUniformBufferSize, 0);
-			shader->SetPSSystemUniformBuffer(m_PSSystemUniformBuffer, m_PSSystemUniformBufferSize, 0);
+			shader->SetSystemUniformBuffer(API::ShaderType::VERTEX, m_VSSystemUniformBuffer, m_VSSystemUniformBufferSize, 0);
+			shader->SetSystemUniformBuffer(API::ShaderType::GEOMETRY, m_GSSystemUniformBuffer, m_GSSystemUniformBufferSize, 0);
+			shader->SetSystemUniformBuffer(API::ShaderType::FRAGMENT, m_PSSystemUniformBuffer, m_PSSystemUniformBufferSize, 0);
 		}
 
 		void DeferredRenderer::Present()

@@ -7,10 +7,7 @@ class Test3D : public sp::graphics::Layer3D
 private:
 	sp::graphics::Camera* m_FPSCamera;
 
-	sp::entity::Entity* m_Cube;
-	std::vector<sp::entity::Entity*> m_Spheres;
-	sp::entity::Entity* m_Plane;
-	sp::entity::Entity* m_Dagger;
+	std::vector<sp::scene::Object*> m_Spheres;
 	sp::graphics::Light* m_Light;
 	float m_Rotation;
 	bool m_SetUniforms[2];
@@ -19,7 +16,7 @@ public:
 	Test3D();
 	~Test3D();
 
-	void OnInit(sp::graphics::Renderer3D* renderer, sp::graphics::Scene* scene) override;
+	void OnInit(sp::graphics::Renderer3D* renderer, sp::scene::Scene* scene) override;
 
 	void OnTick() override;
 	void OnUpdate(const sp::Timestep& ts) override;

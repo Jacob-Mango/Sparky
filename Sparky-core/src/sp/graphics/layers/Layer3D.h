@@ -4,7 +4,7 @@
 
 #include "Layer.h"
 
-#include "sp/graphics/scene/Scene.h"
+#include "sp/scene/Scene.h"
 
 #include "sp/graphics/ForwardRenderer.h"
 #include "sp/graphics/DeferredRenderer.h"
@@ -14,16 +14,16 @@ namespace sp { namespace graphics {
 	class SP_API Layer3D : public Layer
 	{
 	protected:
-		graphics::Scene* m_Scene;
+		scene::Scene* m_Scene;
 		Renderer3D* m_Renderer;
 	public:
-		Layer3D(graphics::Scene* scene);
+		Layer3D(scene::Scene* scene);
 		~Layer3D();
 
 		virtual void Init();
-		virtual void OnInit(Renderer3D* renderer, graphics::Scene* scene);
+		virtual void OnInit(Renderer3D* renderer, scene::Scene* scene);
 
-		inline graphics::Scene* GetScene() const { return m_Scene; }
+		inline scene::Scene* GetScene() const { return m_Scene; }
 
 		void OnUpdateInternal(const Timestep& ts) override;
 		void OnRender() override;

@@ -164,9 +164,9 @@ namespace sp {
 
 		void ForwardRenderer::SetSystemUniforms(API::Shader* shader)
 		{
-			shader->SetVSSystemUniformBuffer(m_VSSystemUniformBuffer, m_VSSystemUniformBufferSize, 0);
-			shader->SetGSSystemUniformBuffer(m_GSSystemUniformBuffer, m_GSSystemUniformBufferSize, 0);
-			shader->SetPSSystemUniformBuffer(m_PSSystemUniformBuffer, m_PSSystemUniformBufferSize, 0);
+			shader->SetSystemUniformBuffer(API::ShaderType::VERTEX, m_VSSystemUniformBuffer, m_VSSystemUniformBufferSize, 0);
+			shader->SetSystemUniformBuffer(API::ShaderType::GEOMETRY, m_GSSystemUniformBuffer, m_GSSystemUniformBufferSize, 0);
+			shader->SetSystemUniformBuffer(API::ShaderType::FRAGMENT, m_PSSystemUniformBuffer, m_PSSystemUniformBufferSize, 0);
 		}
 
 		void ForwardRenderer::Present()

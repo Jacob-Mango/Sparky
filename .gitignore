@@ -19,3 +19,10 @@ ipch/
 Tools/Dependencies/FBX_SDK_2016.1.2/include/
 Tools/Dependencies/FBX_SDK_2017.0.1/include/
 Tools/Dependencies/FBX_SDK_2017.0.1/lib/
+
+bin/
+
+obj/
+
+.vs/
+

@@ -5,7 +5,7 @@ using namespace graphics;
 using namespace maths;
 
 using namespace events;
-using namespace entity;
+using namespace scene;
 using namespace component;
 
 using namespace API;
@@ -13,7 +13,7 @@ using namespace API;
 #define DEBUG_MENU(name, var, min, max) debug::DebugMenu::Add("Test3D/" ## name, var, min, max)
 
 Test3D::Test3D()
-	: Layer3D(spnew graphics::Scene())
+	: Layer3D(spnew Scene())
 {
 	m_FPSCamera = spnew FPSCamera(maths::mat4::Perspective(65.0f, 16.0f / 9.0f, 0.1f, 1000.0f));
 
@@ -95,17 +95,19 @@ void Test3D::OnInit(Renderer3D* renderer, Scene* scene)
 		vec3 spec(0.04f);
 		vec4 diffuse(vec3(1.0f, 0.0f, 0.0f), 1.0f);
 
-		PBRMaterialInstance* m = spnew PBRMaterialInstance(custom);
+		PBRMaterialInstance* m = spnew PBRMaterialInstance(absRed);
 		m->SetGloss(1.0f - roughness);
-		m->UsingNormalMap(true);
+		m->SetAlbedo(diffuse);
+		m->SetSpecular(spec);
+		m->UsingNormalMap(false);
 
 		Mesh* mesh = spnew Mesh(sphereModel->GetMesh());
 		mesh->SetMaterial(m);
 
-		maths::mat4* transform = spnew maths::mat4(1.0f);
-		transform->SetPosition(vec3(xx, 10.0f, -space + z));
-		*transform *= mat4::Scale(vec3(3, 3, 3));
-		Entity* sphere = spnew Entity(mesh, transform);
+		maths::mat4 transform = maths::mat4(1.0f);
+		transform.SetPosition(vec3(xx, 10.0f, -space + z));
+		transform *= mat4::Scale(vec3(3, 3, 3));
+		Object* sphere = spnew Object(mesh, transform);
 
 		m_Spheres.push_back(sphere);
 		m_Scene->Add(sphere);
@@ -120,26 +122,35 @@ void Test3D::OnInit(Renderer3D* renderer, Scene* scene)
 		vec3 spec(1.0f);
 		vec4 diffuse(0.0f, 0.0f, 0.0f, 1.0f);
 
-		PBRMaterialInstance* m = spnew PBRMaterialInstance(custom);
+		PBRMaterialInstance* m = spnew PBRMaterialInstance(castIron);
 		m->SetGloss(1.0f - roughness);
-		m->UsingNormalMap(true);
+		m->SetAlbedo(diffuse);
+		m->SetSpecular(spec);
+		m->UsingNormalMap(false);
 
 		Mesh* mesh = spnew Mesh(sphereModel->GetMesh());
 		mesh->SetMaterial(m);
 
 
-		maths::mat4* transform = spnew maths::mat4(1.0f);
-		transform->SetPosition(vec3(xx, 10.0f, space + z));
-		*transform *= mat4::Scale(vec3(3, 3, 3));
-		Entity* sphere = spnew Entity(mesh, transform);
+		maths::mat4 transform = maths::mat4(1.0f);
+		transform.SetPosition(vec3(xx, 10.0f, space + z));
+		transform *= mat4::Scale(vec3(3, 3, 3));
+		Object* sphere = spnew Object(mesh, transform);
 
 		m_Spheres.push_back(sphere);
 		m_Scene->Add(sphere);
 	}
 
-	m_Scene->Add(spnew Entity(MeshFactory::CreatePlane2(512, 1, spnew PBRMaterialInstance(custom)), &maths::mat4::Translate(vec3(0, 0, 0))));
-	m_Scene->Add(spnew Entity(MeshFactory::CreatePlane2(512, 1, spnew PBRMaterialInstance(custom)), &maths::mat4::Translate(vec3(512, 0, 512))));
-	
+	float size = 64;
+	float density = 1;
+	int amount = 10;
+	Mesh* mesh = MeshFactory::CreatePlane(size, vec3(0, 1, 0), spnew PBRMaterialInstance(custom));
+	for (int x = -amount; x < amount; x++) {
+		for (int z = -amount; z < amount; z++) {
+			m_Scene->Add(spnew Object(mesh, maths::mat4::Translate(vec3(x * size, 0, z * size))));
+		}
+	}
+
 
 	LightSetup* lights = spnew LightSetup();
 	m_Light = spnew Light(vec3(0, 20, 0), 1.0f, vec4(0.8f, 0.8f, 0.8f, 1.0f));

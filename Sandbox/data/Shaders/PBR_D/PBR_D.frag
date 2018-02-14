@@ -15,8 +15,6 @@ struct Light
 {
 	vec3 color;
 	vec3 position;
-	vec3 direction;
-	vec3 vector;
 	float intensity;
 };
 
@@ -24,6 +22,7 @@ struct Material
 {
 	vec4 albedo;
 	float specular;
+    float metallic;
 	float roughness;
 };
 
@@ -45,150 +44,116 @@ uniform sampler2D u_Albedo;
 uniform sampler2D u_SpecularRoughness;
 uniform sampler2D u_Normal;
 
-uniform sampler2D u_PreintegratedFG;
 uniform samplerCube u_EnvironmentMap;
+uniform sampler2D u_PreintegratedFG;
 
 uniform vec3 u_CameraPosition;
 
-vec3 FinalGamma(vec3 color)
+float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
-	return pow(color, vec3(1.0 / GAMMA));
+    float a = roughness * roughness;
+    float a2 = a * a;
+    float NdotH = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH * NdotH;
+
+    float nom = a2;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+
+    return nom / denom;
 }
 
-float FresnelSchlick(float f0, float fd90, float view)
+float GeometrySchlickGGX(float NdotV, float roughness)
 {
-	return f0 + (fd90 - f0) * pow(max(1.0 - view, 0.1), 5.0);
+    float r = (roughness + 1.0);
+    float k = (r * r) / 8.0;
+
+    float nom = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+
+    return nom / denom;
 }
 
-float Disney(Light light, vec3 eye)
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 {
-	vec3 halfVector = normalize(light.vector + eye);
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx2 = GeometrySchlickGGX(NdotV, roughness);
+    float ggx1 = GeometrySchlickGGX(NdotL, roughness);
 
-	float NdotL = max(dot(g_Attributes.normal, light.vector), 0.0);
-	float LdotH = max(dot(light.vector, halfVector), 0.0);
-	float NdotV = max(dot(g_Attributes.normal, eye), 0.0);
-
-	float energyBias = mix(0.0, 0.5, g_Material.roughness);
-	float energyFactor = mix(1.0, 1.0 / 1.51, g_Material.roughness);
-	float fd90 = energyBias + 2.0 * (LdotH * LdotH) * g_Material.roughness;
-	float f0 = 1.0;
-
-	float lightScatter = FresnelSchlick(f0, fd90, NdotL);
-	float viewScatter = FresnelSchlick(f0, fd90, NdotV);
-
-	return lightScatter * viewScatter * energyFactor;
+    return ggx1 * ggx2;
 }
 
-vec3 GGX(Light light, vec3 eye)
+vec3 FresnelSchlick(float cosTheta, vec3 F0)
 {
-	vec3 h = normalize(light.vector + eye);
-	float NdotH = max(dot(g_Attributes.normal, h), 0.0);
-
-	float rough2 = max(g_Material.roughness * g_Material.roughness, 2.0e-3); // capped so spec highlights don't disappear
-	float rough4 = rough2 * rough2;
-
-	float d = (NdotH * rough4 - NdotH) * NdotH + 1.0;
-	float D = rough4 / (PI * (d * d));
-
-	// Fresnel
-	vec3 reflectivity = vec3(g_Material.specular);
-	float fresnel = 1.0;
-	float NdotL = clamp(dot(g_Attributes.normal, light.vector), 0.0, 1.0);
-	float LdotH = clamp(dot(light.vector, h), 0.0, 1.0);
-	float NdotV = clamp(dot(g_Attributes.normal, eye), 0.0, 1.0);
-	vec3 F = reflectivity + (fresnel - fresnel * reflectivity) * exp2((-5.55473 * LdotH - 6.98316) * LdotH);
-
-	// geometric / visibility
-	float k = rough2 * 0.5;
-	float G_SmithL = NdotL * (1.0 - k) + k;
-	float G_SmithV = NdotV * (1.0 - k) + k;
-	float G = 0.25 / (G_SmithL * G_SmithV);
-
-	return G * D * F;
+    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
-vec3 RadianceIBLIntegration(float NdotV, float roughness, vec3 specular)
+vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 {
-	vec2 preintegratedFG = texture(u_PreintegratedFG, vec2(roughness, 1.0 - NdotV)).rg;
-	return specular * preintegratedFG.r + preintegratedFG.g;
-}
-
-vec3 IBL(vec3 eye)
-{
-	float NdotV = max(dot(g_Attributes.normal, eye), 0.0);
-
-	vec3 reflectionVector = normalize(reflect(-eye, g_Attributes.normal));
-	float smoothness = 1.0 - g_Material.roughness;
-	float mipLevel = (1.0 - smoothness * smoothness) * 10.0;
-	vec3 cs = vec3(0.1); // textureLod(u_EnvironmentMap, reflectionVector, mipLevel).rgb;
-	vec3 result = pow(cs, vec3(GAMMA)) * RadianceIBLIntegration(NdotV, g_Material.roughness, vec3(g_Material.specular));
-
-	// vec3 diffuseDominantDirection = g_Attributes.normal;
-	const float MAX_REFLECTION_LOD = 4.0;
-	vec3 diffuseImageLighting = vec3(0.1); // textureLod(u_EnvironmentMap, reflectionVector, g_Material.roughness * MAX_REFLECTION_LOD).rgb;
-	diffuseImageLighting = pow(diffuseImageLighting, vec3(GAMMA));
-
-	return result + diffuseImageLighting * g_Material.albedo.rgb;
-}
-
-float Diffuse(Light light, vec3 eye)
-{
-	return Disney(light, eye);
-}
-
-vec3 Specular(Light light, vec3 eye)
-{
-	return GGX(light, eye);
-}
-
-float Attenuate(Light light)
-{
-	float dist = length(light.position - g_Attributes.position);
-	float multiplier = 1.0 / (dist + 0.01);
-	return light.intensity * multiplier;
-}
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
+}   
 
 Light TestLight() {
 	Light light;	
-	light.position = vec3(0, 5, 0);
-	light.intensity = 1000;
+	light.position = vec3(0, 100, -75);
+	light.intensity = 300;
 	light.color = vec3(1.0);
-	// light.direction = normalize(vec3(0, -10, 5));
 	return light;
+}
+
+vec3 Radiance(Light light, vec3 N, vec3 V, vec3 F0) 
+{
+    vec3 L = normalize(light.position - g_Attributes.position);
+    vec3 H = normalize(V + L);
+    float dist = length(light.position - g_Attributes.position);
+    float attenuation = 1.0 / (dist / light.intensity);
+    vec3 radiance = light.color * attenuation;
+
+    float NDF = DistributionGGX(N, H, g_Material.roughness);   
+    float G = GeometrySmith(N, V, L, g_Material.roughness);    
+    vec3 F = FresnelSchlick(max(dot(H, V), 0.0), F0);        
+        
+    vec3 nominator = NDF * G * F;
+    float denominator = 4 * max(dot(V, N), 0.0) * max(dot(L, N), 0.0) + 0.001;
+    vec3 specular = nominator / denominator;
+        
+    vec3 kS = F;
+    vec3 kD = vec3(1.0) - kS;
+    kD *= 1.0 - vec3(g_Material.metallic);
+
+    float NdotL = max(dot(N, L), 0.0);        
+    return ((kD * g_Material.albedo.rgb / PI + specular) * radiance * NdotL);
 }
 
 void main()
 {
 	g_Attributes.position = texture(u_Position, fs_in.uv).xyz;
-	g_Attributes.normal = normalize(texture(u_Normal, fs_in.uv).xyz);
+	g_Attributes.normal = texture(u_Normal, fs_in.uv).xyz;
 
-	vec3 eye = normalize(u_CameraPosition - g_Attributes.position);
-
-	vec4 albedo = texture(u_Albedo, fs_in.uv);
 	vec4 specRoughness = texture(u_SpecularRoughness, fs_in.uv);
-	g_Material.albedo = albedo;
+	g_Material.albedo = texture(u_Albedo, fs_in.uv);
 	g_Material.specular = specRoughness.r;
 	g_Material.roughness = specRoughness.g;
+    g_Material.metallic = specRoughness.b;
 
-	vec4 diffuse = vec4(0.0);
-	vec3 specular = vec3(0.0);
+    vec3 N = normalize(g_Attributes.normal);
+    vec3 V = normalize(u_CameraPosition - g_Attributes.position);
+    vec3 R = reflect(-V, N); 
 
-	for (int i = 0; i < 1; i++)
-	{
-		Light light = TestLight(); // u_LightSetup[i];
+    vec3 F0 = vec3(0.04); 
+    // F0 = mix(F0, g_Material.albedo.rgb, vec3(g_Material.metallic));
 
-		light.intensity = Attenuate(light);
-		light.vector = normalize(light.position - vec3(g_Attributes.position));
+    vec3 Lo = vec3(0.0);
+    for(int i = 0; i < 1; ++i) 
+    {
+        Light light = TestLight();
+        Lo += Radiance(light, N, V, F0); 
+    }
+    
+    vec3 color = Lo;
+    color = color / (color + vec3(1.0));
+    color = pow(color, vec3(1.0 / GAMMA)); 
 
-		float NdotL = clamp(dot(g_Attributes.normal, light.vector), 0.1, 1.0);
-		diffuse += NdotL * Diffuse(light, eye) * vec4(light.color, 1.0) * light.intensity;
-		specular += NdotL * Specular(light, eye) * light.color * light.intensity;
-	}
-
-	float visibility = 1;
-	vec3 diff = g_Material.albedo.rgb * diffuse.rgb * visibility;
-	vec3 spec = (specular + IBL(eye)) * visibility; 
-	vec3 finalColor = FinalGamma(diff + spec);
-
-	out_Color = vec4(finalColor, g_Material.albedo.a);
-};
+    out_Color = vec4(color, g_Material.albedo.a);
+}

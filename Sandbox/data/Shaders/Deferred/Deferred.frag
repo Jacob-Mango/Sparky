@@ -95,7 +95,7 @@ void main()
 {
 	g_Attributes.position = fs_in.position.xyz;
 	g_Attributes.normal = normalize(fs_in.normal);
-	g_Attributes.normal = GetNormal();
+	// g_Attributes.normal = GetNormal();
 
 	Material material;
 	material.albedo = GetAlbedoMap();

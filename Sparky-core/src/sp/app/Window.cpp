@@ -28,7 +28,7 @@ namespace sp {
 		FontManager::Add(new Font("SourceSansPro", "res/SourceSansPro-Light.ttf", 32));
 #else
 		FontManager::SetScale(maths::vec2(m_Properties->width / 32.0f, m_Properties->height / 18.0f)); // TODO: Seriously
-		FontManager::Add(new Font("SourceSansPro", internal::DEFAULT_FONT, internal::DEFAULT_FONT_SIZE, 32));
+		FontManager::Add(new Font("SourceSansPro", internal::DEFAULT_FONT, internal::DEFAULT_FONT_SIZE, 24));
 #endif
 
 		FreeImage_Initialise();

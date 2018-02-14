@@ -10,18 +10,16 @@ namespace sp {
 	namespace graphics {
 		namespace API {
 
-			bool* types = spnew bool[3];
 			bool IGNORE_LINES = false;
 			ShaderType type = ShaderType::UNKNOWN;
 
 			bool GLShader::TryCompile(const String& source, String& error)
 			{
-				String vert, geo, frag;
-				String* shaders[3] = { &vert, &geo, &frag };
-				GLShader::PreProcess(source, shaders);
+				std::map<ShaderType, String>* sources = spnew std::map<ShaderType, String>();
+				GLShader::PreProcess(source, sources);
 
 				GLShaderErrorInfo info;
-				if (!GLShader::Compile(shaders, info))
+				if (!GLShader::Compile(sources, info))
 				{
 					error = info.message[info.shader];
 					SP_ERROR(error);
@@ -49,23 +47,15 @@ namespace sp {
 			bool GLShader::Init()
 			{
 				SP_WARN("Compiling shader: ", m_Name);
-				m_VSUserUniformBuffer = nullptr;
-				m_GSUserUniformBuffer = nullptr;
-				m_PSUserUniformBuffer = nullptr;
 
-				String* shaders[3] = { &m_VertexSource, &m_GeometrySource, &m_FragmentSource };
-				PreProcess(m_Source, shaders);
-				Parse(m_VertexSource, m_GeometrySource, m_FragmentSource);
+				std::map<ShaderType, String>* sources = spnew std::map<ShaderType, String>();
 
-				//_SP_WARN("Vertex:\n");
-				//_SP_INFO(m_VertexSource);
-				//_SP_WARN("Geometry:\n");
-				//_SP_INFO(m_GeometrySource);
-				//_SP_WARN("Fragment:\n");
-				//_SP_INFO(m_FragmentSource);
+				PreProcess(m_Source, sources);
+				Parse(sources);
 
 				GLShaderErrorInfo error;
-				m_Handle = Compile(shaders, error);
+
+				m_Handle = Compile(sources, error);
 				if (!m_Handle) {
 					SP_ERROR(error.message[error.shader]);
 					return false;
@@ -87,19 +77,14 @@ namespace sp {
 				GLCall(glDeleteProgram(m_Handle));
 			}
 
-			void GLShader::PreProcess(const String& source, String** shaders)
+			void GLShader::PreProcess(const String& source, std::map<ShaderType, String>* sources)
 			{
 				type = ShaderType::UNKNOWN;
-
-				types[0] = false;
-				types[1] = false;
-				types[2] = false;
-
 				std::vector<String> lines = GetLines(source);
-				ReadShaderFile(lines, shaders);
+				ReadShaderFile(lines, sources);
 			}
 
-			void GLShader::ReadShaderFile(std::vector<String> lines, String** shaders) {
+			void GLShader::ReadShaderFile(std::vector<String> lines, std::map<ShaderType, String>* shaders) {
 				for (uint i = 0; i < lines.size(); i++)
 				{
 					String str = String(lines[i]);
@@ -113,16 +98,35 @@ namespace sp {
 					else if (StartsWith(str, "#shader"))
 					{
 						if (StringContains(str, "vertex")) {
-							type = ShaderType::VERTEX;
-							types[0] = true;
+							type = ShaderType::VERTEX; 
+							std::map<ShaderType, String>::iterator it = shaders->begin();
+							shaders->insert(it, std::pair<ShaderType, String>(type, ""));
 						}
 						else if (StringContains(str, "geometry")) {
 							type = ShaderType::GEOMETRY;
-							types[1] = true;
+							std::map<ShaderType, String>::iterator it = shaders->begin();
+							shaders->insert(it, std::pair<ShaderType, String>(type, ""));
+							m_ShaderTypes.push_back(type);
 						}
 						else if (StringContains(str, "fragment")) {
 							type = ShaderType::FRAGMENT;
-							types[2] = true;
+							std::map<ShaderType, String>::iterator it = shaders->begin();
+							shaders->insert(it, std::pair<ShaderType, String>(type, ""));
+						}
+						else if (StringContains(str, "tess_cont")) {
+							type = ShaderType::TESSELLATION_CONTROL;
+							std::map<ShaderType, String>::iterator it = shaders->begin();
+							shaders->insert(it, std::pair<ShaderType, String>(type, ""));
+						}
+						else if (StringContains(str, "tess_eval")) {
+							type = ShaderType::TESSELLATION_EVALUATION;
+							std::map<ShaderType, String>::iterator it = shaders->begin();
+							shaders->insert(it, std::pair<ShaderType, String>(type, ""));
+						}
+						else if (StringContains(str, "compute")) {
+							type = ShaderType::COMPUTE;
+							std::map<ShaderType, String>::iterator it = shaders->begin();
+							shaders->insert(it, std::pair<ShaderType, String>(type, ""));
 						}
 						else if (StringContains(str, "end")) {
 							type = ShaderType::UNKNOWN;
@@ -163,145 +167,121 @@ namespace sp {
 					}
 					else if (type != ShaderType::UNKNOWN)
 					{
-						shaders[(int32)type - 1]->append(lines[i].c_str());
-						shaders[(int32)type - 1]->append("\n");
+						shaders->at(type).append(lines[i].c_str());
+						shaders->at(type).append("\n");
 					}
 				}
 			}
 
-			uint GLShader::Compile(String** shaders, GLShaderErrorInfo& info)
+			uint GLShader::Compile(std::map<ShaderType, String>* sources, GLShaderErrorInfo& info)
 			{
-				const char* vertexSource = shaders[0]->c_str();
-				const char* geometrySource = shaders[1]->c_str();
-				const char* fragmentSource = shaders[2]->c_str();
-
 				GLCall(uint program = glCreateProgram());
-				GLCall(GLuint vertex = glCreateShader(GL_VERTEX_SHADER));
 
-				GLuint geometry;
-				if (types[1])
-					GLCall(geometry = glCreateShader(GL_GEOMETRY_SHADER));
+				std::vector<GLuint> shaders;
 
-
-				GLCall(GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER));
-
-				GLCall(glShaderSource(vertex, 1, &vertexSource, NULL));
-				GLCall(glCompileShader(vertex));
-
-				GLint result;
-				GLCall(glGetShaderiv(vertex, GL_COMPILE_STATUS, &result));
-				if (result == GL_FALSE)
-				{
-					GLint length;
-					GLCall(glGetShaderiv(vertex, GL_INFO_LOG_LENGTH, &length));
-					std::vector<char> error(length);
-					GLCall(glGetShaderInfoLog(vertex, length, &length, &error[0]));
-					String errorMessage(&error[0]);
-					int32 lineNumber;
-					sscanf(&error[0], "%*s %*d:%d", &lineNumber);
-					info.shader = 0;
-					info.message[info.shader] += "Failed to compile vertex shader!\n";
-
-					uint absoluteLine = lineNumber + 1;
-					info.line[info.shader] = absoluteLine;
-					info.message[info.shader] += errorMessage;
-					GLCall(glDeleteShader(vertex));
-					return 0;
+				for (auto source : *sources) {
+					shaders.push_back(CompileShader(source.first, source.second.c_str(), program, info));
 				}
 
-				if (types[1]) {
-
-					GLCall(glShaderSource(geometry, 1, &geometrySource, NULL));
-					GLCall(glCompileShader(geometry));
-
-					GLCall(glGetShaderiv(geometry, GL_COMPILE_STATUS, &result));
-					if (result == GL_FALSE)
-					{
-						GLint length;
-						GLCall(glGetShaderiv(geometry, GL_INFO_LOG_LENGTH, &length));
-						std::vector<char> error(length);
-						GLCall(glGetShaderInfoLog(geometry, length, &length, &error[0]));
-						String errorMessage(&error[0], length);
-						int32 lineNumber;
-						sscanf(&error[0], "%*s %*d:%d", &lineNumber);
-						info.shader = 1;
-						info.message[info.shader] += "Failed to compile geometry shader!\n";
-
-						uint absoluteLine = GetLines(vertexSource).size() + lineNumber + 2;
-						info.line[info.shader] = absoluteLine;
-						info.message[info.shader] += errorMessage;
-						GLCall(glDeleteShader(geometry));
-						return 0;
-					}
+				for (int z = 0; z < shaders.size(); z++) {
+					GLCall(glAttachShader(program, shaders[z]));
 				}
-
-				GLCall(glShaderSource(fragment, 1, &fragmentSource, NULL));
-				GLCall(glCompileShader(fragment));
-
-				GLCall(glGetShaderiv(fragment, GL_COMPILE_STATUS, &result));
-				if (result == GL_FALSE)
-				{
-					GLint length;
-					GLCall(glGetShaderiv(fragment, GL_INFO_LOG_LENGTH, &length));
-					std::vector<char> error(length);
-					GLCall(glGetShaderInfoLog(fragment, length, &length, &error[0]));
-					String errorMessage(&error[0], length);
-					int32 lineNumber;
-					sscanf(&error[0], "%*s %*d:%d", &lineNumber);
-					info.shader = 2;
-					info.message[info.shader] += "Failed to compile fragment shader!\n";
-
-					uint absoluteLine = GetLines(vertexSource).size() + GetLines(geometrySource).size() + lineNumber + 3;
-					info.line[info.shader] = absoluteLine;
-					info.message[info.shader] += errorMessage;
-					GLCall(glDeleteShader(fragment));
-					return 0;
-				}
-
-				GLCall(glAttachShader(program, vertex));
-				if (types[1]) {
-					GLCall(glAttachShader(program, geometry));
-				}
-				GLCall(glAttachShader(program, fragment));
 
 				GLCall(glLinkProgram(program));
 
+				GLint result;
 				GLCall(glGetProgramiv(program, GL_LINK_STATUS, &result));
 				if (result == GL_FALSE)
 				{
 					GLint length;
 					GLCall(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length));
 					std::vector<char> error(length);
-					GLCall(glGetProgramInfoLog(program, length, &length, &error[0]));
-					String errorMessage(&error[0], length);
-					int32 lineNumber;
-					sscanf(&error[0], "%*s %*d:%d", &lineNumber);
+					GLCall(glGetProgramInfoLog(program, length, &length, error.data()));
+					String errorMessage(error.data(), length);
+					int32 lineNumber = -1;
+					sscanf(error.data(), "%*s %*d:%d", &lineNumber);
 					info.shader = 3;
 					info.message[info.shader] += "Failed to link shader!\n";
-
-					// String line = utils::GetLines(m_FragmentSource)[lineNumber - 1];
-					// uint absoluteLine = utils::GetLines(m_VertexSource).size() + lineNumber + 2;
-					// info.message += lineNumber + "(" + StringFormat::ToString(absoluteLine) + ")  " + line;
-					info.line[info.shader] = 0;// lineNumber;
+					info.line[info.shader] = 0;
 					info.message[info.shader] += errorMessage;
 					return 0;
 				}
 
 				GLCall(glValidateProgram(program));
 
-				GLCall(glDetachShader(program, vertex));
-				if (types[1]) {
-					GLCall(glDetachShader(program, geometry));
-				}
-				GLCall(glDetachShader(program, fragment));
 
-				GLCall(glDeleteShader(vertex));
-				if (types[1]) {
-					GLCall(glDeleteShader(geometry));
+				for (int z = 0; z < shaders.size(); z++) {
+					GLCall(glDetachShader(program, shaders[z]));
 				}
-				GLCall(glDeleteShader(fragment));
+
+				for (int z = 0; z < shaders.size(); z++) {
+					GLCall(glDeleteShader(shaders[z]));
+				}
 
 				return program;
+			}
+
+			GLenum TypeToGL(ShaderType type) {
+				switch (type) {
+				case VERTEX:
+					return GL_VERTEX_SHADER;
+				case GEOMETRY:
+					return GL_GEOMETRY_SHADER;
+				case FRAGMENT:
+					return GL_FRAGMENT_SHADER;
+				case TESSELLATION_CONTROL:
+					return GL_TESS_CONTROL_SHADER;
+				case TESSELLATION_EVALUATION:
+					return GL_TESS_EVALUATION_SHADER;
+				case COMPUTE:
+					return GL_COMPUTE_SHADER;
+				}
+				return -1;
+			}
+
+			String TypeToString(ShaderType type) {
+				switch (type) {
+				case VERTEX:
+					return "GL_VERTEX_SHADER";
+				case GEOMETRY:
+					return "GL_GEOMETRY_SHADER";
+				case FRAGMENT:
+					return "GL_FRAGMENT_SHADER";
+				case TESSELLATION_CONTROL:
+					return "GL_TESS_CONTROL_SHADER";
+				case TESSELLATION_EVALUATION:
+					return "GL_TESS_EVALUATION_SHADER";
+				case COMPUTE:
+					return "GL_COMPUTE_SHADER";
+				}
+				return "N/A";
+			}
+
+			GLuint GLShader::CompileShader(ShaderType type, const char* source, uint program, GLShaderErrorInfo& info) {
+				GLCall(GLuint shader = glCreateShader(TypeToGL(type)));
+				GLCall(glShaderSource(shader, 1, &source, NULL));
+				GLCall(glCompileShader(shader));
+
+				GLint result;
+				GLCall(glGetShaderiv(shader, GL_COMPILE_STATUS, &result));
+				if (result == GL_FALSE)
+				{
+					GLint length;
+					GLCall(glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length));
+					std::vector<char> error(length);
+					GLCall(glGetShaderInfoLog(shader, length, &length, error.data()));
+					String errorMessage(error.data(), length);
+					int32 lineNumber;
+					sscanf(error.data(), "%*s %*d:%d", &lineNumber);
+					info.shader = type;
+					info.message[info.shader] += "Failed to compile " + std::to_string(type) + " shader!\n";
+
+					info.line[info.shader] = lineNumber;
+					info.message[info.shader] += errorMessage;
+					GLCall(glDeleteShader(shader));
+					return -1;
+				}
+				return shader;
 			}
 
 			void GLShader::Bind() const
@@ -317,49 +297,25 @@ namespace sp {
 				s_CurrentlyBound = nullptr;
 			}
 
-			void GLShader::Parse(const String& vertexSource, const String& geometrySource, const String& fragmentSource)
+			void GLShader::Parse(std::map<ShaderType, String>* sources)
 			{
-				m_VSUniformBuffers.push_back(spnew GLShaderUniformBufferDeclaration("Global", 0));
-				if (types[1])
-					m_GSUniformBuffers.push_back(spnew GLShaderUniformBufferDeclaration("Global", 1));
-				m_PSUniformBuffers.push_back(spnew GLShaderUniformBufferDeclaration("Global", 2));
+				for (auto source : *sources) {
+					m_UniformBuffers[source.first].push_back(spnew GLShaderUniformBufferDeclaration("Global", source.first));
 
-				const char* token;
-				const char* vstr;
-				const char* fstr;
-				const char* gstr;
+					const char* token;
+					const char* str;
 
-				// Vertex Shader
-				vstr = vertexSource.c_str();
-				while (token = FindToken(vstr, "struct"))
-					ParseUniformStruct(GetBlock(token, &vstr), 0);
+					str = source.second.c_str();
+					while (token = FindToken(str, "struct"))
+						ParseUniformStruct(GetBlock(token, &str), source.first);
 
-				vstr = vertexSource.c_str();
-				while (token = FindToken(vstr, "uniform"))
-					ParseUniform(GetStatement(token, &vstr), 0);
-
-				// Geometry Shader
-				if (types[1]) {
-					gstr = geometrySource.c_str();
-					while (token = FindToken(gstr, "struct"))
-						ParseUniformStruct(GetBlock(token, &gstr), 1);
-
-					gstr = geometrySource.c_str();
-					while (token = FindToken(gstr, "uniform"))
-						ParseUniform(GetStatement(token, &gstr), 1);
+					str = source.second.c_str();
+					while (token = FindToken(str, "uniform"))
+						ParseUniform(GetStatement(token, &str), source.first);
 				}
-
-				// Fragment Shader
-				fstr = fragmentSource.c_str();
-				while (token = FindToken(fstr, "struct"))
-					ParseUniformStruct(GetBlock(token, &fstr), 2);
-
-				fstr = fragmentSource.c_str();
-				while (token = FindToken(fstr, "uniform"))
-					ParseUniform(GetStatement(token, &fstr), 2);
 			}
 
-			void GLShader::ParseUniform(const String& statement, uint shaderType)
+			void GLShader::ParseUniform(const String& statement, ShaderType type)
 			{
 				std::vector<String> tokens = Tokenize(statement);
 				uint index = 0;
@@ -406,38 +362,18 @@ namespace sp {
 
 					if (StartsWith(name, "sys_"))
 					{
-						if (shaderType == 0)
-							((GLShaderUniformBufferDeclaration*)m_VSUniformBuffers.front())->PushUniform(declaration);
-						else if (shaderType == 1)
-							((GLShaderUniformBufferDeclaration*)m_GSUniformBuffers.front())->PushUniform(declaration);
-						else if (shaderType == 2)
-							((GLShaderUniformBufferDeclaration*)m_PSUniformBuffers.front())->PushUniform(declaration);
+						((GLShaderUniformBufferDeclaration*)m_UniformBuffers[type].front())->PushUniform(declaration);
 					}
 					else
 					{
-						if (shaderType == 0)
-						{
-							if (m_VSUserUniformBuffer == nullptr)
-								m_VSUserUniformBuffer = new GLShaderUniformBufferDeclaration("", 0);
-							m_VSUserUniformBuffer->PushUniform(declaration);
-						}
-						else if (shaderType == 1)
-						{
-							if (m_GSUserUniformBuffer == nullptr)
-								m_GSUserUniformBuffer = new GLShaderUniformBufferDeclaration("", 1);
-							m_GSUserUniformBuffer->PushUniform(declaration);
-						}
-						else if (shaderType == 2)
-						{
-							if (m_PSUserUniformBuffer == nullptr)
-								m_PSUserUniformBuffer = new GLShaderUniformBufferDeclaration("", 2);
-							m_PSUserUniformBuffer->PushUniform(declaration);
-						}
+						if (m_UserUniformBuffers[type] == nullptr)
+							m_UserUniformBuffers[type] = new GLShaderUniformBufferDeclaration("", 0);
+						m_UserUniformBuffers[type]->PushUniform(declaration);
 					}
 				}
 			}
 
-			void GLShader::ParseUniformStruct(const String& block, uint shaderType)
+			void GLShader::ParseUniformStruct(const String& block, ShaderType type)
 			{
 				std::vector<String> tokens = Tokenize(block);
 
@@ -487,126 +423,30 @@ namespace sp {
 			{
 				Bind();
 
-				for (uint i = 0; i < m_VSUniformBuffers.size(); i++)
-				{
-					GLShaderUniformBufferDeclaration* decl = (GLShaderUniformBufferDeclaration*)m_VSUniformBuffers[i];
-					const ShaderUniformList& uniforms = decl->GetUniformDeclarations();
-					for (uint j = 0; j < uniforms.size(); j++)
+				for (auto shader : m_UniformBuffers) {
+					for (uint j = 0; j < shader.second.size(); j++)
 					{
-						GLShaderUniformDeclaration* uniform = (GLShaderUniformDeclaration*)uniforms[j];
-						if (uniform->GetType() == GLShaderUniformDeclaration::Type::STRUCT)
-						{
-							const ShaderStruct& s = uniform->GetShaderUniformStruct();
-							const auto& fields = s.GetFields();
-							for (int i = 0; i < uniform->GetCount(); i++) {
-								for (uint l = 0; l < fields.size(); l++)
-								{
-									GLShaderUniformDeclaration* field = (GLShaderUniformDeclaration*)fields[l];
-									field->m_Location = GetUniformLocation(uniform->m_Name + "[" + std::to_string(i) + "]" + "." + field->m_Name);
-								}
-							}
-						}
-						else
-						{
-							uniform->m_Location = GetUniformLocation(uniform->m_Name);
-						}
-					}
-				}
-
-
-				for (uint j = 0; j < m_GSUniformBuffers.size(); j++)
-				{
-					GLShaderUniformBufferDeclaration* decl = (GLShaderUniformBufferDeclaration*)m_GSUniformBuffers[j];
-					const ShaderUniformList& uniforms = decl->GetUniformDeclarations();
-					for (uint k = 0; k < uniforms.size(); k++)
-					{
-						GLShaderUniformDeclaration* uniform = (GLShaderUniformDeclaration*)uniforms[k];
-						if (uniform->GetType() == GLShaderUniformDeclaration::Type::STRUCT)
-						{
-							const ShaderStruct& s = uniform->GetShaderUniformStruct();
-							const auto& fields = s.GetFields();
-							if (uniform->GetCount() == 1) {
-								for (uint l = 0; l < fields.size(); l++)
-								{
-									GLShaderUniformDeclaration* field = (GLShaderUniformDeclaration*)fields[l];
-									field->m_Location = GetUniformLocation(uniform->m_Name + "." + field->m_Name);
-								}
-							}
-							else {
-								for (int i = 0; i < uniform->GetCount(); i++) {
-									for (uint l = 0; l < fields.size(); l++)
-									{
-										GLShaderUniformDeclaration* field = (GLShaderUniformDeclaration*)fields[l];
-										field->m_Location = GetUniformLocation(uniform->m_Name + "[" + std::to_string(i) + "]" + "." + field->m_Name);
-									}
-								}
-							}
-						}
-						else
-						{
-							uniform->m_Location = GetUniformLocation(uniform->m_Name);
-						}
-					}
-				}
-
-				for (uint j = 0; j < m_PSUniformBuffers.size(); j++)
-				{
-					GLShaderUniformBufferDeclaration* decl = (GLShaderUniformBufferDeclaration*)m_PSUniformBuffers[j];
-					const ShaderUniformList& uniforms = decl->GetUniformDeclarations();
-					for (uint k = 0; k < uniforms.size(); k++)
-					{
-						GLShaderUniformDeclaration* uniform = (GLShaderUniformDeclaration*)uniforms[k];
-						if (uniform->GetType() == GLShaderUniformDeclaration::Type::STRUCT)
-						{
-							const ShaderStruct& s = uniform->GetShaderUniformStruct();
-							const auto& fields = s.GetFields();
-							if (uniform->GetCount() == 1) {
-								for (uint l = 0; l < fields.size(); l++)
-								{
-									GLShaderUniformDeclaration* field = (GLShaderUniformDeclaration*)fields[l];
-									field->m_Location = GetUniformLocation(uniform->m_Name + "." + field->m_Name);
-								}
-							}
-							else {
-								for (int i = 0; i < uniform->GetCount(); i++) {
-									for (uint l = 0; l < fields.size(); l++)
-									{
-										GLShaderUniformDeclaration* field = (GLShaderUniformDeclaration*)fields[l];
-										field->m_Location = GetUniformLocation(uniform->m_Name + "[" + std::to_string(i) + "]" + "." + field->m_Name);
-									}
-								}
-							}
-						}
-						else
-						{
-							uniform->m_Location = GetUniformLocation(uniform->m_Name);
-						}
-					}
-				}
-				{
-					GLShaderUniformBufferDeclaration* decl = m_VSUserUniformBuffer;
-					if (decl)
-					{
+						GLShaderUniformBufferDeclaration* decl = (GLShaderUniformBufferDeclaration*)shader.second[j];
 						const ShaderUniformList& uniforms = decl->GetUniformDeclarations();
-						for (uint j = 0; j < uniforms.size(); j++)
+						for (uint k = 0; k < uniforms.size(); k++)
 						{
-							GLShaderUniformDeclaration* uniform = (GLShaderUniformDeclaration*)uniforms[j];
+							GLShaderUniformDeclaration* uniform = (GLShaderUniformDeclaration*)uniforms[k];
 							if (uniform->GetType() == GLShaderUniformDeclaration::Type::STRUCT)
 							{
 								const ShaderStruct& s = uniform->GetShaderUniformStruct();
 								const auto& fields = s.GetFields();
 								if (uniform->GetCount() == 1) {
-									for (uint k = 0; k < fields.size(); k++)
+									for (uint l = 0; l < fields.size(); l++)
 									{
-										GLShaderUniformDeclaration* field = (GLShaderUniformDeclaration*)fields[k];
+										GLShaderUniformDeclaration* field = (GLShaderUniformDeclaration*)fields[l];
 										field->m_Location = GetUniformLocation(uniform->m_Name + "." + field->m_Name);
 									}
 								}
 								else {
 									for (int i = 0; i < uniform->GetCount(); i++) {
-										for (uint k = 0; k < fields.size(); k++)
+										for (uint l = 0; l < fields.size(); l++)
 										{
-											GLShaderUniformDeclaration* field = (GLShaderUniformDeclaration*)fields[k];
+											GLShaderUniformDeclaration* field = (GLShaderUniformDeclaration*)fields[l];
 											field->m_Location = GetUniformLocation(uniform->m_Name + "[" + std::to_string(i) + "]" + "." + field->m_Name);
 										}
 									}
@@ -620,48 +460,9 @@ namespace sp {
 					}
 				}
 
-				{
-					GLShaderUniformBufferDeclaration* decl = m_GSUserUniformBuffer;
-					if (decl)
-					{
-						const ShaderUniformList& uniforms = decl->GetUniformDeclarations();
-						for (uint j = 0; j < uniforms.size(); j++)
-						{
-							GLShaderUniformDeclaration* uniform = (GLShaderUniformDeclaration*)uniforms[j];
-							if (uniform->GetType() == GLShaderUniformDeclaration::Type::STRUCT)
-							{
-								const ShaderStruct& s = uniform->GetShaderUniformStruct();
-								const auto& fields = s.GetFields();
 
-								if (uniform->GetCount() == 1) {
-									for (uint k = 0; k < fields.size(); k++)
-									{
-										GLShaderUniformDeclaration* field = (GLShaderUniformDeclaration*)fields[k];
-										field->m_Location = GetUniformLocation(uniform->m_Name + "." + field->m_Name);
-									}
-								}
-								else {
-									for (int i = 0; i < uniform->GetCount(); i++) {
-										for (uint k = 0; k < fields.size(); k++)
-										{
-											GLShaderUniformDeclaration* field = (GLShaderUniformDeclaration*)fields[k];
-											field->m_Location = GetUniformLocation(uniform->m_Name + "[" + std::to_string(i) + "]" + "." + field->m_Name);
-										}
-									}
-								}
-
-
-							}
-							else
-							{
-								uniform->m_Location = GetUniformLocation(uniform->m_Name);
-							}
-						}
-					}
-				}
-
-				{
-					GLShaderUniformBufferDeclaration* decl = m_PSUserUniformBuffer;
+				for (auto shader : m_UserUniformBuffers) {
+					GLShaderUniformBufferDeclaration* decl = shader.second;
 					if (decl)
 					{
 						const ShaderUniformList& uniforms = decl->GetUniformDeclarations();
@@ -768,81 +569,35 @@ namespace sp {
 			ShaderUniformDeclaration* GLShader::FindUniformDeclaration(const String& name)
 			{
 				ShaderUniformDeclaration* result = nullptr;
-				for (uint i = 0; i < m_VSUniformBuffers.size(); i++)
-				{
-					result = FindUniformDeclaration(name, m_VSUniformBuffers[i]);
+
+				for (auto shader : m_UniformBuffers) {
+					for (uint i = 0; i < shader.second.size(); i++) {
+						result = FindUniformDeclaration(name, shader.second[i]);
+						if (result)
+							return result;
+					}
+				}
+
+				for (auto shader : m_UserUniformBuffers) {
+					result = FindUniformDeclaration(name, shader.second);
 					if (result)
 						return result;
 				}
-
-				for (uint i = 0; i < m_GSUniformBuffers.size(); i++)
-				{
-					result = FindUniformDeclaration(name, m_GSUniformBuffers[i]);
-					if (result)
-						return result;
-				}
-
-				for (uint i = 0; i < m_PSUniformBuffers.size(); i++)
-				{
-					result = FindUniformDeclaration(name, m_PSUniformBuffers[i]);
-					if (result)
-						return result;
-				}
-
-				result = FindUniformDeclaration(name, m_VSUserUniformBuffer);
-				if (result)
-					return result;
-
-				result = FindUniformDeclaration(name, m_GSUserUniformBuffer);
-				if (result)
-					return result;
-
-				result = FindUniformDeclaration(name, m_PSUserUniformBuffer);
-				if (result)
-					return result;
 
 				return result;
 			}
 
-			void GLShader::SetVSSystemUniformBuffer(byte* data, uint size, uint slot)
+			void GLShader::SetSystemUniformBuffer(ShaderType type, byte* data, uint size, uint slot)
 			{
 				Bind();
-				SP_ASSERT(m_VSUniformBuffers.size() > slot);
-				ShaderUniformBufferDeclaration* declaration = m_VSUniformBuffers[slot];
+				SP_ASSERT(m_UniformBuffers.size() > slot);
+				ShaderUniformBufferDeclaration* declaration = m_UniformBuffers[type][slot];
 				ResolveAndSetUniforms(declaration, data, size);
 			}
 
-			void GLShader::SetGSSystemUniformBuffer(byte* data, uint size, uint slot)
+			void GLShader::SetUserUniformBuffer(ShaderType type, byte* data, uint size)
 			{
-				if (size == 0) return;
-
-				Bind();
-				SP_ASSERT(m_GSUniformBuffers.size() > slot);
-				ShaderUniformBufferDeclaration* declaration = m_GSUniformBuffers[slot];
-				ResolveAndSetUniforms(declaration, data, size);
-			}
-
-			void GLShader::SetPSSystemUniformBuffer(byte* data, uint size, uint slot)
-			{
-				Bind();
-				SP_ASSERT(m_PSUniformBuffers.size() > slot);
-				ShaderUniformBufferDeclaration* declaration = m_PSUniformBuffers[slot];
-				ResolveAndSetUniforms(declaration, data, size);
-			}
-
-			void GLShader::SetVSUserUniformBuffer(byte* data, uint size)
-			{
-				ResolveAndSetUniforms(m_VSUserUniformBuffer, data, size);
-			}
-
-			void GLShader::SetGSUserUniformBuffer(byte* data, uint size)
-			{
-				ResolveAndSetUniforms(m_GSUserUniformBuffer, data, size);
-			}
-
-			void GLShader::SetPSUserUniformBuffer(byte* data, uint size)
-			{
-				ResolveAndSetUniforms(m_PSUserUniformBuffer, data, size);
+				ResolveAndSetUniforms(m_UserUniformBuffers[type], data, size);
 			}
 
 			ShaderStruct* GLShader::FindStruct(const String& name)

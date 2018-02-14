@@ -57,6 +57,17 @@ namespace sp {
 			spdel m_ScreenQuad;
 		}
 
+		void Renderer2D::SetViewportSize(const maths::tvec2<uint>& size)
+		{
+			m_ViewportSize = size;
+		}
+
+		void Renderer2D::SetScreenSize(const maths::tvec2<uint>& size)
+		{
+			m_ScreenSize = size;
+			SetCamera(spnew Camera(mat4::Orthographic(-m_ScreenSize.x / 2, m_ScreenSize.x / 2, -m_ScreenSize.y / 2, m_ScreenSize.y / 2, -1.0f, 1.0f)));
+		}
+
 		void Renderer2D::Init()
 		{
 			m_TransformationStack.push_back(maths::mat4::Identity());
@@ -66,7 +77,7 @@ namespace sp {
 			m_SystemUniforms.resize(g_RequiredSystemUniformsCount);
 
 			m_Shader = ShaderFactory::BatchRendererShader();
-			const API::ShaderUniformBufferList& vssu = m_Shader->GetVSSystemUniforms();
+			const API::ShaderUniformBufferList& vssu = m_Shader->GetSystemUniforms(API::ShaderType::VERTEX);
 			SP_ASSERT(vssu.size());
 			for (uint i = 0; i < vssu.size(); i++)
 			{
@@ -83,7 +94,7 @@ namespace sp {
 				}
 			}
 
-			SetCamera(spnew Camera(mat4::Orthographic(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f)));
+			SetCamera(spnew Camera(mat4::Orthographic(-m_ScreenSize.x / 2, m_ScreenSize.x / 2, -m_ScreenSize.y / 2, m_ScreenSize.y / 2, -1.0f, 1.0f)));
 
 			m_Shader->Bind();
 
@@ -146,6 +157,7 @@ namespace sp {
 
 			m_TransformationBack = &m_TransformationStack.back();
 		}
+
 		void Renderer2D::Pop()
 		{
 			// TODO: Add to log!
@@ -522,7 +534,7 @@ namespace sp {
 
 			m_Shader->Bind();
 			for (uint i = 0; i < m_SystemUniformBuffers.size(); i++)
-				m_Shader->SetVSSystemUniformBuffer(m_SystemUniformBuffers[i].buffer, m_SystemUniformBuffers[i].size, i);
+				m_Shader->SetSystemUniformBuffer(API::ShaderType::VERTEX, m_SystemUniformBuffers[i].buffer, m_SystemUniformBuffers[i].size, i);
 
 			for (uint i = 0; i < m_Textures.size(); i++)
 				m_Textures[i]->Bind(i);

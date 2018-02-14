@@ -32,20 +32,13 @@ namespace sp { namespace graphics {
 
 		API::Shader* m_Shader;
 
-		byte* m_VSUserUniformBuffer;
-		uint m_VSUserUniformBufferSize;
+		std::map<API::ShaderType, byte*> m_UserUniformBuffers;
+		std::map<API::ShaderType, uint> m_UserUniformBuffersSize;
 
-		byte* m_GSUserUniformBuffer;
-		uint m_GSUserUniformBufferSize;
-
-		byte* m_PSUserUniformBuffer;
-		uint m_PSUserUniformBufferSize;
+		std::map<API::ShaderType, API::ShaderUniformList> m_UserUniforms;
 
 		std::vector<API::Texture*> m_Textures;
 
-		const API::ShaderUniformList* m_VSUserUniforms;
-		const API::ShaderUniformList* m_GSUserUniforms;
-		const API::ShaderUniformList* m_PSUserUniforms;
 		const API::ShaderResourceList* m_Resources;
 
 		int m_RenderFlags;
@@ -101,20 +94,13 @@ namespace sp { namespace graphics {
 	private:
 		Material* m_Material;
 
-		byte* m_VSUserUniformBuffer;
-		uint m_VSUserUniformBufferSize;
+		std::map<API::ShaderType, byte*> m_UserUniformBuffers;
+		std::map<API::ShaderType, uint> m_UserUniformBuffersSize;
 
-		byte* m_GSUserUniformBuffer;
-		uint m_GSUserUniformBufferSize;
-
-		byte* m_PSUserUniformBuffer;
-		uint m_PSUserUniformBufferSize;
+		std::map<API::ShaderType, API::ShaderUniformList> m_UserUniforms;
 
 		std::vector<API::Texture*> m_Textures;
 
-		const API::ShaderUniformList* m_VSUserUniforms;
-		const API::ShaderUniformList* m_GSUserUniforms;
-		const API::ShaderUniformList* m_PSUserUniforms;
 		const API::ShaderResourceList* m_Resources;
 
 		int m_RenderFlags;

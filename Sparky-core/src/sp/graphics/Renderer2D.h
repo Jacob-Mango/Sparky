@@ -113,9 +113,10 @@ namespace sp {
 			inline bool GetPostEffects() const { return m_PostEffectsEnabled; }
 			inline void AddPostEffectsPass(PostEffectsPass* pass) { m_PostEffects->Push(pass); }
 
-			inline void SetScreenSize(const maths::tvec2<uint>& size) { m_ScreenSize = size; }
+			void SetScreenSize(const maths::tvec2<uint>& size);
+			void SetViewportSize(const maths::tvec2<uint>& size);
+
 			inline const maths::tvec2<uint>& GetScreenSize() const { return m_ScreenSize; }
-			inline void SetViewportSize(const maths::tvec2<uint>& size) { m_ViewportSize = size; }
 			inline const maths::tvec2<uint>& GetViewportSize() const { return m_ViewportSize; }
 		private:
 			void Init();

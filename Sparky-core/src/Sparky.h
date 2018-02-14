@@ -19,10 +19,13 @@
 #include <sp/debug/DebugMenuAction.h>
 #include <sp/debug/DebugMenuItem.h>
 
-#include <sp/entity/Entity.h>
-#include <sp/entity/component/Component.h>
-#include <sp/entity/component/MeshComponent.h>
-#include <sp/entity/component/TransformComponent.h>
+#include <sp/scene/Node.h>
+#include <sp/scene/Object.h>
+#include <sp/scene/Scene.h>
+#include <sp/scene/Scene2D.h>
+
+#include <sp/scene/component/Component.h>
+#include <sp/scene/component/Components.h>
 
 #include <sp/events/Event.h>
 #include <sp/events/KeyEvent.h>
@@ -64,9 +67,6 @@
 #include <sp/graphics/shaders/ShaderFactory.h>
 #include <sp/graphics/shaders/ShaderManager.h>
 #include <sp/graphics/shaders/ShaderUniform.h>
-
-#include <sp/graphics/scene/Scene.h>
-#include <sp/graphics/scene/Scene2D.h>
 
 #include <sp/graphics/API/Renderer.h>
 #include <sp/graphics/API/Texture.h>
