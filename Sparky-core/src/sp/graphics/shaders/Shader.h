@@ -11,6 +11,8 @@
 #include "ShaderUniform.h"
 #include "ShaderResource.h"
 
+#ifndef SHADER_H
+#define SHADER_H
 namespace sp {
 	namespace graphics {
 
@@ -37,6 +39,21 @@ namespace sp {
 				FRAGMENT = 4,
 				COMPUTE = 5
 			};
+
+			struct ShaderEnumClassHash
+			{
+				template <typename T>
+				std::size_t operator()(T t) const
+				{
+					return static_cast<std::size_t>(t);
+				}
+			};
+
+			template <typename Key>
+			using HashType = typename std::conditional<std::is_enum<Key>::value, ShaderEnumClassHash, std::hash<Key>>::type;
+
+			template <typename Key, typename T>
+			using UnorderedMap = std::unordered_map<Key, T, HashType<Key>>;
 
 			class SP_API Shader
 			{
@@ -77,3 +94,4 @@ namespace sp {
 		}
 	}
 }
+#endif // SHADER_H

@@ -207,6 +207,8 @@ namespace sp {
 					info.message[info.shader] += "Failed to link shader!\n";
 					info.line[info.shader] = 0;
 					info.message[info.shader] += errorMessage;
+
+					SP_ERROR(info.message[info.shader]);
 					return 0;
 				}
 
@@ -277,7 +279,7 @@ namespace sp {
 					int32 lineNumber;
 					sscanf(error.data(), "%*s %*d:%d", &lineNumber);
 					info.shader = type;
-					info.message[info.shader] += "Failed to compile " + std::to_string(type) + " shader!\n";
+					info.message[info.shader] += "Failed to compile " + TypeToString(type) + " shader!\n";
 
 					info.line[info.shader] = lineNumber;
 					info.message[info.shader] += errorMessage;

@@ -124,8 +124,9 @@ namespace sp { namespace graphics {
 		{
 			byte* buffer;
 			API::ShaderUniformDeclaration* declaration = FindUniformDeclaration(name, &buffer);
-			SP_ASSERT(declaration);
-			memcpy(buffer + declaration->GetOffset(), &data, declaration->GetSize());
+			if (declaration) {
+				memcpy(buffer + declaration->GetOffset(), &data, declaration->GetSize());
+			}
 		}
 
 		template<typename T>

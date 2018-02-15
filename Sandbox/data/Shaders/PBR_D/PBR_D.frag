@@ -14,8 +14,9 @@ in DATA
 struct Light
 {
 	vec3 color;
+    vec3 direction;
 	vec3 position;
-	float intensity;
+    float distance;
 };
 
 struct Material
@@ -96,18 +97,28 @@ vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 
 Light TestLight() {
 	Light light;	
-	light.position = vec3(0, 100, -75);
-	light.intensity = 300;
-	light.color = vec3(1.0);
+	light.position = vec3(0, 40, -80);
+	light.direction = vec3(0, 0, 0);
+    light.distance = 1;
+	light.color = vec3(0.0);
+	return light;
+}
+
+Light SunLight() {
+	Light light;
+	light.position = vec3(0, 0, 0);	
+	light.direction = normalize(vec3(0.2, 1, 0.1));
+    light.distance = 1;
+	light.color = vec3(GAMMA) * vec3(10);
 	return light;
 }
 
 vec3 Radiance(Light light, vec3 N, vec3 V, vec3 F0) 
 {
-    vec3 L = normalize(light.position - g_Attributes.position);
+    vec3 L = light.direction;
     vec3 H = normalize(V + L);
-    float dist = length(light.position - g_Attributes.position);
-    float attenuation = 1.0 / (dist / light.intensity);
+    float dist = light.distance + 0.01;
+    float attenuation = 1.0 / dist;
     vec3 radiance = light.color * attenuation;
 
     float NDF = DistributionGGX(N, H, g_Material.roughness);   
@@ -135,20 +146,28 @@ void main()
 	g_Material.albedo = texture(u_Albedo, fs_in.uv);
 	g_Material.specular = specRoughness.r;
 	g_Material.roughness = specRoughness.g;
-    g_Material.metallic = specRoughness.b;
+    g_Material.metallic = 1 - specRoughness.b;
 
     vec3 N = normalize(g_Attributes.normal);
     vec3 V = normalize(u_CameraPosition - g_Attributes.position);
     vec3 R = reflect(-V, N); 
 
     vec3 F0 = vec3(0.04); 
-    // F0 = mix(F0, g_Material.albedo.rgb, vec3(g_Material.metallic));
+    F0 = mix(F0, g_Material.albedo.rgb, vec3(g_Material.metallic));
 
     vec3 Lo = vec3(0.0);
-    for(int i = 0; i < 1; ++i) 
+    Light lights[2];
+    lights[0] = SunLight();
+    lights[1] = TestLight();
+ 
+    for(int i = 0; i < 2; i++) 
     {
-        Light light = TestLight();
-        Lo += Radiance(light, N, V, F0); 
+        if (lights[i].direction == vec3(0)) {
+            lights[i].direction = normalize(lights[i].position - g_Attributes.position);
+            lights[i].distance = length(lights[i].position - g_Attributes.position);
+        }
+
+        Lo += Radiance(lights[i], N, V, F0); 
     }
     
     vec3 color = Lo;

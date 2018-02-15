@@ -12,8 +12,8 @@ namespace sp { namespace graphics { namespace API {
 	struct GLShaderErrorInfo
 	{
 		uint shader;
-		String message[4];
-		uint line[4];
+		String message[6];
+		uint line[6];
 	};
 
 	class GLShader : public Shader
@@ -26,8 +26,8 @@ namespace sp { namespace graphics { namespace API {
 		String m_Name, m_Path;
 		String m_Source;
 
-		std::map<ShaderType, ShaderUniformBufferList> m_UniformBuffers;
-		std::map<ShaderType, GLShaderUniformBufferDeclaration*> m_UserUniformBuffers;
+		UnorderedMap<ShaderType, ShaderUniformBufferList> m_UniformBuffers;
+		UnorderedMap<ShaderType, GLShaderUniformBufferDeclaration*> m_UserUniformBuffers;
 
 		std::vector<ShaderType> m_ShaderTypes;
 		
@@ -52,8 +52,12 @@ namespace sp { namespace graphics { namespace API {
 		inline const String& GetName() const override { return m_Name; }
 		inline const String& GetFilePath() const override { return m_Path; }
 
-		inline const ShaderUniformBufferList& GetSystemUniforms(ShaderType type) const override { return m_UniformBuffers.at(type); }
-		inline const ShaderUniformBufferDeclaration* GetUserUniformBuffer(ShaderType type) const override { return m_UserUniformBuffers.at(type); }
+		//inline const ShaderUniformBufferList& GetSystemUniforms(ShaderType type) const override { return m_UniformBuffers.at(type); }
+		//inline const ShaderUniformBufferDeclaration* GetUserUniformBuffer(ShaderType type) const override { return m_UserUniformBuffers.at(type); }
+
+		inline const ShaderUniformBufferList& GetSystemUniforms(ShaderType type) const override { try { return m_UniformBuffers.at(type); } catch (std::exception) { return ShaderUniformBufferList(); } }
+
+		inline const ShaderUniformBufferDeclaration* GetUserUniformBuffer(ShaderType type) const override { try { return m_UserUniformBuffers.at(type); } catch (std::exception) { return nullptr; } }
 
 		inline const std::vector<ShaderType> GetShaderTypes() const override { return m_ShaderTypes; }
 
