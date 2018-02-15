@@ -40,6 +40,8 @@ namespace sp {
 				std::map<ShaderType, ShaderUniformBufferList> m_UniformBuffers;
 				std::map<ShaderType, D3DShaderUniformBufferDeclaration*> m_UserUniformBuffers;
 
+				std::vector<ShaderType> m_ShaderTypes;
+
 				ShaderResourceList m_Resources;
 				ShaderStructList m_Structs;
 
@@ -64,6 +66,9 @@ namespace sp {
 				inline const ShaderUniformBufferList& GetSystemUniforms(ShaderType type) const override { return m_UniformBuffers.at(type); }
 				inline const ShaderUniformBufferDeclaration* GetUserUniformBuffer(ShaderType type) const override { return m_UserUniformBuffers.at(type); }
 				inline const ShaderResourceList& GetResources() const override { return m_Resources; }
+
+				inline const std::vector<ShaderType> GetShaderTypes() const override { return m_ShaderTypes; }
+
 			private:
 				static ID3DBlob* Compile(const String& source, const String& profile, const String& main, D3DShaderErrorInfo& info);
 				void Load(const String& source);

@@ -53,6 +53,10 @@ namespace sp {
 				PreProcess(m_Source, sources);
 				Parse(sources);
 
+				for (auto source : *sources) {
+					m_ShaderTypes.push_back(source.first);
+				}
+
 				GLShaderErrorInfo error;
 
 				m_Handle = Compile(sources, error);
@@ -106,7 +110,6 @@ namespace sp {
 							type = ShaderType::GEOMETRY;
 							std::map<ShaderType, String>::iterator it = shaders->begin();
 							shaders->insert(it, std::pair<ShaderType, String>(type, ""));
-							m_ShaderTypes.push_back(type);
 						}
 						else if (StringContains(str, "fragment")) {
 							type = ShaderType::FRAGMENT;

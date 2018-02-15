@@ -26,14 +26,14 @@ namespace sp {
 
 		void Material::AllocateStorage()
 		{
-			for (auto user : m_Shader->) {
-				const ShaderUniformBufferDeclaration* buffer = m_Shader->GetUserUniformBuffer(user.first);
+			for (ShaderType type : m_Shader->GetShaderTypes()) {
+				const ShaderUniformBufferDeclaration* buffer = m_Shader->GetUserUniformBuffer(type);
 				if (buffer)
 				{
-					m_UserUniformBuffersSize[user.first] = buffer->GetSize();
-					m_UserUniformBuffers[user.first] = spnew byte[m_UserUniformBuffersSize[user.first]];
-					memset(m_UserUniformBuffers[user.first], 0, m_UserUniformBuffersSize[user.first]);
-					m_UserUniforms[user.first] = buffer->GetUniformDeclarations();
+					m_UserUniformBuffersSize[type] = buffer->GetSize();
+					m_UserUniformBuffers[type] = spnew byte[m_UserUniformBuffersSize[type]];
+					memset(m_UserUniformBuffers[type], 0, m_UserUniformBuffersSize[type]);
+					m_UserUniforms[type] = buffer->GetUniformDeclarations();
 				}
 			}
 		}

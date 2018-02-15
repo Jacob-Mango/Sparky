@@ -30,7 +30,7 @@ namespace sp { namespace graphics { namespace API {
 		std::map<ShaderType, GLShaderUniformBufferDeclaration*> m_UserUniformBuffers;
 
 		std::vector<ShaderType> m_ShaderTypes;
-
+		
 		ShaderResourceList m_Resources;
 		ShaderStructList m_Structs;
 	public:
@@ -55,7 +55,7 @@ namespace sp { namespace graphics { namespace API {
 		inline const ShaderUniformBufferList& GetSystemUniforms(ShaderType type) const override { return m_UniformBuffers.at(type); }
 		inline const ShaderUniformBufferDeclaration* GetUserUniformBuffer(ShaderType type) const override { return m_UserUniformBuffers.at(type); }
 
-		inline const std::vector<ShaderType> GetShaderTypes() { return m_ShaderTypes; }
+		inline const std::vector<ShaderType> GetShaderTypes() const override { return m_ShaderTypes; }
 
 		inline const ShaderResourceList& GetResources() const override { return m_Resources; }
 	private:
