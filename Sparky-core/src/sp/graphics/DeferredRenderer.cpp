@@ -34,11 +34,17 @@ namespace sp {
 			PSSystemUniformIndex_Size
 		};
 
+		std::vector<API::TextureParameters> deferredBufferParameters = {
+			API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
+			API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
+			API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
+			API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
+		};
+
 		std::vector<API::TextureParameters> framebufferParameters = {
 			API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
 			API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
-			API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
-			API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false),
+			API::TextureParameters(API::TextureFormat::RGBA32F, API::TextureFilter::LINEAR, API::TextureWrap::CLAMP_TO_EDGE, API::TextureType::FLOAT, false)
 		};
 
 		DeferredRenderer::DeferredRenderer()
@@ -56,15 +62,17 @@ namespace sp {
 			m_ScreenBufferWidth = width;
 			m_ScreenBufferHeight = height;
 
-			float w = m_ScreenBufferWidth * 2;
-			float h = m_ScreenBufferHeight * 2;
+			float w = m_ScreenBufferWidth;
+			float h = m_ScreenBufferHeight;
 
+			m_DeferredBuffer = API::FrameBuffer2D::Create(w, h, deferredBufferParameters);
 			m_FrameBuffer = API::FrameBuffer2D::Create(w, h, framebufferParameters);
-			FontManager::SetScale(maths::vec2(w / 32.0f, h / 18.0f));
+			// FontManager::SetScale(maths::vec2(w / 32.0f, h / 18.0f));
 		}
 
 		void DeferredRenderer::Init()
 		{
+			m_DeferredBuffer = API::FrameBuffer2D::Create(m_ScreenBufferWidth, m_ScreenBufferHeight, deferredBufferParameters);
 			m_FrameBuffer = API::FrameBuffer2D::Create(m_ScreenBufferWidth, m_ScreenBufferHeight, framebufferParameters);
 
 			m_MaxLights = 64;
@@ -199,9 +207,9 @@ namespace sp {
 
 		void DeferredRenderer::Present()
 		{
-			m_FrameBuffer->Bind();
-			m_FrameBuffer->SetClearColor(maths::vec4(0));
-			m_FrameBuffer->Clear();
+			m_DeferredBuffer->Bind();
+			m_DeferredBuffer->SetClearColor(maths::vec4(0));
+			m_DeferredBuffer->Clear();
 			for (uint i = 0; i < m_CommandQueue.size(); i++)
 			{
 				RenderCommand& command = m_CommandQueue[i];
@@ -216,7 +224,12 @@ namespace sp {
 
 				command.mesh->Render(*this);
 			}
-			m_FrameBuffer->Unbind();
+			m_DeferredBuffer->Unbind();
+
+			m_FrameBuffer->Bind();
+			m_FrameBuffer->SetClearColor(maths::vec4(0));
+			m_FrameBuffer->Clear();
+			m_Material->Bind();
 
 			float aspectX = (float)m_ScreenBufferWidth / (float)m_ScreenBufferHeight;
 			float aspectY = (float)m_ScreenBufferHeight / (float)m_ScreenBufferWidth;
@@ -231,10 +244,9 @@ namespace sp {
 			m_Material->SetTexture("u_PreintegratedFG", m_PreintegratedFG);
 			m_Material->SetTexture("u_EnvironmentMap", m_PreintegratedFG);
 
-			m_Shader->Bind();
-			m_Material->Bind();
+			
 
-			std::vector<API::Texture2D*> textures = m_FrameBuffer->GetTextures();
+			std::vector<API::Texture2D*> textures = m_DeferredBuffer->GetTextures();
 			m_Material->SetTexture("u_Position", textures[0]);
 			m_Material->SetTexture("u_Albedo", textures[1]);
 			m_Material->SetTexture("u_SpecularRoughness", textures[2]);
@@ -247,7 +259,8 @@ namespace sp {
 			m_VertexArray->Unbind();
 
 			m_Material->Unbind();
-			m_Shader->Unbind();
+
+			m_FrameBuffer->Unbind();
 		}
 	}
 }

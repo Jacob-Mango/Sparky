@@ -15,13 +15,16 @@ namespace sp { namespace graphics {
 	{
 	private:
 		std::vector<PostEffectsPass*> m_Passes;
+
+		API::VertexArray* m_VertexArray;
+		API::IndexBuffer* m_IndexBuffer;
 	public:
 		PostEffects();
 		~PostEffects();
 		void Push(PostEffectsPass* pass);
 		void Pop();
 
-		void RenderPostEffects(API::Framebuffer* source, API::Framebuffer* target, API::VertexArray* quad, API::IndexBuffer* indices);
+		void Render(API::Framebuffer* source);
 	};
 
 } }

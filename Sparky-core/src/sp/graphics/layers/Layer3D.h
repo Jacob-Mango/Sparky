@@ -9,6 +9,8 @@
 #include "sp/graphics/ForwardRenderer.h"
 #include "sp/graphics/DeferredRenderer.h"
 
+#include "sp/graphics/postfx/PostEffects.h"
+
 namespace sp { namespace graphics {
 
 	class SP_API Layer3D : public Layer
@@ -16,6 +18,8 @@ namespace sp { namespace graphics {
 	protected:
 		scene::Scene* m_Scene;
 		Renderer3D* m_Renderer;
+
+		PostEffects* m_PostEffects;
 	public:
 		Layer3D(scene::Scene* scene);
 		~Layer3D();

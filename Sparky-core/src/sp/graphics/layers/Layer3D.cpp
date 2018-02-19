@@ -12,12 +12,14 @@ namespace sp { namespace graphics {
 		switch (graphics::API::Context::GetRendererType()) {
 		default:
 		case graphics::API::RendererType::FORWARD:
-			m_Renderer = new ForwardRenderer();
+			m_Renderer = spnew ForwardRenderer();
 			break;
 		case graphics::API::RendererType::DEFERRED:
-			m_Renderer = new DeferredRenderer();
+			m_Renderer = spnew DeferredRenderer();
 			break;
 		}
+
+		m_PostEffects = spnew PostEffects();
 	}
 
 	Layer3D::~Layer3D()
@@ -51,6 +53,8 @@ namespace sp { namespace graphics {
 	void Layer3D::OnRender()
 	{
 		OnRender(*m_Renderer);
+
+		m_PostEffects->Render(m_Renderer->GetFrameBuffer());
 	}
 
 	void Layer3D::OnRender(Renderer3D& renderer)

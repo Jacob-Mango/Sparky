@@ -15,6 +15,8 @@ namespace sp { namespace graphics {
 		~PostEffectsPass();
 
 		void RenderPass(API::Framebuffer* target);
+
+		inline Material* GetMaterial() { return m_Material; }
 	};
 
 } }

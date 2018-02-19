@@ -96,7 +96,7 @@ void Test3D::OnInit(Renderer3D* renderer, Scene* scene)
 		vec4 diffuse(vec3(1.0f, 0.0f, 0.0f), 1.0f);
 
 		PBRMaterialInstance* m = spnew PBRMaterialInstance(absRed);
-		m->SetGloss(1.0f - roughness);
+		m->SetGloss(roughness);
 		m->SetAlbedo(diffuse);
 		m->SetSpecular(spec);
 		m->UsingNormalMap(false);
@@ -123,7 +123,7 @@ void Test3D::OnInit(Renderer3D* renderer, Scene* scene)
 		vec4 diffuse(0.0f, 0.0f, 0.0f, 1.0f);
 
 		PBRMaterialInstance* m = spnew PBRMaterialInstance(castIron);
-		m->SetGloss(1.0f - roughness);
+		m->SetGloss(roughness);
 		m->SetAlbedo(diffuse);
 		m->SetSpecular(spec);
 		m->UsingNormalMap(false);
@@ -157,7 +157,16 @@ void Test3D::OnInit(Renderer3D* renderer, Scene* scene)
 	lights->Add(m_Light);
 	m_Scene->PushLightSetup(lights);
 
+	Shader* test_PEP = Shader::CreateFromFile("Test_PEP", String("/shaders/PostFX/Test/Test.shader"));
+	ShaderManager::Add(test_PEP);
+	m_PostEffects->Push(spnew PostEffectsPass(test_PEP));
+
+	Shader* HDR_PEP = Shader::CreateFromFile("HDR_PEP", String("/shaders/PostFX/HDR/HDR.shader"));
+	ShaderManager::Add(HDR_PEP);
+	m_PostEffects->Push(spnew PostEffectsPass(HDR_PEP));
+
 	SP_INFO("Init took ", timer.ElapsedMillis(), " ms");
+
 }
 
 void Test3D::OnTick()
@@ -185,9 +194,7 @@ void Test3D::OnEvent(Event& event)
 			switch (kpe->GetKeyCode())
 			{
 			case SP_KEY_R:
-				ShaderManager::Reload("Deferred");
-				ShaderManager::Reload("Default");
-				ShaderManager::Reload("Water");
+				ShaderManager::ReloadAll();
 				break;
 			}
 		}

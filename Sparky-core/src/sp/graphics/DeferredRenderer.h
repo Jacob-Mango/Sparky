@@ -33,6 +33,8 @@ namespace sp { namespace graphics {
 
 		API::Texture2D* m_PreintegratedFG;
 
+		API::FrameBuffer2D* m_DeferredBuffer;
+
 		uint m_MaxLights;
 	public:
 		DeferredRenderer(uint width, uint height);

@@ -1,42 +1,65 @@
 #include "sp/sp.h"
 #include "PostEffects.h"
 
-namespace sp { namespace graphics {
+#include "sp/graphics/MeshFactory.h"
 
-	PostEffects::PostEffects()
-	{
+namespace sp {
+	namespace graphics {
+
+		PostEffects::PostEffects()
+		{
+			Mesh* mesh = MeshFactory::CreateQuad(maths::vec2(-1, -1), maths::vec2(2, 2), nullptr);
+			m_IndexBuffer = mesh->m_IndexBuffer;
+			m_VertexArray = mesh->m_VertexArray;
+		}
+
+		PostEffects::~PostEffects()
+		{
+
+		}
+
+		void PostEffects::Push(PostEffectsPass* pass)
+		{
+			m_Passes.push_back(pass);
+		}
+
+		void PostEffects::Pop()
+		{
+			m_Passes.pop_back();
+		}
+
+		void PostEffects::Render(API::Framebuffer* source) {
+			for (int i = 0; i < m_Passes.size(); i++) {
+				if (i != m_Passes.size() - 1) source->Bind();
+				Material* material = m_Passes[i]->GetMaterial();
+				material->Bind();
+
+				std::vector<API::Texture2D*> textures = source->GetTextures();
+				material->SetTexture("u_Screen", textures[0]);
+				material->SetTexture("u_Normal", textures[1]);
+
+				float aspectX = (float)source->GetWidth() / (float)source->GetHeight();
+				float aspectY = (float)source->GetHeight() / (float)source->GetWidth();
+				if (aspectX < 1.0f) aspectX = 1.0f;
+				if (aspectY < 1.0f) aspectY = 1.0f;
+
+				aspectX *= 0.5f;
+				aspectY *= 0.5f;
+
+				material->SetUniform("u_ProjectionMatrix", maths::mat4::Orthographic(-aspectX, aspectX, aspectY, -aspectY, -10.0f, 10.0f));
+				material->SetUniform("u_ModelMatrix", maths::mat4::Scale(maths::vec3(aspectX, -aspectY)));
+
+
+				m_VertexArray->Bind();
+				m_IndexBuffer->Bind();
+				m_VertexArray->Draw(RenderType::TRIANGLES, 6);
+				m_IndexBuffer->Unbind();
+				m_VertexArray->Unbind();
+
+				material->Unbind();
+				if (i != m_Passes.size() - 1) source->Unbind();
+			}
+		}
 
 	}
-
-	PostEffects::~PostEffects()
-	{
-
-	}
-
-	void PostEffects::Push(PostEffectsPass* pass)
-	{
-		m_Passes.push_back(pass);
-	}
-
-	void PostEffects::Pop()
-	{
-		m_Passes.pop_back();
-	}
-
-	void PostEffects::RenderPostEffects(API::Framebuffer* source, API::Framebuffer* target, API::VertexArray* quad, API::IndexBuffer* indices)
-	{
-		target->Bind();
-		// API::SetActiveTexture(GL_TEXTURE0);
-		// source->GetTexture()->Bind(nullptr);
-
-		quad->Bind();
-		indices->Bind();
-
-		for (PostEffectsPass* pass : m_Passes)
-			pass->RenderPass(target);
-
-		indices->Unbind();
-		quad->Unbind();
-	}
-
-} }
+}

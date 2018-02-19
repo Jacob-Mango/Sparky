@@ -1,6 +1,6 @@
 #version 330 core
 
-#define PI 3.1415926535897932384626433832795
+#define PI 3.14159265359
 #define GAMMA 2.2
 
 layout(location = 0) out vec4 out_Color;
@@ -95,24 +95,6 @@ vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }   
 
-Light TestLight() {
-	Light light;	
-	light.position = vec3(0, 40, -80);
-	light.direction = vec3(0, 0, 0);
-    light.distance = 1;
-	light.color = vec3(0.0);
-	return light;
-}
-
-Light SunLight() {
-	Light light;
-	light.position = vec3(0, 0, 0);	
-	light.direction = normalize(vec3(0.2, 1, 0.1));
-    light.distance = 1;
-	light.color = vec3(GAMMA) * vec3(10);
-	return light;
-}
-
 vec3 Radiance(Light light, vec3 N, vec3 V, vec3 F0) 
 {
     vec3 L = light.direction;
@@ -131,10 +113,30 @@ vec3 Radiance(Light light, vec3 N, vec3 V, vec3 F0)
         
     vec3 kS = F;
     vec3 kD = vec3(1.0) - kS;
-    kD *= 1.0 - vec3(g_Material.metallic);
+    kD *= 1.0 - g_Material.metallic;
 
     float NdotL = max(dot(N, L), 0.0);        
     return ((kD * g_Material.albedo.rgb / PI + specular) * radiance * NdotL);
+}
+
+Light TestLight() 
+{
+	Light light;	
+	light.position = vec3(0, 20, -80);
+	light.direction = vec3(0, 0, 0);
+    light.distance = 1;
+	light.color = vec3(1000.0);
+	return light;
+}
+
+Light SunLight() 
+{
+	Light light;
+	light.position = vec3(0, 0, 0);	
+	light.direction = normalize(vec3(0.2, 1, 0.1));
+    light.distance = 1;
+	light.color = vec3(GAMMA) * vec3(0.0);
+	return light;
 }
 
 void main()

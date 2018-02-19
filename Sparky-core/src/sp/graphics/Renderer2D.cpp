@@ -65,7 +65,7 @@ namespace sp {
 		void Renderer2D::SetScreenSize(const maths::tvec2<uint>& size)
 		{
 			m_ScreenSize = size;
-			SetCamera(spnew Camera(mat4::Orthographic(-m_ScreenSize.x / 2, m_ScreenSize.x / 2, -m_ScreenSize.y / 2, m_ScreenSize.y / 2, -1.0f, 1.0f)));
+			// SetCamera(spnew Camera(mat4::Orthographic(-m_ScreenSize.x / 2, m_ScreenSize.x / 2, -m_ScreenSize.y / 2, m_ScreenSize.y / 2, -1.0f, 1.0f)));
 		}
 
 		void Renderer2D::Init()

@@ -19,6 +19,8 @@ namespace sp { namespace graphics {
 
 		static void Reload(const String& name);
 		static void Reload(const API::Shader* shader);
+
+		static void ReloadAll();
 	private:
 		ShaderManager() { }
 	};
