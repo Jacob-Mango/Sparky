@@ -183,7 +183,7 @@ namespace sp {
 				std::vector<GLuint> shaders;
 
 				for (auto source : *sources) {
-					shaders.push_back(CompileShader(source.first, source.second.c_str(), program, info));
+					shaders.push_back(CompileShader(source.first, source.second, program, info));
 				}
 
 				for (int z = 0; z < shaders.size(); z++) {
@@ -262,9 +262,11 @@ namespace sp {
 				return "N/A";
 			}
 
-			GLuint GLShader::CompileShader(ShaderType type, const char* source, uint program, GLShaderErrorInfo& info) {
+			GLuint GLShader::CompileShader(ShaderType type, String source, uint program, GLShaderErrorInfo& info) {
+				const char* cstr = source.c_str();
+
 				GLCall(GLuint shader = glCreateShader(TypeToGL(type)));
-				GLCall(glShaderSource(shader, 1, &source, NULL));
+				GLCall(glShaderSource(shader, 1, &cstr, NULL));
 				GLCall(glCompileShader(shader));
 
 				GLint result;
@@ -284,6 +286,10 @@ namespace sp {
 					info.line[info.shader] = lineNumber;
 					info.message[info.shader] += errorMessage;
 					GLCall(glDeleteShader(shader));
+
+					SP_INFO(source);
+
+					SP_ERROR(info.message[info.shader]);
 					return -1;
 				}
 				return shader;

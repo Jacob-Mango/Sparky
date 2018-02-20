@@ -63,7 +63,7 @@ namespace sp { namespace graphics { namespace API {
 
 		inline const ShaderResourceList& GetResources() const override { return m_Resources; }
 	private:
-		static GLuint CompileShader(ShaderType type, const char* source, uint program, GLShaderErrorInfo& info);
+		static GLuint CompileShader(ShaderType type, String source, uint program, GLShaderErrorInfo& info);
 		static uint Compile(std::map<ShaderType, String>* sources, GLShaderErrorInfo& info = GLShaderErrorInfo());
 		static void PreProcess(const String& source, std::map<ShaderType, String>* sources);
 		static void ReadShaderFile(std::vector<String> lines, std::map<ShaderType, String>* sources);

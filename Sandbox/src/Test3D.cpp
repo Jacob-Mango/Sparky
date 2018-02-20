@@ -68,17 +68,11 @@ void Test3D::OnInit(Renderer3D* renderer, Scene* scene)
 	PBRMaterial* castIron = spnew PBRMaterial("CastIron", pbrShader);
 	castIron->SetEnviromentMap(environment);
 
-	PBRMaterial* wornWood = spnew PBRMaterial("WornWood", pbrShader);
-	wornWood->SetEnviromentMap(environment);
-
-	PBRMaterial* gunMetal = spnew PBRMaterial("GunMetal", pbrShader);
-	gunMetal->SetEnviromentMap(environment);
-
 	PBRMaterial* absRed = spnew PBRMaterial("ABSRed", pbrShader);
 	absRed->SetEnviromentMap(environment);
 
 	PBRMaterial* custom = spnew PBRMaterial("Custom", pbrShader);
-	castIron->SetEnviromentMap(environment);
+	custom->SetEnviromentMap(environment);
 
 	Model* sphereModel = spnew Model("/models/Sphere/Sphere.spm");
 
@@ -96,10 +90,7 @@ void Test3D::OnInit(Renderer3D* renderer, Scene* scene)
 		vec4 diffuse(vec3(1.0f, 0.0f, 0.0f), 1.0f);
 
 		PBRMaterialInstance* m = spnew PBRMaterialInstance(absRed);
-		m->SetGloss(roughness);
-		m->SetAlbedo(diffuse);
-		m->SetSpecular(spec);
-		m->UsingNormalMap(false);
+		m->SetMetallic(vec3(roughness, 0.04f, 0.0f));
 
 		Mesh* mesh = spnew Mesh(sphereModel->GetMesh());
 		mesh->SetMaterial(m);
@@ -119,14 +110,10 @@ void Test3D::OnInit(Renderer3D* renderer, Scene* scene)
 		float xx = (x + 1) * spaceX;
 
 		float roughness = (x + 6) / 10.0f;
-		vec3 spec(1.0f);
 		vec4 diffuse(0.0f, 0.0f, 0.0f, 1.0f);
 
 		PBRMaterialInstance* m = spnew PBRMaterialInstance(castIron);
-		m->SetGloss(roughness);
-		m->SetAlbedo(diffuse);
-		m->SetSpecular(spec);
-		m->UsingNormalMap(false);
+		m->SetMetallic(vec3(roughness, 0.1f, 0.0f));
 
 		Mesh* mesh = spnew Mesh(sphereModel->GetMesh());
 		mesh->SetMaterial(m);

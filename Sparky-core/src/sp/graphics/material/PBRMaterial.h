@@ -19,20 +19,17 @@ namespace sp { namespace graphics {
 
 		// PBR Statics
 		void SetAlbedo(const maths::vec4& color);
-		void SetSpecular(const maths::vec3& color);
-		void SetGloss(float value);
+		void SetMetallic(const maths::vec3& color);
 		void UsingNormalMap(bool value);
 
 		// PBR Maps
 		void SetAlbedoMap(API::Texture2D* texture);
-		void SetSpecularMap(API::Texture2D* texture);
+		void SetMetallicMap(API::Texture2D* texture);
 		void SetNormalMap(API::Texture2D* texture);
-		void SetGlossMap(API::Texture2D* texture); // TODO: Grayscale texture
 
 		API::Texture* GetAlbedoMap();
-		API::Texture* GetSpecularMap();
+		API::Texture* GetMetallicMap();
 		API::Texture* GetNormalMap();
-		API::Texture* GetGlossMap();
 	};
 
 	class SP_API PBRMaterialInstance : public MaterialInstance
@@ -45,15 +42,13 @@ namespace sp { namespace graphics {
 
 		// PBR Statics
 		void SetAlbedo(const maths::vec4& color);
-		void SetSpecular(const maths::vec3& color);
-		void SetGloss(float value);
+		void SetMetallic(const maths::vec3& color);
 		void UsingNormalMap(bool value);
 
 		// PBR Maps
 		void SetAlbedoMap(API::Texture2D* texture);
-		void SetSpecularMap(API::Texture2D* texture);
+		void SetMetallicMap(API::Texture2D* texture);
 		void SetNormalMap(API::Texture2D* texture);
-		void SetGlossMap(API::Texture2D* texture); // TODO: Grayscale texture
 	};
 
 } }

@@ -249,7 +249,7 @@ namespace sp {
 			std::vector<API::Texture2D*> textures = m_DeferredBuffer->GetTextures();
 			m_Material->SetTexture("u_Position", textures[0]);
 			m_Material->SetTexture("u_Albedo", textures[1]);
-			m_Material->SetTexture("u_SpecularRoughness", textures[2]);
+			m_Material->SetTexture("u_Metallic", textures[2]);
 			m_Material->SetTexture("u_Normal", textures[3]);
 
 			m_VertexArray->Bind();

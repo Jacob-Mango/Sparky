@@ -46,7 +46,8 @@ namespace sp { namespace graphics { namespace API {
 
 	GLShaderUniformDeclaration::Type GLShaderUniformDeclaration::StringToType(const String& type)
 	{
-		if (type == "int32")		return Type::INT32;
+		if (type == "int32")	return Type::INT32;
+		if (type == "int")		return Type::INT32;
 		if (type == "float")	return Type::FLOAT32;
 		if (type == "vec2")		return Type::VEC2;
 		if (type == "vec3")		return Type::VEC3;

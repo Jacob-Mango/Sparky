@@ -16,33 +16,24 @@ struct Light
 	vec3 color;
     vec3 direction;
 	vec3 position;
-    float distance;
+    int type;
 };
 
 struct Material
 {
 	vec4 albedo;
-	float specular;
+	vec3 normal;
     float metallic;
 	float roughness;
 };
 
-struct Attributes
-{
-	vec3 position;
-	vec3 normal;
-	vec3 binormal;
-	vec3 tangent;
-};
-
 uniform Light u_LightSetup[64];
 
-Attributes g_Attributes;
 Material g_Material;
 
 uniform sampler2D u_Position;
 uniform sampler2D u_Albedo;
-uniform sampler2D u_SpecularRoughness;
+uniform sampler2D u_Metallic;
 uniform sampler2D u_Normal;
 
 uniform samplerCube u_EnvironmentMap;
@@ -50,130 +41,149 @@ uniform sampler2D u_PreintegratedFG;
 
 uniform vec3 u_CameraPosition;
 
-float DistributionGGX(vec3 N, vec3 H, float roughness)
+struct PBRInfo
 {
-    float a = roughness * roughness;
-    float a2 = a * a;
-    float NdotH = max(dot(N, H), 0.0);
-    float NdotH2 = NdotH * NdotH;
+    float NdotL;                  // cos angle between normal and light direction
+    float NdotV;                  // cos angle between normal and view direction
+    float NdotH;                  // cos angle between normal and half vector
+    float LdotH;                  // cos angle between light direction and half vector
+    float VdotH;                  // cos angle between view direction and half vector
+    float perceptualRoughness;    // roughness value, as authored by the model creator (input to shader)
+    float metalness;              // metallic value at the surface
+    vec3 reflectance0;            // full reflectance color (normal incidence angle)
+    vec3 reflectance90;           // reflectance color at grazing angle
+    float alphaRoughness;         // roughness mapped to a more linear change in the roughness (proposed by [2])
+    vec3 diffuseColor;            // color contribution from diffuse lighting
+    vec3 specularColor;           // color contribution from specular lighting
+};
 
-    float nom = a2;
-    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
-    denom = PI * denom * denom;
-
-    return nom / denom;
+vec3 Diffuse(PBRInfo pbrInputs)
+{
+    return pbrInputs.diffuseColor / PI;
 }
 
-float GeometrySchlickGGX(float NdotV, float roughness)
+vec3 IBL(PBRInfo pbrInputs, vec3 n, vec3 reflection)
 {
-    float r = (roughness + 1.0);
-    float k = (r * r) / 8.0;
+    float mipCount = 9.0; 
+    float lod = (pbrInputs.perceptualRoughness * mipCount);
+    vec3 brdf = vec3(0); // texture(u_PreintegratedFG, vec2(pbrInputs.NdotV, 1.0 - pbrInputs.perceptualRoughness)).rgb;
+    vec3 diffuseLight = vec3(0.2, 0.3, 0.8); // SRGBtoLINEAR(textureCube(u_EnvironmentMap, n)).rgb;
 
-    float nom = NdotV;
-    float denom = NdotV * (1.0 - k) + k;
+    vec3 specularLight = vec3(0.04); //textureLod(u_EnvironmentMap, reflection, lod).rgb;
 
-    return nom / denom;
+    vec3 diffuse = diffuseLight * pbrInputs.diffuseColor;
+    vec3 specular = specularLight * (pbrInputs.specularColor * brdf.x + brdf.y);
+
+    return diffuse + specular;
 }
 
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
-{
-    float NdotV = max(dot(N, V), 0.0);
-    float NdotL = max(dot(N, L), 0.0);
-    float ggx2 = GeometrySchlickGGX(NdotV, roughness);
-    float ggx1 = GeometrySchlickGGX(NdotL, roughness);
 
-    return ggx1 * ggx2;
+vec3 SpecularReflection(PBRInfo pbrInputs)
+{
+    return pbrInputs.reflectance0 + (pbrInputs.reflectance90 - pbrInputs.reflectance0) * pow(clamp(1.0 - pbrInputs.VdotH, 0.0, 1.0), 5.0);
 }
 
-vec3 FresnelSchlick(float cosTheta, vec3 F0)
+float GeometricOcclusion(PBRInfo pbrInputs)
 {
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+    float NdotL = pbrInputs.NdotL;
+    float NdotV = pbrInputs.NdotV;
+    float r = pbrInputs.alphaRoughness;
+
+    float attenuationL = 2.0 * NdotL / (NdotL + sqrt(r * r + (1.0 - r * r) * (NdotL * NdotL)));
+    float attenuationV = 2.0 * NdotV / (NdotV + sqrt(r * r + (1.0 - r * r) * (NdotV * NdotV)));
+    return attenuationL * attenuationV;
 }
 
-vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+float MicrofacetDistribution(PBRInfo pbrInputs)
 {
-    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
-}   
-
-vec3 Radiance(Light light, vec3 N, vec3 V, vec3 F0) 
-{
-    vec3 L = light.direction;
-    vec3 H = normalize(V + L);
-    float dist = light.distance + 0.01;
-    float attenuation = 1.0 / dist;
-    vec3 radiance = light.color * attenuation;
-
-    float NDF = DistributionGGX(N, H, g_Material.roughness);   
-    float G = GeometrySmith(N, V, L, g_Material.roughness);    
-    vec3 F = FresnelSchlick(max(dot(H, V), 0.0), F0);        
-        
-    vec3 nominator = NDF * G * F;
-    float denominator = 4 * max(dot(V, N), 0.0) * max(dot(L, N), 0.0) + 0.001;
-    vec3 specular = nominator / denominator;
-        
-    vec3 kS = F;
-    vec3 kD = vec3(1.0) - kS;
-    kD *= 1.0 - g_Material.metallic;
-
-    float NdotL = max(dot(N, L), 0.0);        
-    return ((kD * g_Material.albedo.rgb / PI + specular) * radiance * NdotL);
-}
-
-Light TestLight() 
-{
-	Light light;	
-	light.position = vec3(0, 20, -80);
-	light.direction = vec3(0, 0, 0);
-    light.distance = 1;
-	light.color = vec3(1000.0);
-	return light;
-}
-
-Light SunLight() 
-{
-	Light light;
-	light.position = vec3(0, 0, 0);	
-	light.direction = normalize(vec3(0.2, 1, 0.1));
-    light.distance = 1;
-	light.color = vec3(GAMMA) * vec3(0.0);
-	return light;
+    float roughnessSq = pbrInputs.alphaRoughness * pbrInputs.alphaRoughness;
+    float f = (pbrInputs.NdotH * roughnessSq - pbrInputs.NdotH) * pbrInputs.NdotH + 1.0;
+    return roughnessSq / (PI * f * f);
 }
 
 void main()
 {
-	g_Attributes.position = texture(u_Position, fs_in.uv).xyz;
-	g_Attributes.normal = texture(u_Normal, fs_in.uv).xyz;
+	vec3 position = texture(u_Position, fs_in.uv).xyz;
 
-	vec4 specRoughness = texture(u_SpecularRoughness, fs_in.uv);
+	vec4 metallic = texture(u_Metallic, fs_in.uv);
 	g_Material.albedo = texture(u_Albedo, fs_in.uv);
-	g_Material.specular = specRoughness.r;
-	g_Material.roughness = specRoughness.g;
-    g_Material.metallic = 1 - specRoughness.b;
+	g_Material.normal = texture(u_Normal, fs_in.uv).xyz;
+	g_Material.roughness = metallic.r;
+    g_Material.metallic = metallic.g;
+    
+    float perceptualRoughness = g_Material.roughness;
+    float alphaRoughness = perceptualRoughness * perceptualRoughness;
 
-    vec3 N = normalize(g_Attributes.normal);
-    vec3 V = normalize(u_CameraPosition - g_Attributes.position);
-    vec3 R = reflect(-V, N); 
+    vec3 f0 = vec3(0.04);
+    vec3 diffuseColor = g_Material.albedo.rgb * (vec3(1.0) - f0);
+    diffuseColor *= 1.0 - g_Material.metallic;
 
-    vec3 F0 = vec3(0.04); 
-    F0 = mix(F0, g_Material.albedo.rgb, vec3(g_Material.metallic));
+    vec3 specularColor = mix(f0, g_Material.albedo.rgb, g_Material.metallic);
+    float reflectance = max(max(specularColor.r, specularColor.g), specularColor.b);
+    float reflectance90 = clamp(reflectance * 25.0, 0.0, 1.0);
+    vec3 specularEnvironmentR0 = specularColor.rgb;
+    vec3 specularEnvironmentR90 = vec3(1.0, 1.0, 1.0) * reflectance90;
 
-    vec3 Lo = vec3(0.0);
+    vec3 n = g_Material.normal;
+    vec3 v = normalize(u_CameraPosition - position);
+    vec3 reflection = -normalize(reflect(v, n));
+
     Light lights[2];
-    lights[0] = SunLight();
-    lights[1] = TestLight();
- 
-    for(int i = 0; i < 2; i++) 
-    {
-        if (lights[i].direction == vec3(0)) {
-            lights[i].direction = normalize(lights[i].position - g_Attributes.position);
-            lights[i].distance = length(lights[i].position - g_Attributes.position);
+    lights[0] = Light(vec3(0.0001), vec3(0.5, 1, 0), vec3(0), 1);
+    lights[1] = Light(vec3(100), vec3(0), vec3(0, 20, -80), 0);
+
+    PBRInfo pbrInputs;
+
+    vec3 color = vec3(0.0);
+    for (int i = 0; i < 2; i++) {
+        Light light = lights[i];
+
+        if (light.type == 0) {
+            light.direction = normalize(light.position - position);
+        } else if (light.type == 1) {
+            light.position = position;
         }
 
-        Lo += Radiance(lights[i], N, V, F0); 
+        vec3 l = normalize(light.direction);
+        vec3 h = normalize(l + v);
+
+        float NdotL = clamp(dot(n, l), 0.001, 1.0);
+        float NdotV = abs(dot(n, v)) + 0.001;
+        float NdotH = clamp(dot(n, h), 0.0, 1.0);
+        float LdotH = clamp(dot(l, h), 0.0, 1.0);
+        float VdotH = clamp(dot(v, h), 0.0, 1.0);
+
+        pbrInputs = PBRInfo(
+            NdotL,
+            NdotV,
+            NdotH,
+            LdotH,
+            VdotH,
+            perceptualRoughness,
+            g_Material.metallic,
+            specularEnvironmentR0,
+            specularEnvironmentR90,
+            alphaRoughness,
+            diffuseColor,
+            specularColor
+        ); 
+
+        vec3 F = SpecularReflection(pbrInputs);
+        float G = GeometricOcclusion(pbrInputs);
+        float D = MicrofacetDistribution(pbrInputs);
+
+        vec3 diffuseContrib = ((1.0 - F) * Diffuse(pbrInputs)) * light.color;
+        vec3 specContrib = (F * G * D / (4.0 * NdotL * NdotV)) * light.color;
+
+        float dist = length(light.position - position) + 0.001;
+        float attenuation = 1.0 / dist;
+
+        color += NdotL * (diffuseContrib + specContrib) * attenuation;
     }
-    
-    vec3 color = Lo;
-    color = color / (color + vec3(1.0));
+
+    color += IBL(pbrInputs, n, reflection);
+
+    color = vec3(color / (color + vec3(1.0)));
     color = pow(color, vec3(1.0 / GAMMA)); 
 
     out_Color = vec4(color, g_Material.albedo.a);

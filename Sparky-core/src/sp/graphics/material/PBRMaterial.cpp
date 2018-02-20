@@ -16,16 +16,11 @@ namespace sp { namespace graphics {
 	PBRMaterial::PBRMaterial(String name, API::Shader* shader)
 		: Material(name, shader)
 	{
-		SetUniform("u_UsingNormalMap", 0.0f);
-
 		SetUniform("u_UsingAlbedoMap", 0.0f);
 		SetUniform("u_AlbedoColor", maths::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
-		SetUniform("u_SpecularColor", maths::vec3(1.0f, 1.0f, 1.0f));
-		SetUniform("u_UsingSpecularMap", 0.0f);
-
-		SetUniform("u_GlossColor", 0.8f);
-		SetUniform("u_UsingGlossMap", 0.0f);
+		SetUniform("u_MetallicColor", maths::vec3(1.0f, 1.0f, 1.0f));
+		SetUniform("u_UsingMetallicMap", 0.0f);
 
 		SetUniform("u_UsingNormalMap", 0.0f);
 
@@ -34,8 +29,7 @@ namespace sp { namespace graphics {
 		tp.filter = TextureFilter::LINEAR;
 
 		SetAlbedoMap(Texture2D::CreateFromFile("/materials/" + name + "/" + name + "_Albedo.tga", tp));
-		SetSpecularMap(Texture2D::CreateFromFile("/materials/" + name + "/" + name + "_Specular.tga", tp));
-		SetGlossMap(Texture2D::CreateFromFile("/materials/" + name + "/" + name + "_Gloss.tga", tp));
+		SetMetallicMap(Texture2D::CreateFromFile("/materials/" + name + "/" + name + "_Metallic.tga", tp));
 		SetNormalMap(Texture2D::CreateFromFile("/materials/" + name + "/" + name + "_Normal.tga", tp));
 	}
 
@@ -55,16 +49,10 @@ namespace sp { namespace graphics {
 		SetUniform("u_UsingAlbedoMap", 0.0f);
 	}
 
-	void PBRMaterial::SetSpecular(const maths::vec3& color)
+	void PBRMaterial::SetMetallic(const maths::vec3& color)
 	{
-		SetUniform("u_SpecularColor", color);
-		SetUniform("u_UsingSpecularMap", 0.0f);
-	}
-
-	void PBRMaterial::SetGloss(float value)
-	{
-		SetUniform("u_GlossColor", value);
-		SetUniform("u_UsingGlossMap", 0.0f);
+		SetUniform("u_MetallicColor", color);
+		SetUniform("u_UsingMetallicMap", 0.0f);
 	}
 
 	void PBRMaterial::UsingNormalMap(bool value)
@@ -78,22 +66,16 @@ namespace sp { namespace graphics {
 		SetUniform("u_UsingAlbedoMap", 1.0f);
 	}
 
-	void PBRMaterial::SetSpecularMap(API::Texture2D* texture)
+	void PBRMaterial::SetMetallicMap(API::Texture2D* texture)
 	{
-		SetTexture("u_SpecularMap", texture);
-		SetUniform("u_UsingSpecularMap", 1.0f);
+		SetTexture("u_MetallicMap", texture);
+		SetUniform("u_UsingMetallicMap", 1.0f);
 	}
 
 	void PBRMaterial::SetNormalMap(API::Texture2D* texture)
 	{
 		SetTexture("u_NormalMap", texture);
 		SetUniform("u_UsingNormalMap", 1.0f);
-	}
-
-	void PBRMaterial::SetGlossMap(API::Texture2D* texture)
-	{
-		SetTexture("u_GlossMap", texture);
-		SetUniform("u_UsingGlossMap", 1.0f);
 	}
 
 	API::Texture* PBRMaterial::GetAlbedoMap()
@@ -104,9 +86,9 @@ namespace sp { namespace graphics {
 		return m_Textures.size() > slot ? m_Textures[slot] : nullptr;
 	}
 
-	API::Texture* PBRMaterial::GetSpecularMap()
+	API::Texture* PBRMaterial::GetMetallicMap()
 	{
-		ShaderResourceDeclaration* declaration = FindResourceDeclaration("u_SpecularMap");
+		ShaderResourceDeclaration* declaration = FindResourceDeclaration("u_MetallicMap");
 		SP_ASSERT(declaration);
 		uint slot = declaration->GetRegister();
 		return m_Textures.size() > slot ? m_Textures[slot] : nullptr;
@@ -115,14 +97,6 @@ namespace sp { namespace graphics {
 	API::Texture* PBRMaterial::GetNormalMap()
 	{
 		ShaderResourceDeclaration* declaration = FindResourceDeclaration("u_NormalMap");
-		SP_ASSERT(declaration);
-		uint slot = declaration->GetRegister();
-		return m_Textures.size() > slot ? m_Textures[slot] : nullptr;
-	}
-
-	API::Texture* PBRMaterial::GetGlossMap()
-	{
-		ShaderResourceDeclaration* declaration = FindResourceDeclaration("u_GlossMap");
 		SP_ASSERT(declaration);
 		uint slot = declaration->GetRegister();
 		return m_Textures.size() > slot ? m_Textures[slot] : nullptr;
@@ -149,16 +123,10 @@ namespace sp { namespace graphics {
 		SetUniform("u_UsingAlbedoMap", 0.0f);
 	}
 
-	void PBRMaterialInstance::SetSpecular(const maths::vec3& color)
+	void PBRMaterialInstance::SetMetallic(const maths::vec3& color)
 	{
-		SetUniform("u_SpecularColor", color);
-		SetUniform("u_UsingSpecularMap", 0.0f);
-	}
-
-	void PBRMaterialInstance::SetGloss(float value)
-	{
-		SetUniform("u_GlossColor", value);
-		SetUniform("u_UsingGlossMap", 0.0f);
+		SetUniform("u_MetallicColor", color);
+		SetUniform("u_UsingMetallicMap", 0.0f);
 	}
 
 	void PBRMaterialInstance::UsingNormalMap(bool value)
@@ -172,10 +140,10 @@ namespace sp { namespace graphics {
 		SetUniform("u_UsingAlbedoMap", 1.0f);
 	}
 
-	void PBRMaterialInstance::SetSpecularMap(API::Texture2D* texture)
+	void PBRMaterialInstance::SetMetallicMap(API::Texture2D* texture)
 	{
-		SetTexture("u_SpecularMap", texture);
-		SetUniform("u_UsingSpecularMap", 1.0f);
+		SetTexture("u_MetallicMap", texture);
+		SetUniform("u_UsingMetallicMap", 1.0f);
 	}
 
 	void PBRMaterialInstance::SetNormalMap(API::Texture2D* texture)
@@ -183,12 +151,5 @@ namespace sp { namespace graphics {
 		SetTexture("u_NormalMap", texture);
 		SetUniform("u_UsingNormalMap", 1.0f);
 	}
-
-	void PBRMaterialInstance::SetGlossMap(API::Texture2D* texture)
-	{
-		SetUniform("u_GlossMap", texture);
-		SetUniform("u_UsingGlossMap", 1.0f);
-	}
-
 
 } }
