@@ -110,6 +110,23 @@ namespace sp {
 			m_VertexArray = m_Mesh->m_VertexArray;
 
 			m_PreintegratedFG = API::Texture2D::CreateFromFile("PreintegratedFG", "engine/PreintegratedFG.bmp");
+			
+			String environmentFiles[11] =
+			{
+				"/materials/cubemap/CubeMap0.tga",
+				"/materials/cubemap/CubeMap1.tga",
+				"/materials/cubemap/CubeMap2.tga",
+				"/materials/cubemap/CubeMap3.tga",
+				"/materials/cubemap/CubeMap4.tga",
+				"/materials/cubemap/CubeMap5.tga",
+				"/materials/cubemap/CubeMap6.tga",
+				"/materials/cubemap/CubeMap7.tga",
+				"/materials/cubemap/CubeMap8.tga",
+				"/materials/cubemap/CubeMap9.tga",
+				"/materials/cubemap/CubeMap10.tga"
+			};
+
+			m_Environment = API::TextureCube::CreateFromVCross(environmentFiles, 11);
 		}
 
 		void DeferredRenderer::Begin()
@@ -242,7 +259,7 @@ namespace sp {
 			m_Material->SetUniform("u_ProjectionMatrix", maths::mat4::Orthographic(-aspectX, aspectX, aspectY, -aspectY, -10.0f, 10.0f));
 			m_Material->SetUniform("u_ModelMatrix", maths::mat4::Scale(vec3(aspectX, -aspectY)));
 			m_Material->SetTexture("u_PreintegratedFG", m_PreintegratedFG);
-			m_Material->SetTexture("u_EnvironmentMap", m_PreintegratedFG);
+			m_Material->SetTexture("u_EnvironmentMap", m_Environment);
 
 			
 

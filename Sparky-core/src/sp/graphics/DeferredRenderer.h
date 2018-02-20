@@ -36,6 +36,8 @@ namespace sp { namespace graphics {
 		API::FrameBuffer2D* m_DeferredBuffer;
 
 		uint m_MaxLights;
+
+		API::TextureCube* m_Environment;
 	public:
 		DeferredRenderer(uint width, uint height);
 		DeferredRenderer();

@@ -21,6 +21,8 @@ namespace sp { namespace graphics {
 		std::vector<uint> m_PSSystemUniformBufferOffsets;
 
 		uint m_MaxLights;
+
+		API::TextureCube* m_Environment;
 	public:
 		ForwardRenderer();
 		ForwardRenderer(uint width, uint height);

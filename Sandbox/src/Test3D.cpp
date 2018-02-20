@@ -45,34 +45,13 @@ void Test3D::OnInit(Renderer3D* renderer, Scene* scene)
 	scene->SetCamera(m_FPSCamera);
 
 	Timer timer;
-	String environmentFiles[11] =
-	{
-		"/materials/cubemap/CubeMap0.tga",
-		"/materials/cubemap/CubeMap1.tga",
-		"/materials/cubemap/CubeMap2.tga",
-		"/materials/cubemap/CubeMap3.tga",
-		"/materials/cubemap/CubeMap4.tga",
-		"/materials/cubemap/CubeMap5.tga",
-		"/materials/cubemap/CubeMap6.tga",
-		"/materials/cubemap/CubeMap7.tga",
-		"/materials/cubemap/CubeMap8.tga",
-		"/materials/cubemap/CubeMap9.tga",
-		"/materials/cubemap/CubeMap10.tga"
-	};
-
-	TextureCube* environment = TextureCube::CreateFromVCross(environmentFiles, 11);
 
 	Shader* pbrShader = Shader::CreateFromFile("Default", String("/shaders/Default/Default.shader"));
 	ShaderManager::Add(pbrShader);
 
 	PBRMaterial* castIron = spnew PBRMaterial("CastIron", pbrShader);
-	castIron->SetEnviromentMap(environment);
-
 	PBRMaterial* absRed = spnew PBRMaterial("ABSRed", pbrShader);
-	absRed->SetEnviromentMap(environment);
-
 	PBRMaterial* custom = spnew PBRMaterial("Custom", pbrShader);
-	custom->SetEnviromentMap(environment);
 
 	Model* sphereModel = spnew Model("/models/Sphere/Sphere.spm");
 
