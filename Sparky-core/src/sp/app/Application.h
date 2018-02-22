@@ -43,7 +43,7 @@ namespace sp {
 		Application(const String& name);
 
 		/// CLIENT
-		Application(const String& name, WindowProperties* properties, graphics::API::RenderAPI api = graphics::API::RenderAPI::OPENGL, graphics::API::RendererType rendererType = graphics::API::RendererType::FORWARD);
+		Application(const String& name, WindowProperties* properties, graphics::API::RenderAPI api = graphics::API::RenderAPI::OPENGL);
 		virtual ~Application();
 
 		virtual void Init();

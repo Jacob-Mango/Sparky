@@ -2,8 +2,6 @@
 #include "/shaders/Default/Default.vert"
 #shader end
 
-#shader geometry
-#include "/shaders/Default/Default.geo"
+#shader fragment
+#include "/shaders/GBuffer.frag"
 #shader end
-
-#include "/shaders/Determinate/Determinate.shader"

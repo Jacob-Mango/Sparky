@@ -13,7 +13,10 @@ namespace sp { namespace graphics {
 		static API::Texture2D* s_PreintegratedFG;
 	public:
 		PBRMaterial(String name, API::Shader* shader);
+		PBRMaterial(String name, String shader = DEFAULT_SHADER_NAME);
 		~PBRMaterial();
+		
+		void Init();
 
 		void SetEnviromentMap(API::TextureCube* texture);
 

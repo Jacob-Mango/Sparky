@@ -17,12 +17,11 @@ namespace sp {
 		s_Instance = this;
 	}
 
-	Application::Application(const String& name, WindowProperties* properties, graphics::API::RenderAPI api, graphics::API::RendererType rendererType)
+	Application::Application(const String& name, WindowProperties* properties, graphics::API::RenderAPI api)
 		: m_Name(name), m_Properties(properties), m_Frametime(0.0f)
 	{
 		s_Instance = this;
 		graphics::API::Context::SetRenderAPI(api);
-		graphics::API::Context::SetRendererType(rendererType);
 	}
 
 	Application::~Application()

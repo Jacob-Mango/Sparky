@@ -5,7 +5,7 @@ layout(location = 1) out vec4 gAlebdo;
 layout(location = 2) out vec4 gMetallic;
 layout(location = 3) out vec4 gNormal;
 
-in FSDATA
+in DataBlock
 {
 	vec4 position;
 	vec3 normal;
@@ -59,12 +59,12 @@ vec3 GammaCorrectTextureRGB(sampler2D tex, vec2 uv)
 
 vec4 GetAlbedoMap()
 {
-	return (1.0 - u_UsingAlbedoMap) * u_AlbedoColor + u_UsingAlbedoMap * GammaCorrectTexture(u_AlbedoMap, fs_in.uv);
+	return ((1.0 - u_UsingAlbedoMap) * u_AlbedoColor) + (u_UsingAlbedoMap * GammaCorrectTexture(u_AlbedoMap, fs_in.uv));
 }
 
 vec3 GetMetallicMap()
 {
-	return (1.0 - u_UsingMetallicMap) * u_MetallicColor + u_UsingMetallicMap * GammaCorrectTextureRGB(u_MetallicMap, fs_in.uv);
+	return ((1.0 - u_UsingMetallicMap) * u_MetallicColor) + (u_UsingMetallicMap * GammaCorrectTextureRGB(u_MetallicMap, fs_in.uv));
 }
 
 vec3 GetNormal()

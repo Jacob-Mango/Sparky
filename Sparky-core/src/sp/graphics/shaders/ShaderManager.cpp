@@ -20,6 +20,7 @@ namespace sp {
 				if (shader->GetName() == name)
 					return shader;
 			}
+			SP_WARN("Could not find '", name, "' shader.");
 			return nullptr;
 		}
 

@@ -3,5 +3,5 @@
 #shader end
 
 #shader fragment
-#include "/shaders/PostFX/Test/Test.frag"
+#include "/shaders/PostFX/SSAO/SSAO.frag"
 #shader end

@@ -10,7 +10,6 @@ namespace sp { namespace graphics { namespace API {
 
 	Context* Context::s_Context = nullptr;
 	RenderAPI Context::s_RenderAPI = RenderAPI::NONE;
-	RendererType Context::s_RendererType = RendererType::FORWARD;
 
 	void Context::Create(WindowProperties* properties, void* deviceContext)
 	{

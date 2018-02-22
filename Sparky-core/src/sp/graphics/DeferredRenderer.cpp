@@ -77,7 +77,7 @@ namespace sp {
 
 			m_MaxLights = 64;
 
-			m_Shader = API::Shader::CreateFromFile("Deferred", String("/shaders/PBR_D/PBR_D.shader"));
+			m_Shader = API::Shader::CreateFromFile("Deferred", String("/shaders/PBR/PBR.shader"));
 			m_Material = spnew Material("Deferred", m_Shader);
 
 			ShaderManager::Add(m_Shader);
@@ -143,6 +143,8 @@ namespace sp {
 			memcpy(m_VSSystemUniformBuffer + m_VSSystemUniformBufferOffsets[VSSystemUniformIndex_ViewMatrix], &camera->GetViewMatrix(), sizeof(mat4));
 
 			m_Material->SetUniform("u_CameraPosition", camera->GetPosition());
+
+			m_MainCamera = camera;
 		}
 
 		void DeferredRenderer::Submit(const RenderCommand& command)
@@ -209,6 +211,12 @@ namespace sp {
 
 		void DeferredRenderer::EndScene()
 		{
+			for (uint i = 0; i < m_CommandQueue.size(); i++)
+			{
+				RenderCommand& command = m_CommandQueue[i];
+				
+
+			}
 		}
 
 		void DeferredRenderer::End()
@@ -260,8 +268,6 @@ namespace sp {
 			m_Material->SetUniform("u_ModelMatrix", maths::mat4::Scale(vec3(aspectX, -aspectY)));
 			m_Material->SetTexture("u_PreintegratedFG", m_PreintegratedFG);
 			m_Material->SetTexture("u_EnvironmentMap", m_Environment);
-
-			
 
 			std::vector<API::Texture2D*> textures = m_DeferredBuffer->GetTextures();
 			m_Material->SetTexture("u_Position", textures[0]);

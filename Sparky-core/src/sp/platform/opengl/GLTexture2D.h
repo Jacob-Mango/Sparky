@@ -30,6 +30,9 @@ namespace sp { namespace graphics { namespace API {
 
 		inline const String& GetName() const { return m_Name; }
 		inline const String& GetFilepath() const { return m_FileName; }
+
+		inline const bool IsMultiSampled() const { return m_Parameters.samples != 1; }
+
 	private:
 		uint Load();
 	public:

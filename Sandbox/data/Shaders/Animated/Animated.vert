@@ -5,10 +5,15 @@ layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 uv;
 layout(location = 3) in vec3 binormal;
 layout(location = 4) in vec3 tangent;
+layout(location = 5) in vec4 jointWeights;
+layout(location = 6) in vec4 jointIndices;
+
+#define MAX_JOINTS 64
 
 uniform mat4 sys_ProjectionMatrix;
 uniform mat4 sys_ViewMatrix;
 uniform mat4 sys_ModelMatrix;
+uniform mat4 sys_JointMatrix[MAX_JOINTS];
 
 out DataBlock
 {
@@ -21,13 +26,21 @@ out DataBlock
 
 void main()
 {
+	mat4 boneTransform = mat4(0.0);
+ 
+	boneTransform += sys_JointMatrix[int(jointIndices.x)] * jointWeights.x;
+	boneTransform += sys_JointMatrix[int(jointIndices.y)] * jointWeights.y;
+	boneTransform += sys_JointMatrix[int(jointIndices.z)] * jointWeights.z;
+	boneTransform += sys_JointMatrix[int(jointIndices.w)] * jointWeights.w;
+
 	mat4 model = sys_ModelMatrix;
-	vec4 transformedPos = model * vec4(position.xyz, 1.0);
+	mat4 transformedMat = model * boneTransform;
+	vec4 transformedPos = transformedMat * vec4(position.xyz, 1.0);
 
 	gl_Position = sys_ProjectionMatrix * sys_ViewMatrix * transformedPos;
 
 	vs_out.position = transformedPos;
-	vs_out.normal = normalize(vec3(model * vec4(normal, 0)));
+	vs_out.normal = normalize(vec3(transformedMat * vec4(normal, 0)));
 	vs_out.binormal = normalize(vec3(model * vec4(binormal, 0)));
 	vs_out.tangent = normalize(vec3(model * vec4(tangent, 0)));
 	vs_out.uv = uv;

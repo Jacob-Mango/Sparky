@@ -14,6 +14,8 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
+#define DEFAULT_SHADER_NAME "Default"
+
 namespace sp { namespace graphics {
 
 	class SP_API Material
@@ -44,6 +46,7 @@ namespace sp { namespace graphics {
 		int m_RenderFlags;
 	public:
 		Material(String name, API::Shader* shader);
+		Material(String name, String shader = DEFAULT_SHADER_NAME);
 		~Material();
 
 		void Bind();

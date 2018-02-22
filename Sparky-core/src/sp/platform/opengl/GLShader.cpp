@@ -88,6 +88,7 @@ namespace sp {
 				ReadShaderFile(lines, sources);
 			}
 
+			// NEED TO MAKE THIS MORE ABSTRACT AND PRETTY AND EASIER TO READ AND OTHER STUFF!!!
 			void GLShader::ReadShaderFile(std::vector<String> lines, std::map<ShaderType, String>* shaders) {
 				for (uint i = 0; i < lines.size(); i++)
 				{
@@ -158,10 +159,6 @@ namespace sp {
 							if (j != std::string::npos)
 								def.erase(j, rem.length());
 							def = StringReplace(def, '\"');
-
-							if (def != graphics::API::Context::GetRendererString()) {
-								IGNORE_LINES = true;
-							}
 
 							if (def == "0") {
 								IGNORE_LINES = true;
@@ -602,8 +599,11 @@ namespace sp {
 			{
 				Bind();
 				SP_ASSERT(m_UniformBuffers.size() > slot);
-				ShaderUniformBufferDeclaration* declaration = m_UniformBuffers[type][slot];
-				ResolveAndSetUniforms(declaration, data, size);
+				if (m_UniformBuffers[type].size() > 0) {
+					ShaderUniformBufferDeclaration* declaration = m_UniformBuffers[type][slot];
+					if (declaration != nullptr)
+						ResolveAndSetUniforms(declaration, data, size);
+				}
 			}
 
 			void GLShader::SetUserUniformBuffer(ShaderType type, byte* data, uint size)

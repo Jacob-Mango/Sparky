@@ -1,6 +1,7 @@
 #version 330 core
 
-layout(location = 0) out vec4 out_Color;
+layout(location = 0) out vec4 out_Screen;
+layout(location = 1) out vec4 out_Normal;
 
 in DATA
 {
@@ -10,7 +11,7 @@ in DATA
 
 uniform sampler2D u_Screen;
 
-const float exposure = 1;
+const float exposure = 0.1;
 
 void main()
 {
@@ -18,5 +19,5 @@ void main()
 
 	vec3 result = vec3(1.0) - exp(-screen * exposure);
 
-    out_Color = vec4(result.r, result.g, result.b, 1.0);
+    out_Screen = vec4(result.r, result.g, result.b, 1.0);
 }

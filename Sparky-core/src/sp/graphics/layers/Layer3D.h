@@ -19,7 +19,7 @@ namespace sp { namespace graphics {
 		scene::Scene* m_Scene;
 		Renderer3D* m_Renderer;
 
-		PostEffects* m_PostEffects;
+		postfx::PostEffects* m_PostEffects;
 	public:
 		Layer3D(scene::Scene* scene);
 		~Layer3D();

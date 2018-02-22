@@ -5,14 +5,12 @@ layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 uv;
 layout(location = 3) in vec3 binormal;
 layout(location = 4) in vec3 tangent;
-layout(location = 5) in vec4 jointWeights;
-layout(location = 6) in vec4 jointIndices;
 
 uniform mat4 sys_ProjectionMatrix;
 uniform mat4 sys_ViewMatrix;
 uniform mat4 sys_ModelMatrix;
 
-out VSDATA
+out DataBlock
 {
 	vec4 position;
 	vec3 normal;
@@ -37,17 +35,12 @@ float generateHeight() {
 
 void main()
 {
-	vec4 pos = sys_ModelMatrix * vec4(position.x, generateHeight(), position.z, 1.0);
-	vs_out.position = pos;
+	vec4 pos = sys_ModelMatrix * vec4(position.x, position.y + generateHeight(), position.z, 1.0);
 	gl_Position = sys_ProjectionMatrix * sys_ViewMatrix * pos;
-	
-	vs_out.normal = normal;
-	vs_out.binormal = binormal;
-	vs_out.tangent = tangent;
 
+	vs_out.position = pos;
 	vs_out.normal = normalize(vec3(sys_ModelMatrix * vec4(normal, 0)));
 	vs_out.binormal = normalize(vec3(sys_ModelMatrix * vec4(binormal, 0)));
 	vs_out.tangent = normalize(vec3(sys_ModelMatrix * vec4(tangent, 0)));
-
 	vs_out.uv = uv + vec2(u_Time * 0.1, 0);
 }

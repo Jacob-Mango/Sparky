@@ -58,7 +58,7 @@ namespace sp {
 			const maths::mat4* m_TransformationBack;
 			const Mask* m_Mask;
 			RenderTarget m_Target;
-			PostEffects* m_PostEffects;
+			postfx::PostEffects* m_PostEffects;
 			bool m_PostEffectsEnabled;
 
 			API::Shader* m_Shader;
@@ -111,7 +111,7 @@ namespace sp {
 			inline void SetMask(const Mask* mask) { m_Mask = mask; }
 			inline void SetPostEffects(bool enabled) { m_PostEffectsEnabled = enabled; }
 			inline bool GetPostEffects() const { return m_PostEffectsEnabled; }
-			inline void AddPostEffectsPass(PostEffectsPass* pass) { m_PostEffects->Push(pass); }
+			inline void AddPostEffectsPass(postfx::PostEffectsPass* pass) { m_PostEffects->Push(pass); }
 
 			void SetScreenSize(const maths::tvec2<uint>& size);
 			void SetViewportSize(const maths::tvec2<uint>& size);

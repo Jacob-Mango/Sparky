@@ -8,23 +8,27 @@
 #include "sp/graphics/API/IndexBuffer.h"
 #include "PostEffectsPass.h"
 
-namespace sp { namespace graphics {
+namespace sp {
+	namespace graphics {
+		namespace postfx {
 
-	// The Post Effects pipeline
-	class SP_API PostEffects
-	{
-	private:
-		std::vector<PostEffectsPass*> m_Passes;
+			class SP_API PostEffects
+			{
+			private:
+				std::vector<PostEffectsPass*> m_Passes;
 
-		API::VertexArray* m_VertexArray;
-		API::IndexBuffer* m_IndexBuffer;
-	public:
-		PostEffects();
-		~PostEffects();
-		void Push(PostEffectsPass* pass);
-		void Pop();
+				API::VertexArray* m_VertexArray;
+				API::IndexBuffer* m_IndexBuffer;
+			public:
+				PostEffects();
+				~PostEffects();
+				void Push(PostEffectsPass* pass);
+				void Pop();
 
-		void Render(API::Framebuffer* source);
-	};
+				void RenderPass(API::Framebuffer* source, PostEffectsPass* pass);
 
-} }
+				void Render(API::Framebuffer* source);
+			};
+		}
+	}
+}

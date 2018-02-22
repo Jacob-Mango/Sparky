@@ -10,7 +10,7 @@ class Game : public Application
 {
 public:
 	Game()
-		: Application("Sandbox", spnew WindowProperties { 1280, 720, false, false }, API::RenderAPI::OPENGL, API::RendererType::DEFERRED)
+		: Application("Sandbox", spnew WindowProperties { 1280, 720, false, false }, API::RenderAPI::OPENGL)
 	{
 	}
 

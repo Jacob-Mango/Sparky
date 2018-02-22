@@ -51,6 +51,7 @@ namespace sp { namespace graphics { namespace API {
 		TextureWrap wrap;
 		TextureType type;
 		bool mipmap;
+		int16 samples;
 
 		TextureParameters()
 		{
@@ -60,18 +61,18 @@ namespace sp { namespace graphics { namespace API {
 			type = TextureType::UNSIGNED_BYTE;
 		}
 
-		TextureParameters(TextureFormat format, TextureFilter filter, TextureWrap wrap, TextureType type, bool mipmap = true)
-			: format(format), filter(filter), wrap(wrap), type(type), mipmap(mipmap)
+		TextureParameters(TextureFormat format, TextureFilter filter, TextureWrap wrap, TextureType type, bool mipmap = true, int16 samples = 0)
+			: format(format), filter(filter), wrap(wrap), type(type), mipmap(mipmap), samples(samples)
 		{
 		}
 
 		TextureParameters(TextureFormat format, TextureFilter filter, TextureWrap wrap)
-			: format(format), filter(filter), wrap(wrap), type(TextureType::UNSIGNED_BYTE)
+			: TextureParameters(format, filter, wrap, TextureType::UNSIGNED_BYTE)
 		{
 		}
 
 		TextureParameters(TextureFilter filter)
-			: format(TextureFormat::RGBA), filter(filter), wrap(TextureWrap::CLAMP)
+			: TextureParameters(TextureFormat::RGBA, filter, TextureWrap::CLAMP)
 		{
 		}
 

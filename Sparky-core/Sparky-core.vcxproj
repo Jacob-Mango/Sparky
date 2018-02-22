@@ -334,6 +334,9 @@ xcopy /f /y $"(SolutionDir)Dependencies\OpenAL\bin\x86\OpenAL32.dll" "$(Solution
     <ClCompile Include="src\sp\graphics\material\MaterialManager.cpp" />
     <ClCompile Include="src\sp\graphics\Model.cpp" />
     <ClCompile Include="src\sp\graphics\material\PBRMaterial.cpp" />
+    <ClCompile Include="src\sp\graphics\postfx\effects\FXAAPostEffect.cpp" />
+    <ClCompile Include="src\sp\graphics\postfx\effects\HDRPostEffect.cpp" />
+    <ClCompile Include="src\sp\graphics\postfx\effects\SSAOPostEffect.cpp" />
     <ClCompile Include="src\sp\graphics\postfx\PostEffects.cpp" />
     <ClCompile Include="src\sp\graphics\postfx\PostEffectsPass.cpp" />
     <ClCompile Include="src\sp\graphics\Renderable2D.cpp" />
@@ -976,6 +979,9 @@ xcopy /f /y $"(SolutionDir)Dependencies\OpenAL\bin\x86\OpenAL32.dll" "$(Solution
     <ClInclude Include="src\sp\graphics\LightSetup.h" />
     <ClInclude Include="src\sp\graphics\material\PBRMaterial.h" />
     <ClInclude Include="src\sp\graphics\material\MaterialManager.h" />
+    <ClInclude Include="src\sp\graphics\postfx\effects\FXAAPostEffect.h" />
+    <ClInclude Include="src\sp\graphics\postfx\effects\HDRPostEffect.h" />
+    <ClInclude Include="src\sp\graphics\postfx\effects\SSAOPostEffect.h" />
     <ClInclude Include="src\sp\graphics\postfx\PostEffects.h" />
     <ClInclude Include="src\sp\graphics\postfx\PostEffectsPass.h" />
     <ClInclude Include="src\sp\graphics\API\Renderer.h" />

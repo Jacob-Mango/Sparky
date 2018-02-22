@@ -28,17 +28,6 @@ Test3D::~Test3D()
 {
 }
 
-vec3 g_CubeTransform(-10, 10, 0);
-vec3 g_DaggerTransform(0, 20, 0);
-vec4 g_SphereColor(0.0f, 0.0f, 0.0f, 1.0f);
-vec3 g_SphereSpecularColor(1.0f, 1.0f, 0.6f);
-
-float g_DaggerGloss = 0.5f;
-
-Shader* shadowPassShader;
-FrameBufferDepth* g_DepthBuffer;
-TextureDepth* g_ShadowMap;
-
 void Test3D::OnInit(Renderer3D* renderer, Scene* scene)
 {
 	// Enable this to use FPS camera
@@ -46,12 +35,12 @@ void Test3D::OnInit(Renderer3D* renderer, Scene* scene)
 
 	Timer timer;
 
-	Shader* pbrShader = Shader::CreateFromFile("Default", String("/shaders/Default/Default.shader"));
-	ShaderManager::Add(pbrShader);
+	ShaderManager::Add(Shader::CreateFromFile(DEFAULT_SHADER_NAME, String("/shaders/Default/Default.shader")));
+	ShaderManager::Add(Shader::CreateFromFile("Animated", String("/shaders/Animated/Animated.shader")));
 
-	PBRMaterial* castIron = spnew PBRMaterial("CastIron", pbrShader);
-	PBRMaterial* absRed = spnew PBRMaterial("ABSRed", pbrShader);
-	PBRMaterial* custom = spnew PBRMaterial("Custom", pbrShader);
+	PBRMaterial* castIron = spnew PBRMaterial("CastIron");
+	PBRMaterial* absRed = spnew PBRMaterial("ABSRed");
+	PBRMaterial* custom = spnew PBRMaterial("Custom");
 
 	Model* sphereModel = spnew Model("/models/Sphere/Sphere.spm");
 
@@ -97,7 +86,6 @@ void Test3D::OnInit(Renderer3D* renderer, Scene* scene)
 		Mesh* mesh = spnew Mesh(sphereModel->GetMesh());
 		mesh->SetMaterial(m);
 
-
 		maths::mat4 transform = maths::mat4(1.0f);
 		transform.SetPosition(vec3(xx, 10.0f, space + z));
 		transform *= mat4::Scale(vec3(3, 3, 3));
@@ -117,19 +105,16 @@ void Test3D::OnInit(Renderer3D* renderer, Scene* scene)
 		}
 	}
 
-
 	LightSetup* lights = spnew LightSetup();
 	m_Light = spnew Light(vec3(0, 20, 0), 1.0f, vec4(0.8f, 0.8f, 0.8f, 1.0f));
 	lights->Add(m_Light);
 	m_Scene->PushLightSetup(lights);
 
-	Shader* test_PEP = Shader::CreateFromFile("Test_PEP", String("/shaders/PostFX/Test/Test.shader"));
-	ShaderManager::Add(test_PEP);
-	m_PostEffects->Push(spnew PostEffectsPass(test_PEP));
+	ShaderManager::Add(Shader::CreateFromFile("HDR_PEP", String("/shaders/PostFX/HDR/HDR.shader")));
+	m_PostEffects->Push(spnew postfx::HDRPostEffect());
 
-	Shader* HDR_PEP = Shader::CreateFromFile("HDR_PEP", String("/shaders/PostFX/HDR/HDR.shader"));
-	ShaderManager::Add(HDR_PEP);
-	m_PostEffects->Push(spnew PostEffectsPass(HDR_PEP));
+	ShaderManager::Add(Shader::CreateFromFile("FXAA_PEP", String("/shaders/PostFX/FXAA/FXAA.shader")));
+	m_PostEffects->Push(spnew postfx::FXAAPostEffect());
 
 	SP_INFO("Init took ", timer.ElapsedMillis(), " ms");
 

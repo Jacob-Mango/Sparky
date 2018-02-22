@@ -38,6 +38,8 @@ namespace sp { namespace graphics {
 		uint m_MaxLights;
 
 		API::TextureCube* m_Environment;
+
+		Camera* m_MainCamera;
 	public:
 		DeferredRenderer(uint width, uint height);
 		DeferredRenderer();

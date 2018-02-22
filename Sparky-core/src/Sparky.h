@@ -63,6 +63,10 @@
 #include <sp/graphics/postfx/PostEffects.h>
 #include <sp/graphics/postfx/PostEffectsPass.h>
 
+#include <sp/graphics/postfx/effects/HDRPostEffect.h>
+#include <sp/graphics/postfx/effects/FXAAPostEffect.h>
+#include <sp/graphics/postfx/effects/SSAOPostEffect.h>
+
 #include <sp/graphics/shaders/Shader.h>
 #include <sp/graphics/shaders/ShaderFactory.h>
 #include <sp/graphics/shaders/ShaderManager.h>

@@ -3,6 +3,7 @@
 
 #include "sp/system/Memory.h"
 #include "sp/graphics/shaders/ShaderResource.h"
+#include "sp/graphics/shaders/ShaderManager.h"
 
 #include "MaterialManager.h"
 
@@ -16,6 +17,23 @@ namespace sp { namespace graphics {
 	PBRMaterial::PBRMaterial(String name, API::Shader* shader)
 		: Material(name, shader)
 	{
+		Init();
+	}
+
+	PBRMaterial::PBRMaterial(String name, String shaderName)
+		: Material(name, shaderName)
+	{
+		Init();
+	}
+		
+
+	PBRMaterial::~PBRMaterial()
+	{
+		spdel m_Shader;
+	}
+
+	void PBRMaterial::Init()
+	{
 		SetUniform("u_UsingAlbedoMap", 0.0f);
 		SetUniform("u_AlbedoColor", maths::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
@@ -28,14 +46,9 @@ namespace sp { namespace graphics {
 		tp.wrap = TextureWrap::REPEAT;
 		tp.filter = TextureFilter::LINEAR;
 
-		SetAlbedoMap(Texture2D::CreateFromFile("/materials/" + name + "/" + name + "_Albedo.tga", tp));
-		SetMetallicMap(Texture2D::CreateFromFile("/materials/" + name + "/" + name + "_Metallic.tga", tp));
-		SetNormalMap(Texture2D::CreateFromFile("/materials/" + name + "/" + name + "_Normal.tga", tp));
-	}
-
-	PBRMaterial::~PBRMaterial()
-	{
-		spdel m_Shader;
+		SetAlbedoMap(Texture2D::CreateFromFile("/materials/" + m_Name + "/" + m_Name + "_Albedo.tga", tp));
+		SetMetallicMap(Texture2D::CreateFromFile("/materials/" + m_Name + "/" + m_Name + "_Metallic.tga", tp));
+		SetNormalMap(Texture2D::CreateFromFile("/materials/" + m_Name + "/" + m_Name + "_Normal.tga", tp));
 	}
 
 	void PBRMaterial::SetEnviromentMap(API::TextureCube* texture)

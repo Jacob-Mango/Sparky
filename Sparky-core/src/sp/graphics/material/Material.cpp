@@ -5,6 +5,7 @@
 
 #include "sp/system/Memory.h"
 #include "sp/graphics/shaders/ShaderResource.h"
+#include "sp/graphics/shaders/ShaderManager.h"
 
 #include <sstream>
 
@@ -18,6 +19,15 @@ namespace sp {
 		{
 			AllocateStorage();
 			m_Resources = &shader->GetResources();
+		}
+		
+		Material::Material(String name, String shader)
+			: m_Name(name)
+		{
+			m_Shader = ShaderManager::Get(shader);
+
+			AllocateStorage();
+			m_Resources = &m_Shader->GetResources();
 		}
 
 		Material::~Material()
