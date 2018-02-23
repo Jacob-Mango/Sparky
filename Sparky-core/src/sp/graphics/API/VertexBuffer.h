@@ -11,7 +11,7 @@ namespace sp { namespace graphics { namespace API {
 		STATIC, DYNAMIC
 	};
 
-	class VertexBuffer
+	class SP_API VertexBuffer
 	{
 	public:
 		virtual void Resize(uint size) = 0;

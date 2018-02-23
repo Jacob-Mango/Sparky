@@ -156,11 +156,10 @@ void main()
     g_Material.metallic = metallic.g;
 
 	vec3 eye = normalize(u_CameraPosition - g_Material.position);
-
-    
+	
     vec3 f0 = vec3(0.04);
-    // g_Material.albedo = g_Material.albedo.rgb * (vec3(1.0) - f0);
-    // g_Material.albedo *= 1.0 - g_Material.metallic;
+    g_Material.albedo = g_Material.albedo * (vec4(1.0) - vec4(f0, 0));
+    // g_Material.albedo *= vec4(1.0 - g_Material.metallic);
 
     g_Material.specular = mix(f0, g_Material.albedo.rgb, g_Material.metallic);
     //float reflectance = max(max(g_Material.specular.r, g_Material.specular.g), g_Material.specular.b);

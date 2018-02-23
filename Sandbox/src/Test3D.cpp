@@ -1,5 +1,7 @@
 #include "Test3D.h"
 
+#include "Terrain/TerrainNode.h"
+
 using namespace sp;
 using namespace graphics;
 using namespace maths;
@@ -42,11 +44,14 @@ void Test3D::OnInit(Renderer3D* renderer, Scene* scene)
 	PBRMaterial* absRed = spnew PBRMaterial("ABSRed");
 	PBRMaterial* custom = spnew PBRMaterial("Custom");
 
+	ShaderManager::Add(Shader::CreateFromFile("Terrain", String("/shaders/Terrain/Terrain.shader")));
+	MaterialManager::Add(spnew PBRMaterial("Terrain", "Terrain"));
+
 	Model* sphereModel = spnew Model("/models/Sphere/Sphere.spm");
 
-	float space = 20.0f;
+	float spaceZ = 20.0f;
 	float spaceX = 20.0f;
-	float z = -80;
+	float z = 0;
 
 	// Plastics
 	for (int x = -6; x < 5; x++)
@@ -62,9 +67,10 @@ void Test3D::OnInit(Renderer3D* renderer, Scene* scene)
 
 		Mesh* mesh = spnew Mesh(sphereModel->GetMesh());
 		mesh->SetMaterial(m);
+		m->SetMetallic(vec3(roughness, 0.04f, 0.0f));
 
 		maths::mat4 transform = maths::mat4(1.0f);
-		transform.SetPosition(vec3(xx, 10.0f, -space + z));
+		transform.SetPosition(vec3(xx, 10.0f, -spaceZ + z));
 		transform *= mat4::Scale(vec3(3, 3, 3));
 		Object* sphere = spnew Object(mesh, transform);
 
@@ -81,13 +87,14 @@ void Test3D::OnInit(Renderer3D* renderer, Scene* scene)
 		vec4 diffuse(0.0f, 0.0f, 0.0f, 1.0f);
 
 		PBRMaterialInstance* m = spnew PBRMaterialInstance(castIron);
-		m->SetMetallic(vec3(roughness, 0.1f, 0.0f));
+		m->SetMetallic(vec3(roughness, 1.0f, 0.0f));
 
 		Mesh* mesh = spnew Mesh(sphereModel->GetMesh());
 		mesh->SetMaterial(m);
+		m->SetMetallic(vec3(roughness, 1.0f, 0.0f));
 
 		maths::mat4 transform = maths::mat4(1.0f);
-		transform.SetPosition(vec3(xx, 10.0f, space + z));
+		transform.SetPosition(vec3(xx, 10.0f, spaceZ + z));
 		transform *= mat4::Scale(vec3(3, 3, 3));
 		Object* sphere = spnew Object(mesh, transform);
 
@@ -99,22 +106,25 @@ void Test3D::OnInit(Renderer3D* renderer, Scene* scene)
 	float density = 1;
 	int amount = 10;
 	Mesh* mesh = MeshFactory::CreatePlane(size, vec3(0, 1, 0), spnew PBRMaterialInstance(custom));
-	for (int x = -amount; x < amount; x++) {
-		for (int z = -amount; z < amount; z++) {
-			m_Scene->Add(spnew Object(mesh, maths::mat4::Translate(vec3(x * size, 0, z * size))));
-		}
-	}
+	//for (int x = -amount; x < amount; x++) {
+	//	for (int z = -amount; z < amount; z++) {
+	//		m_Scene->Add(spnew Object(mesh, maths::mat4::Translate(vec3(x * size, 0, z * size))));
+	//	}
+	//}
 
 	LightSetup* lights = spnew LightSetup();
 	m_Light = spnew Light(vec3(0, 20, 0), 1.0f, vec4(0.8f, 0.8f, 0.8f, 1.0f));
 	lights->Add(m_Light);
 	m_Scene->PushLightSetup(lights);
 
+	terrain::TerrainNode* terrain = spnew terrain::TerrainNode();
+	m_Scene->Add(terrain);
+
 	ShaderManager::Add(Shader::CreateFromFile("HDR_PEP", String("/shaders/PostFX/HDR/HDR.shader")));
 	m_PostEffects->Push(spnew postfx::HDRPostEffect());
 
-	ShaderManager::Add(Shader::CreateFromFile("FXAA_PEP", String("/shaders/PostFX/FXAA/FXAA.shader")));
-	m_PostEffects->Push(spnew postfx::FXAAPostEffect());
+	//ShaderManager::Add(Shader::CreateFromFile("FXAA_PEP", String("/shaders/PostFX/FXAA/FXAA.shader")));
+	//m_PostEffects->Push(spnew postfx::FXAAPostEffect());
 
 	SP_INFO("Init took ", timer.ElapsedMillis(), " ms");
 

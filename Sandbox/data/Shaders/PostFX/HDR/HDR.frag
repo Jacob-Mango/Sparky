@@ -11,7 +11,7 @@ in DATA
 
 uniform sampler2D u_Screen;
 
-const float exposure = 0.1;
+const float exposure = 1.0;
 
 void main()
 {

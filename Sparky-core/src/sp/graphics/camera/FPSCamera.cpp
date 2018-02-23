@@ -15,6 +15,8 @@ namespace sp {
 		float Yaw;
 		float Pitch;
 
+		bool ShouldHaveFocus = false;
+
 		FPSCamera::FPSCamera(const maths::mat4& projectionMatrix)
 			: Camera(projectionMatrix), m_MouseSensitivity(1.0f), m_Speed(50.0f), m_SprintSpeed(500.0f), m_MouseWasGrabbed(false)
 		{
@@ -30,7 +32,8 @@ namespace sp {
 
 		void FPSCamera::OnFocus()
 		{
-			Input::GetInputManager()->SetMouseCursor(SP_NO_CURSOR);
+			if (ShouldHaveFocus)
+				Input::GetInputManager()->SetMouseCursor(SP_NO_CURSOR);
 		}
 
 		void FPSCamera::OnUpdate(const Timestep& ts)
@@ -40,7 +43,8 @@ namespace sp {
 
 			if (Input::IsMouseButtonPressed(SP_MOUSE_RIGHT))
 			{
-				if (!Input::GetInputManager()->IsMouseGrabbed() && !debug::DebugMenu::IsVisible())
+				ShouldHaveFocus = true;
+				if (!Input::GetInputManager()->IsMouseGrabbed() && !debug::DebugMenu::IsVisible() && ShouldHaveFocus)
 				{
 					Input::GetInputManager()->SetMouseGrabbed(true);
 					Input::GetInputManager()->SetMouseCursor(SP_NO_CURSOR);

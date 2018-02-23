@@ -37,7 +37,7 @@ namespace sp { namespace graphics {
 		SetUniform("u_UsingAlbedoMap", 0.0f);
 		SetUniform("u_AlbedoColor", maths::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
-		SetUniform("u_MetallicColor", maths::vec3(1.0f, 1.0f, 1.0f));
+		SetUniform("u_MetallicColor", maths::vec3(0.0f, 0.0f, 0.0f));
 		SetUniform("u_UsingMetallicMap", 0.0f);
 
 		SetUniform("u_UsingNormalMap", 0.0f);

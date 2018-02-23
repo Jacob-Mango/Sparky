@@ -2,21 +2,17 @@
 
 #include <Sparky.h>
 
-#include "sp/Common.h"
-#include "sp/Types.h"
-
-#include "sp/maths/maths.h"
-
-#include "sp/graphics/Mesh.h"
-#include "sp/graphics/API/VertexArray.h"
-
-#include "sp/graphics/material/Material.h"
-
 #ifndef TERRAINNODE_H_
 #define TERRAINNODE_H_
 namespace sp {
 	namespace scene {
 		namespace terrain {
+
+			struct TerrainVertex
+			{
+				maths::vec2 position;
+			};
+
 			class TerrainNode : public sp::scene::Object
 			{
 			public:
@@ -25,8 +21,9 @@ namespace sp {
 
 				void OnInit() override;
 				void OnUpdate(const sp::Timestep& ts) override;
-				
-				// void CreatePatch();
+
+			private:
+				TerrainVertex CreateVertex(maths::vec2 pos);
 			};
 		}
 	}

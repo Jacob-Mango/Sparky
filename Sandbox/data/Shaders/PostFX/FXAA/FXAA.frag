@@ -57,5 +57,4 @@ vec4 FXAA(sampler2D tex, vec2 texCoord) {
 void main()
 {
     out_Screen = FXAA(u_Screen, fs_in.uv);
-	out_Screen.g = 0.1;
 }

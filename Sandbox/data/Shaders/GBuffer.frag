@@ -17,7 +17,7 @@ in DataBlock
 struct Material
 {
 	vec4 albedo;
-	vec3 metallic;
+	vec4 metallic;
 };
 
 struct Attributes
@@ -35,7 +35,7 @@ uniform sampler2D u_MetallicMap;
 uniform sampler2D u_NormalMap;
 
 uniform vec4 u_AlbedoColor;
-uniform vec3 u_MetallicColor;
+uniform vec4 u_MetallicColor;
 uniform vec3 u_NormalColor;
 
 uniform float u_UsingAlbedoMap;
@@ -62,9 +62,9 @@ vec4 GetAlbedoMap()
 	return ((1.0 - u_UsingAlbedoMap) * u_AlbedoColor) + (u_UsingAlbedoMap * GammaCorrectTexture(u_AlbedoMap, fs_in.uv));
 }
 
-vec3 GetMetallicMap()
+vec4 GetMetallicMap()
 {
-	return ((1.0 - u_UsingMetallicMap) * u_MetallicColor) + (u_UsingMetallicMap * GammaCorrectTextureRGB(u_MetallicMap, fs_in.uv));
+	return ((1.0 - u_UsingMetallicMap) * u_MetallicColor) + (u_UsingMetallicMap * GammaCorrectTexture(u_MetallicMap, fs_in.uv));
 }
 
 vec3 GetNormal()
@@ -87,7 +87,8 @@ void main()
 	material.metallic = GetMetallicMap();
 	
 	gPosition = vec4(g_Attributes.position, 1.0);
-	gAlebdo = vec4(material.albedo.rgb, 1.0);
-	gMetallic = vec4(material.metallic, 1.0);
 	gNormal = vec4(g_Attributes.normal, 1.0);
+	
+	gAlebdo = material.albedo;
+	gMetallic = material.metallic;
 }

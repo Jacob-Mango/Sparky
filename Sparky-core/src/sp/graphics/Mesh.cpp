@@ -12,10 +12,9 @@
 
 namespace sp { namespace graphics {
 
-	Mesh::Mesh(API::VertexArray* vertexArray, API::IndexBuffer* indexBuffer, MaterialInstance* materialInstance, Bone* rootBone)
-		: m_VertexArray(vertexArray), m_IndexBuffer(indexBuffer), m_MaterialInstance(materialInstance), m_RootBone(rootBone)
+	Mesh::Mesh(API::VertexArray* vertexArray, API::IndexBuffer* indexBuffer, MaterialInstance* materialInstance, RenderType renderType, Bone* rootBone)
+		: m_VertexArray(vertexArray), m_IndexBuffer(indexBuffer), m_MaterialInstance(materialInstance), m_RootBone(rootBone), m_RenderType(renderType)
 	{
-		m_RenderType = RenderType::TRIANGLES;
 #ifdef SP_DEBUG
 		m_DebugVertexData = nullptr;
 		m_DebugVertexDataCount = 0;
@@ -24,9 +23,8 @@ namespace sp { namespace graphics {
 	}
 
 	Mesh::Mesh(const Mesh* mesh)
-		: m_VertexArray(mesh->m_VertexArray), m_IndexBuffer(mesh->m_IndexBuffer), m_MaterialInstance(mesh->m_MaterialInstance)
+		: m_VertexArray(mesh->m_VertexArray), m_IndexBuffer(mesh->m_IndexBuffer), m_MaterialInstance(mesh->m_MaterialInstance), m_RenderType(mesh->m_RenderType)
 	{
-		m_RenderType = RenderType::TRIANGLES;
 #ifdef SP_DEBUG
 		m_DebugVertexData = mesh->m_DebugVertexData;
 		m_DebugVertexDataCount = mesh->m_DebugVertexDataCount;

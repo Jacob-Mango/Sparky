@@ -44,6 +44,8 @@ namespace sp { namespace graphics { namespace API {
 			const BufferElement& element = layout[i];
 			GLCall(glEnableVertexAttribArray(i));
 			GLCall(glVertexAttribPointer(i, element.count, element.type, element.normalized, bufferLayout.GetStride(), (const void*)element.offset));
+
+
 		}
 	}
 
