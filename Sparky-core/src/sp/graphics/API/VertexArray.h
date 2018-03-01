@@ -22,7 +22,7 @@ namespace sp { namespace graphics { namespace API {
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
-		virtual void Draw(RenderType type, uint count) const = 0;
+		virtual void Draw(uint count) const = 0;
 	public:
 		static VertexArray* Create();
 	};

@@ -15,5 +15,5 @@
 #shader end
 
 #shader fragment
-#include "/shaders/GBuffer.frag"
+#include "/shaders/Terrain/Terrain.frag"
 #shader end

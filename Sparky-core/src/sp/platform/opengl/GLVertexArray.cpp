@@ -36,14 +36,22 @@ namespace sp { namespace graphics { namespace API {
 		case TRIANGLES: return GL_TRIANGLES;
 		case POINTS: return GL_POINTS;
 		case LINES: return GL_LINES;
+		case PATCHES: return GL_PATCHES;
 		default: return GL_TRIANGLES;
 		}
 	}
 
-	void GLVertexArray::Draw(RenderType type, uint count) const
+	void GLVertexArray::Draw(uint count) const
 	{
 		// SP_INFO(type == RenderType::TRIANGLES ? "Triangles" : (type == RenderType::POINTS ? "Points" : (type == RenderType::LINES ? "Lines" : "Unknown")));
-		GLCall(glDrawElements(SPRenderTypeToGL(type), count, GL_UNSIGNED_INT, NULL));
+		GLenum draw = SPRenderTypeToGL(m_Buffers.front()->GetLayout().GetRenderType());
+		if (m_Buffers.front()->GetLayout().GetRenderType() == RenderType::PATCHES) {
+			// GLCall(glPatchParameteri(GL_PATCH_VERTICES, 3));
+			GLCall(glDrawElements(draw, count, GL_UNSIGNED_INT, NULL));
+		}
+		else {
+			GLCall(glDrawElements(draw, count, GL_UNSIGNED_INT, NULL));
+		}
 	}
 
 } } }

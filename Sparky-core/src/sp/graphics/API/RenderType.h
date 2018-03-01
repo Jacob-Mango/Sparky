@@ -4,7 +4,7 @@ namespace sp {
 	namespace graphics {
 		enum RenderType
 		{
-			TRIANGLES, POINTS, LINES
+			TRIANGLES, POINTS, LINES, PATCHES
 		};
 	}
 }

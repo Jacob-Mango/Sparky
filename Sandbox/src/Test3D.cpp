@@ -117,7 +117,7 @@ void Test3D::OnInit(Renderer3D* renderer, Scene* scene)
 	lights->Add(m_Light);
 	m_Scene->PushLightSetup(lights);
 
-	terrain::TerrainNode* terrain = spnew terrain::TerrainNode();
+	terrain::TerrainNode* terrain = spnew terrain::TerrainNode(m_FPSCamera);
 	m_Scene->Add(terrain);
 
 	ShaderManager::Add(Shader::CreateFromFile("HDR_PEP", String("/shaders/PostFX/HDR/HDR.shader")));

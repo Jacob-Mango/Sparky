@@ -10,6 +10,8 @@
 #include "sp/platform/opengl/GLTypes.h"
 #include "sp/platform/directx/DXTypes.h"
 
+#include "RenderType.h"
+
 namespace sp { namespace graphics { namespace API {
 
 	struct SP_API BufferElement
@@ -27,8 +29,12 @@ namespace sp { namespace graphics { namespace API {
 	private:
 		uint m_Size;
 		std::vector<BufferElement> m_Layout;
+
+		RenderType m_RenderType;
 	public:
-		BufferLayout();
+		BufferLayout(RenderType renderType = RenderType::TRIANGLES);
+
+		RenderType GetRenderType();
 
 		template<typename T>
 		void Push(const String& name, uint count = 1, bool normalized = false)

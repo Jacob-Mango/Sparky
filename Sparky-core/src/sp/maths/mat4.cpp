@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include "Quaternion.h"
+#include "mat3.h"
 
 namespace sp {
 	namespace maths {
@@ -24,6 +25,23 @@ namespace sp {
 
 		mat4::mat4(float* elements)
 		{
+			memcpy(this->elements, elements, 4 * 4 * sizeof(float));
+		}
+
+		mat4::mat4(const mat3& mat)
+		{
+			float* elements = new float[16];
+			int c = 0;
+			for (int i = 0; i < 16; i++) {
+				if ((i + 1) % 4 == 0) {
+					elements[i] = 0;
+					c++;
+				}
+				else {
+					elements[i - c] = mat.elements[i];
+				}
+			}
+
 			memcpy(this->elements, elements, 4 * 4 * sizeof(float));
 		}
 

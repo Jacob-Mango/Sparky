@@ -3,9 +3,14 @@
 
 namespace sp { namespace graphics { namespace API {
 
-	BufferLayout::BufferLayout()
-		: m_Size(0)
+	BufferLayout::BufferLayout(RenderType renderType)
+		: m_Size(0), m_RenderType(renderType)
 	{
+	}
+
+	RenderType BufferLayout::GetRenderType()
+	{
+		return m_RenderType;
 	}
 
 	void BufferLayout::Push(const String& name, uint type, uint size, uint count, bool normalized)

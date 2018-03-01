@@ -343,6 +343,7 @@ xcopy /f /y $"(SolutionDir)Dependencies\OpenAL\bin\x86\OpenAL32.dll" "$(Solution
     <ClCompile Include="src\sp\graphics\API\Renderer.cpp" />
     <ClCompile Include="src\sp\graphics\shaders\ShaderManager.cpp" />
     <ClCompile Include="src\sp\maths\AABB.cpp" />
+    <ClCompile Include="src\sp\maths\mat3.cpp" />
     <ClCompile Include="src\sp\maths\mat4.cpp" />
     <ClCompile Include="src\sp\maths\Quaternion.cpp" />
     <ClCompile Include="src\sp\maths\Rectangle.cpp" />
@@ -995,6 +996,7 @@ xcopy /f /y $"(SolutionDir)Dependencies\OpenAL\bin\x86\OpenAL32.dll" "$(Solution
     <ClInclude Include="src\sp\graphics\ui\Slider.h" />
     <ClInclude Include="src\sp\graphics\ui\Widget.h" />
     <ClInclude Include="src\sp\maths\AABB.h" />
+    <ClInclude Include="src\sp\maths\mat3.h" />
     <ClInclude Include="src\sp\maths\mat4.h" />
     <ClInclude Include="src\sp\maths\maths.h" />
     <ClInclude Include="src\sp\maths\maths_func.h" />

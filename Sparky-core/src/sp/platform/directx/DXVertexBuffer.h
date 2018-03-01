@@ -24,6 +24,8 @@ namespace sp { namespace graphics { namespace API {
 		void SetLayout(const BufferLayout& layout) override;
 		void SetData(uint size, const void* data) override;
 
+		inline BufferLayout GetLayout() override { return m_Layout; }
+
 		void ReleasePointer() override;
 
 		void Bind() override;

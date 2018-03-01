@@ -10,20 +10,22 @@ namespace sp {
 
 			struct TerrainVertex
 			{
-				maths::vec2 position;
+				maths::vec3 position;
 			};
 
 			class TerrainNode : public sp::scene::Object
 			{
+			private:
+				sp::graphics::MaterialInstance* m_Instance;
+				sp::graphics::Camera* m_Camera;
 			public:
-				TerrainNode();
+				TerrainNode(sp::graphics::Camera* camera);
 				~TerrainNode();
 
 				void OnInit() override;
 				void OnUpdate(const sp::Timestep& ts) override;
-
 			private:
-				TerrainVertex CreateVertex(maths::vec2 pos);
+				TerrainVertex CreateVertex(maths::vec3 pos);
 			};
 		}
 	}

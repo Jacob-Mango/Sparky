@@ -156,7 +156,7 @@ namespace sp { namespace debug {
 		s_Shader->Bind();
 		s_VertexArray->Bind();
 		s_IndexBuffer->Bind();
-		s_VertexArray->Draw(RenderType::LINES, s_IndexCount);
+		s_VertexArray->Draw(s_IndexBuffer->GetCount());
 		s_IndexBuffer->Unbind();
 		s_VertexArray->Unbind();
 		s_Shader->Unbind();

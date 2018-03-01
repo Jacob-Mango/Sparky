@@ -67,9 +67,6 @@ namespace sp {
 			uint m_IndexLength;
 
 			Bone* m_RootBone;
-
-			RenderType m_RenderType;
-
 #ifdef SP_DEBUG
 		private:
 			Vertex * m_DebugVertexData;
@@ -77,7 +74,7 @@ namespace sp {
 			bool m_DebugDraw;
 #endif
 		public:
-			Mesh(API::VertexArray* vertexArray, API::IndexBuffer* indexBuffer, MaterialInstance* materialInstance, RenderType renderType = RenderType::TRIANGLES, Bone* rootBone = spnew Bone());
+			Mesh(API::VertexArray* vertexArray, API::IndexBuffer* indexBuffer, MaterialInstance* materialInstance, Bone* rootBone = spnew Bone());
 			Mesh(const Mesh* mesh);
 			~Mesh();
 

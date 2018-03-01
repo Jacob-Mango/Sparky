@@ -57,7 +57,7 @@ namespace sp {
 				Input::GetInputManager()->SetMouseCursor(1);
 			}
 
-			if (Input::GetInputManager()->IsMouseGrabbed())
+			if (Input::GetInputManager()->IsMouseGrabbed() && ShouldHaveFocus)
 			{
 				vec2 mouse = Input::GetInputManager()->GetMousePosition();
 				mouse.x -= windowCenter.x;

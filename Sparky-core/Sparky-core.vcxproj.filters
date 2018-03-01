@@ -130,6 +130,7 @@
     <ClCompile Include="src\sp\graphics\postfx\effects\SSAOPostEffect.cpp" />
     <ClCompile Include="src\sp\graphics\postfx\effects\FXAAPostEffect.cpp" />
     <ClCompile Include="src\sp\graphics\postfx\effects\HDRPostEffect.cpp" />
+    <ClCompile Include="src\sp\maths\mat3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\sp\graphics\API\RenderType.h" />
@@ -276,6 +277,7 @@
     <ClInclude Include="src\sp\graphics\postfx\effects\SSAOPostEffect.h" />
     <ClInclude Include="src\sp\graphics\postfx\effects\FXAAPostEffect.h" />
     <ClInclude Include="src\sp\graphics\postfx\effects\HDRPostEffect.h" />
+    <ClInclude Include="src\sp\maths\mat3.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\sp\embedded\files\SourceSansPro-Light.embed" />

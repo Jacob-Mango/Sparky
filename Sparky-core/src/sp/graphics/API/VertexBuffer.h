@@ -18,6 +18,8 @@ namespace sp { namespace graphics { namespace API {
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 		virtual void SetData(uint size, const void* data) = 0;
 
+		virtual BufferLayout GetLayout() = 0;
+
 		virtual void ReleasePointer() = 0;
 
 		virtual void Bind() = 0;

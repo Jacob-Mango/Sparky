@@ -12,8 +12,8 @@
 
 namespace sp { namespace graphics {
 
-	Mesh::Mesh(API::VertexArray* vertexArray, API::IndexBuffer* indexBuffer, MaterialInstance* materialInstance, RenderType renderType, Bone* rootBone)
-		: m_VertexArray(vertexArray), m_IndexBuffer(indexBuffer), m_MaterialInstance(materialInstance), m_RootBone(rootBone), m_RenderType(renderType)
+	Mesh::Mesh(API::VertexArray* vertexArray, API::IndexBuffer* indexBuffer, MaterialInstance* materialInstance, Bone* rootBone)
+		: m_VertexArray(vertexArray), m_IndexBuffer(indexBuffer), m_MaterialInstance(materialInstance), m_RootBone(rootBone)
 	{
 #ifdef SP_DEBUG
 		m_DebugVertexData = nullptr;
@@ -23,7 +23,7 @@ namespace sp { namespace graphics {
 	}
 
 	Mesh::Mesh(const Mesh* mesh)
-		: m_VertexArray(mesh->m_VertexArray), m_IndexBuffer(mesh->m_IndexBuffer), m_MaterialInstance(mesh->m_MaterialInstance), m_RenderType(mesh->m_RenderType)
+		: m_VertexArray(mesh->m_VertexArray), m_IndexBuffer(mesh->m_IndexBuffer), m_MaterialInstance(mesh->m_MaterialInstance)
 	{
 #ifdef SP_DEBUG
 		m_DebugVertexData = mesh->m_DebugVertexData;
@@ -49,7 +49,7 @@ namespace sp { namespace graphics {
 
 		m_VertexArray->Bind();
 		m_IndexBuffer->Bind();
-		m_VertexArray->Draw(m_RenderType, m_IndexBuffer->GetCount());
+		m_VertexArray->Draw(m_IndexBuffer->GetCount());
 		m_IndexBuffer->Unbind();
 		m_VertexArray->Unbind();
 

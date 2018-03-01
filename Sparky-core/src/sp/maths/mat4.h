@@ -11,6 +11,7 @@ namespace sp {
 	namespace maths {
 
 		struct Quaternion;
+		struct mat3;
 
 		struct SP_API mat4
 		{
@@ -24,6 +25,7 @@ namespace sp {
 			mat4();
 			mat4(float diagonal);
 			mat4(float* elements);
+			mat4(const mat3& mat);
 			mat4(const vec4& row0, const vec4& row1, const vec4& row2, const vec4& row3);
 
 			static mat4 Identity();

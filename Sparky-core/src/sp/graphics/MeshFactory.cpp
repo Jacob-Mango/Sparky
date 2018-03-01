@@ -29,7 +29,7 @@ namespace sp { namespace graphics { namespace MeshFactory {
 		API::VertexBuffer* buffer = API::VertexBuffer::Create(API::BufferUsage::STATIC);
 		buffer->SetData(sizeof(Vert), data);
 
-		API::BufferLayout layout;
+		API::BufferLayout layout(RenderType::POINTS);
 		layout.Push<vec2>("POSITION");
 		layout.Push<vec2>("UV");
 		buffer->SetLayout(layout);
@@ -39,7 +39,6 @@ namespace sp { namespace graphics { namespace MeshFactory {
 		uint* indices = new uint[1]{ 0 };
 		API::IndexBuffer* ib = API::IndexBuffer::Create(indices, 1);
 		Mesh* mesh = new Mesh(va, ib, material);
-		mesh->m_RenderType = RenderType::POINTS;
 		return mesh;
 	}
 
@@ -181,7 +180,7 @@ namespace sp { namespace graphics { namespace MeshFactory {
 	{
 		using namespace maths;
 
-		vec3 vec = normal.Multiply(90.0f);
+		vec3 vec = normal * 90.0f;
 		mat4 rotation = mat4::Rotate(vec.z, vec3(1, 0, 0)).Multiply(mat4::Rotate(vec.y, vec3(0, 1, 0))).Multiply(mat4::Rotate(vec.x, vec3(0, 0, 1)));
 
 		Vertex data[4];

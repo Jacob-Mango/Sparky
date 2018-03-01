@@ -541,7 +541,7 @@ namespace sp {
 
 			m_VertexArray->Bind();
 			m_IndexBuffer->Bind();
-			m_VertexArray->Draw(RenderType::TRIANGLES, m_IndexCount);
+			m_VertexArray->Draw(m_IndexBuffer->GetCount());
 			m_IndexBuffer->Unbind();
 			m_VertexArray->Unbind();
 

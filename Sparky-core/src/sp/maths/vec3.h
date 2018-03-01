@@ -9,6 +9,7 @@ namespace sp { namespace maths {
 
 	struct vec2;
 	struct vec4;
+	struct mat3;
 	struct mat4;
 
 	struct SP_API vec3
@@ -43,6 +44,7 @@ namespace sp { namespace maths {
 		vec3& Divide(float other);
 
 		vec3 Multiply(const mat4& transform) const;
+		vec3 Multiply(const mat3& transform) const;
 
 		friend vec3 operator+(vec3 left, const vec3& right);
 		friend vec3 operator-(vec3 left, const vec3& right);
